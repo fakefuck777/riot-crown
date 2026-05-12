@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      SESSION_SECRET: '01234567890123456789012345678901'
+      PUBLIC_STOREFRONT_API_TOKEN: '000000000000000000000000000000'
+      PUBLIC_STORE_DOMAIN: 'test.myshopify.com'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run test
+      - run: npm run build

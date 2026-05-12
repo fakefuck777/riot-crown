@@ -1,0 +1,343 @@
+'use client';
+import { useRef, useEffect, useCallback, lazy, Suspense } from 'react';
+import { gsap } from 'gsap';
+import { useLocale } from '~/lib/LocaleContext';
+import { usePrefersReducedMotion } from '~/hooks/usePrefersReducedMotion';
+import { useMagnetic } from '~/hooks/useMagnetic';
+
+const GraffitiCanvas = lazy(() =>
+  import('~/components/GraffitiCanvas').then(m => ({ default: m.GraffitiCanvas }))
+);
+
+export function Hero() {
+  const { t } = useLocale();
+  const reducedMotion = usePrefersReducedMotion();
+  const sectionRef   = useRef<HTMLElement>(null);
+  const titleRef     = useRef<HTMLHeadingElement>(null);
+  const subtitleRef  = useRef<HTMLParagraphElement>(null);
+  const eyebrowRef   = useRef<HTMLParagraphElement>(null);
+  const dividerRef   = useRef<HTMLDivElement>(null);
+  const scrollRef    = useRef<HTMLDivElement>(null);
+  const ctaBlockRef  = useRef<HTMLDivElement>(null);
+  const scrollVelRef = useRef<number>(0);
+  const mouseRef     = useRef<[number, number]>([0.5, 0.5]);
+  const tiltTarget   = useRef({ x: 0, y: 0 });
+  const ctaMagneticRef = useMagnetic<HTMLDivElement>(1.05);
+
+  const onMouseMove = useCallback((e: MouseEvent) => {
+    const nx = e.clientX / window.innerWidth;
+    const ny = 1 - e.clientY / window.innerHeight;
+    mouseRef.current = [nx, ny];
+    tiltTarget.current = { x: (ny - 0.5) * -6, y: (nx - 0.5) * 6 };
+  }, []);
+
+  useEffect(() => {
+    if (reducedMotion) return;
+    let lastTime = performance.now();
+    const onWheel = (e: WheelEvent) => {
+      const now = performance.now();
+      const dt  = Math.max(now - lastTime, 1);
+      scrollVelRef.current = Math.min(Math.abs(e.deltaY) / dt * 0.04, 1.0);
+      lastTime = now;
+      gsap.to(scrollVelRef, { current: 0, duration: 1.2, ease: 'power2.out', overwrite: true });
+    };
+    window.addEventListener('wheel', onWheel, { passive: true });
+    return () => window.removeEventListener('wheel', onWheel);
+  }, [reducedMotion]);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    if (reducedMotion) {
+      gsap.set(section, { rotationX: 0, rotationY: 0 });
+      return;
+    }
+    window.addEventListener('mousemove', onMouseMove);
+    const setRotX = gsap.quickTo(section, 'rotationX', { duration: 1.8, ease: 'power3.out' });
+    const setRotY = gsap.quickTo(section, 'rotationY', { duration: 1.8, ease: 'power3.out' });
+    gsap.set(section, { transformPerspective: 1400, transformOrigin: 'center center' });
+    let rafId: number;
+    const tick = () => {
+      setRotX(tiltTarget.current.x);
+      setRotY(tiltTarget.current.y);
+      rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+    return () => { window.removeEventListener('mousemove', onMouseMove); cancelAnimationFrame(rafId); };
+  }, [onMouseMove, reducedMotion]);
+
+  // Entrance — staggered, architectural
+  useEffect(() => {
+    if (reducedMotion) {
+      gsap.set(
+        [
+          eyebrowRef.current,
+          titleRef.current,
+          dividerRef.current,
+          subtitleRef.current,
+          ctaBlockRef.current,
+          scrollRef.current,
+        ],
+        { opacity: 1, x: 0, y: 0, skewY: 0, scaleX: 1, clearProps: 'transform' },
+      );
+      return;
+    }
+
+    const tl = gsap.timeline({ delay: 0.1 });
+
+    // Eyebrow slides in from left
+    tl.fromTo(eyebrowRef.current,
+      { opacity: 0, x: -20 },
+      { opacity: 1, x: 0, duration: 1.0, ease: 'power3.out' }
+    );
+
+    // Title slams in — heavy, no bounce
+    tl.fromTo(titleRef.current,
+      { opacity: 0, y: 60, skewY: 3 },
+      { opacity: 1, y: 0, skewY: 0, duration: 1.4, ease: 'power4.out' },
+      '-=0.5'
+    );
+
+    // Divider draws across
+    tl.fromTo(dividerRef.current,
+      { scaleX: 0, opacity: 0 },
+      { scaleX: 1, opacity: 1, duration: 0.8, ease: 'power3.out', transformOrigin: 'left center' },
+      '-=0.6'
+    );
+
+    // Subtitle fades up
+    tl.fromTo(subtitleRef.current,
+      { opacity: 0, y: 16 },
+      { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out' },
+      '-=0.5'
+    );
+
+    tl.fromTo(ctaBlockRef.current,
+      { opacity: 0, y: 20 },
+      { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out' },
+      '-=0.45'
+    );
+
+    // Scroll indicator
+    tl.fromTo(scrollRef.current,
+      { opacity: 0 },
+      { opacity: 1, duration: 0.6, ease: 'power2.out' },
+      '-=0.3'
+    );
+  }, [reducedMotion]);
+
+  return (
+    <section
+      id="hero"
+      ref={sectionRef}
+      className="relative w-full h-screen bg-void"
+      style={{ willChange: 'transform', overflow: 'hidden' }}
+    >
+      {/* WebGL background */}
+      <Suspense fallback={null}>
+        <GraffitiCanvas
+          scrollVelRef={scrollVelRef}
+          mouseRef={mouseRef}
+          className="absolute inset-0 w-full h-full"
+        />
+      </Suspense>
+
+      {/* Multi-layer veil — wide bright core so top-of-hero (eyebrow/title) keeps full fluid read */}
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background: `
+          radial-gradient(ellipse 92% 72% at 50% 36%,
+            rgba(5,5,5,0.0) 0%,
+            rgba(5,5,5,0.38) 52%,
+            rgba(5,5,5,0.88) 100%
+          )
+        `,
+      }} />
+      {/* Bottom fade — content below hero */}
+      <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{
+        height: '30%',
+        background: 'linear-gradient(to bottom, transparent, #050505)',
+      }} />
+
+      {/* Left edge accent line */}
+      <div className="absolute left-8 md:left-16 top-1/4 bottom-1/4 pointer-events-none" style={{
+        width: '1px',
+        background: 'linear-gradient(to bottom, transparent, rgba(201,168,76,0.3) 30%, rgba(201,168,76,0.3) 70%, transparent)',
+      }} />
+      {/* Right edge accent line */}
+      <div className="absolute right-8 md:right-16 top-1/4 bottom-1/4 pointer-events-none" style={{
+        width: '1px',
+        background: 'linear-gradient(to bottom, transparent, rgba(242,242,242,0.08) 30%, rgba(242,242,242,0.08) 70%, transparent)',
+      }} />
+
+      {/* Main content — full-width column; title scales to viewport (editorial left anchor) */}
+      <div className="absolute inset-0 flex w-full max-w-full flex-col justify-center px-8 md:px-16 lg:px-24">
+
+        {/* Eyebrow */}
+        <p
+          ref={eyebrowRef}
+          className="w-full max-w-full"
+          style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.6rem',
+            letterSpacing: '0.35em',
+            textTransform: 'uppercase',
+            color: 'rgba(201,168,76,0.7)',
+            marginBottom: '2rem',
+            opacity: 0,
+          }}
+        >
+          {t.hero.eyebrow}
+        </p>
+
+        {/* Title — block spans column width; fluid type (was capped at 16rem so wide screens felt “short”) */}
+        <h1
+          ref={titleRef}
+          className="w-full max-w-full"
+          style={{
+            fontFamily: '"Monument Extended", "Helvetica Neue", "Arial Black", sans-serif',
+            fontWeight: 900,
+            fontSize: 'clamp(4.25rem, min(14vw, 22vh), 22rem)',
+            lineHeight: 0.85,
+            letterSpacing: '-0.02em',
+            textTransform: 'uppercase',
+            color: '#F2F2F2',
+            opacity: 0,
+            textShadow: `
+              0 0 80px rgba(255,255,255,0.12),
+              0 0 120px rgba(201,168,76,0.08),
+              0 2px 0 rgba(0,0,0,0.9)
+            `,
+          }}
+        >
+          {t.hero.title1}
+          <br />
+          {t.hero.title2}
+        </h1>
+
+        {/* Gold divider — draws across on entrance */}
+        <div
+          ref={dividerRef}
+          style={{
+            width: 'clamp(120px, 20vw, 280px)',
+            height: '1px',
+            marginTop: '2.5rem',
+            marginBottom: '2rem',
+            background: 'linear-gradient(90deg, #C9A84C, rgba(201,168,76,0.2))',
+            opacity: 0,
+            boxShadow: '0 0 12px rgba(201,168,76,0.3)',
+          }}
+        />
+
+        {/* Subtitle + metadata row */}
+        <div ref={subtitleRef} style={{ opacity: 0 }}>
+          <p style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.65rem',
+            letterSpacing: '0.2em',
+            textTransform: 'uppercase',
+            color: 'rgba(242,242,242,0.45)',
+            marginBottom: '0.75rem',
+          }}>
+            {t.hero.subtitle}
+          </p>
+          {/* Metadata strip */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+            <span style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.55rem',
+              letterSpacing: '0.15em',
+              color: 'rgba(201,168,76,0.5)',
+            }}>
+              15 {t.hero.artifacts}
+            </span>
+            <span style={{ width: '1px', height: '10px', background: 'rgba(242,242,242,0.15)' }} />
+            <span style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.55rem',
+              letterSpacing: '0.15em',
+              color: 'rgba(242,242,242,0.25)',
+            }}>
+              {t.hero.limited}
+            </span>
+            <span style={{ width: '1px', height: '10px', background: 'rgba(242,242,242,0.15)' }} />
+            <span style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.55rem',
+              letterSpacing: '0.15em',
+              color: 'rgba(242,242,242,0.25)',
+            }}>
+              {t.hero.season}
+            </span>
+          </div>
+        </div>
+
+        <div ref={ctaBlockRef} style={{ marginTop: '2.25rem', opacity: 0 }}>
+          <div ref={ctaMagneticRef} className="inline-block will-change-transform">
+            <button
+              type="button"
+              onClick={() => {
+                document.getElementById('collection')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="border border-[rgba(201,168,76,0.55)] bg-[rgba(201,168,76,0.1)] px-8 py-3 uppercase tracking-[0.28em] text-chrome transition-colors hover:border-[#C9A84C] hover:bg-[rgba(201,168,76,0.18)]"
+              style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem' }}
+            >
+              {t.hero.shopCta}
+            </button>
+          </div>
+          <p
+            className="mt-3 max-w-md text-chrome opacity-50"
+            style={{ fontFamily: 'var(--font-mono)', fontSize: '0.52rem', letterSpacing: '0.14em', lineHeight: 1.65 }}
+          >
+            {t.hero.ctaTrust}
+          </p>
+        </div>
+      </div>
+
+      {/* Scroll indicator — bottom center */}
+      <div
+        ref={scrollRef}
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3"
+        style={{ opacity: 0 }}
+      >
+        <span style={{
+          fontFamily: 'var(--font-mono)',
+          fontSize: '0.5rem',
+          letterSpacing: '0.3em',
+          color: 'rgba(242,242,242,0.25)',
+          textTransform: 'uppercase',
+        }}>
+          {t.hero.scroll}
+        </span>
+        <div style={{
+          width: '1px',
+          height: '48px',
+          background: 'linear-gradient(to bottom, rgba(201,168,76,0.5), transparent)',
+          animation: reducedMotion ? 'none' : 'pulse 2.4s ease-in-out infinite',
+        }} />
+      </div>
+
+      {/* Corner coordinates — editorial detail */}
+      <div className="absolute bottom-10 left-8 md:left-16 pointer-events-none" style={{
+        fontFamily: 'var(--font-mono)',
+        fontSize: '0.5rem',
+        letterSpacing: '0.1em',
+        color: 'rgba(242,242,242,0.15)',
+        lineHeight: 1.8,
+      }}>
+        <div>{t.hero.coords}</div>
+        <div>{t.hero.district}</div>
+      </div>
+
+      <div className="absolute bottom-10 right-8 md:right-16 pointer-events-none text-right" style={{
+        fontFamily: 'var(--font-mono)',
+        fontSize: '0.5rem',
+        letterSpacing: '0.1em',
+        color: 'rgba(242,242,242,0.15)',
+        lineHeight: 1.8,
+      }}>
+        <div>{t.hero.rights}</div>
+        <div>{t.hero.allRights}</div>
+      </div>
+    </section>
+  );
+}

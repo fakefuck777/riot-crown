@@ -1,0 +1,100 @@
+import {
+  createRequestHandler,
+  storefrontRedirect,
+  createStorefrontClient,
+  createCartHandler,
+  cartGetIdDefault,
+  cartSetIdDefault,
+} from '@shopify/hydrogen';
+import { getStorefrontHeaders } from '~/lib/storefrontHeaders';
+import {
+  createCookieSessionStorage,
+  type SessionStorage,
+  type Session,
+} from '@shopify/remix-oxygen';
+import remixBuild from 'virtual:remix/server-build';
+
+export default {
+  async fetch(
+    request: Request,
+    env: HydrogenWorkerEnv,
+    executionContext: ExecutionContext,
+  ): Promise<Response> {
+    try {
+      const waitUntil = executionContext.waitUntil.bind(executionContext);
+      const [cache, session] = await Promise.all([
+        caches.open('hydrogen'),
+        HydrogenSession.init(request, [env.SESSION_SECRET]),
+      ]);
+
+      const {storefront} = createStorefrontClient({
+        cache,
+        waitUntil,
+        i18n: {language: 'EN', country: 'US'},
+        publicStorefrontToken: env.PUBLIC_STOREFRONT_API_TOKEN,
+        storeDomain: env.PUBLIC_STORE_DOMAIN,
+        storefrontHeaders: getStorefrontHeaders(request),
+      });
+
+      const cart = createCartHandler({
+        storefront,
+        getCartId: cartGetIdDefault(request.headers),
+        setCartId: cartSetIdDefault(),
+      });
+
+      const handleRequest = createRequestHandler({
+        build: remixBuild,
+        mode: process.env.NODE_ENV,
+        getLoadContext: () => ({session, storefront, cart, env, waitUntil}),
+      });
+
+      const response = await handleRequest(request);
+
+      if (response.status === 404) {
+        return storefrontRedirect({request, response, storefront});
+      }
+
+      return response;
+    } catch (error) {
+      console.error(error);
+      return new Response('An unexpected error occurred', {status: 500});
+    }
+  },
+};
+
+export class HydrogenSession {
+  public isPending = false;
+
+  static async init(request: Request, secrets: string[]) {
+    const storage = createCookieSessionStorage({
+      cookie: {
+        name: 'session',
+        httpOnly: true,
+        path: '/',
+        sameSite: 'lax',
+        secrets,
+      },
+    });
+    const session = await storage.getSession(request.headers.get('Cookie'));
+    return new HydrogenSession(storage, session);
+  }
+
+  constructor(
+    private sessionStorage: SessionStorage,
+    private session: Session,
+  ) {}
+
+  get(key: string) { return this.session.get(key); }
+  destroy() { return this.sessionStorage.destroySession(this.session); }
+  flash(key: string, value: unknown) { this.session.flash(key, value); }
+  unset(key: string) { this.isPending = true; this.session.unset(key); }
+  set(key: string, value: unknown) { this.isPending = true; this.session.set(key, value); }
+  commit() { return this.sessionStorage.commitSession(this.session); }
+}
+
+interface HydrogenWorkerEnv {
+  SESSION_SECRET: string;
+  PUBLIC_STOREFRONT_API_TOKEN: string;
+  PUBLIC_STORE_DOMAIN: string;
+  PUBLIC_CHECKOUT_DOMAIN?: string;
+}
