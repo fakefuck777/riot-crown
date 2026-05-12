@@ -7,12 +7,13 @@ import {
   cartSetIdDefault,
 } from '@shopify/hydrogen';
 import { getStorefrontHeaders } from '~/lib/storefrontHeaders';
+import type {ServerBuild} from '@remix-run/server-runtime';
 import {
   createCookieSessionStorage,
   type SessionStorage,
   type Session,
 } from '@shopify/remix-oxygen';
-import remixBuild from 'virtual:remix/server-build';
+import * as remixBuild from 'virtual:remix/server-build';
 
 export default {
   async fetch(
@@ -43,7 +44,7 @@ export default {
       });
 
       const handleRequest = createRequestHandler({
-        build: remixBuild,
+        build: remixBuild as unknown as ServerBuild,
         mode: process.env.NODE_ENV,
         getLoadContext: () => ({session, storefront, cart, env, waitUntil}),
       });

@@ -4,7 +4,7 @@
   "type": "module",
   "sideEffects": false,
   "scripts": {
-    "build": "shopify hydrogen build",
+    "build": "shopify hydrogen build --disable-route-warning",
     "dev": "shopify hydrogen dev",
     "preview": "npm run build && shopify hydrogen preview",
     "lint": "eslint --no-eslintrc -c .eslintrc.cjs --ext .ts,.tsx .",
@@ -28,8 +28,8 @@
   },
   "devDependencies": {
     "@remix-run/dev": "^2.8.0",
-    "@shopify/cli": "^3.60.0",
-    "@shopify/mini-oxygen": "^2.2.5",
+    "@shopify/cli": "^3.72.0",
+    "@shopify/mini-oxygen": "3.0.6",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "autoprefixer": "^10.4.19",
