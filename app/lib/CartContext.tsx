@@ -1,7 +1,7 @@
 'use client';
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import type { CartItem } from '~/lib/cartTypes';
-import { loadCartFromStorage, saveCartToStorage } from '~/lib/cartStorage';
+import { CART_STORAGE_KEY, loadCartFromStorage, saveCartToStorage } from '~/lib/cartStorage';
 
 function lineMatch(a: Pick<CartItem, 'id' | 'size'>, b: Pick<CartItem, 'id' | 'size'>) {
   return a.id === b.id && (a.size ?? '') === (b.size ?? '');
@@ -43,6 +43,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setItems(loadCartFromStorage());
     setCartHydrated(true);
   }, []);
+
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key !== CART_STORAGE_KEY || e.storageArea !== window.localStorage) return;
+      if (!cartHydrated) return;
+      setItems(loadCartFromStorage());
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, [cartHydrated]);
 
   useEffect(() => {
     if (!cartHydrated) return;

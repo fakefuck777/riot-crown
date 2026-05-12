@@ -3,6 +3,7 @@ import { useRef, useState, useCallback, useEffect, useId } from 'react';
 import { gsap } from 'gsap';
 import { useLocale } from '~/lib/LocaleContext';
 import { usePrefersReducedMotion } from '~/hooks/usePrefersReducedMotion';
+import { useFocusTrap } from '~/hooks/useFocusTrap';
 
 type Step = 'contact' | 'shipping' | 'payment' | 'confirm';
 const STEPS: Step[] = ['contact', 'shipping', 'payment', 'confirm'];
@@ -19,15 +20,8 @@ export function CheckoutPortal({ isOpen, onClose, total }: CheckoutPortalProps) 
   const [step, setStep]   = useState<Step>('contact');
   const portalRef         = useRef<HTMLDivElement>(null);
   const panelRef          = useRef<HTMLDivElement>(null);
-  const priorFocusRef     = useRef<HTMLElement | null>(null);
 
-  useEffect(() => {
-    if (isOpen) {
-      priorFocusRef.current = document.activeElement as HTMLElement | null;
-    } else {
-      queueMicrotask(() => priorFocusRef.current?.focus?.());
-    }
-  }, [isOpen]);
+  useFocusTrap(isOpen, portalRef);
 
   useEffect(() => {
     if (!isOpen) return;

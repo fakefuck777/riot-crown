@@ -135,6 +135,7 @@ export function ProductCard({
           alt={product.name}
           className="w-full h-full product-img"
           fetchPriority={fetchPriority}
+          sizes="(min-width: 1280px) 22vw, (min-width: 768px) 32vw, 92vw"
         />
       </div>
 

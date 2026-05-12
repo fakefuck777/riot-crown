@@ -1,6 +1,6 @@
 import { useParams, useNavigate, Link } from '@remix-run/react';
 import type { MetaFunction } from '@shopify/remix-oxygen';
-import { useRef, useEffect, useCallback, useState } from 'react';
+import { useRef, useEffect, useLayoutEffect, useCallback, useState } from 'react';
 import { gsap } from 'gsap';
 import { GhostImage } from '~/components/GhostImage';
 import { useCart } from '~/lib/CartContext';
@@ -63,28 +63,62 @@ export default function ProductDetail() {
     addedRef.current = false;
   }, [id]);
 
-  useEffect(() => {
+  // Run after DOM commit so refs exist; retry a few frames like CartDrawer + `mounted`
+  // — otherwise first client navigation can leave image/info at opacity:0 (looks “broken”).
+  useLayoutEffect(() => {
     const p = getProduct(id ?? '');
     if (!p) return;
-    const img = imgRef.current;
-    const info = infoRef.current;
-    const btn = btnRef.current;
-    if (!img || !info || !btn) return;
 
-    const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
-    tl.fromTo(img,
-      { opacity: 0, x: -40 },
-      { opacity: 1, x: 0, duration: 0.9 }
-    ).fromTo(info,
-      { opacity: 0, x: 40 },
-      { opacity: 1, x: 0, duration: 0.9 },
-      '-=0.7'
-    ).fromTo(btn,
-      { opacity: 0, y: 16 },
-      { opacity: 1, y: 0, duration: 0.5 },
-      '-=0.4'
-    );
-  }, [id]);
+    let cancelled = false;
+    let attempts = 0;
+    const maxAttempts = 12;
+
+    const run = () => {
+      if (cancelled) return;
+      const img = imgRef.current;
+      const info = infoRef.current;
+      const btn = btnRef.current;
+      if (!img || !info || !btn) {
+        if (attempts++ < maxAttempts) {
+          requestAnimationFrame(run);
+        } else {
+          if (img) gsap.set(img, { opacity: 1, x: 0 });
+          if (info) gsap.set(info, { opacity: 1, x: 0 });
+          if (btn) gsap.set(btn, { opacity: 1, y: 0 });
+        }
+        return;
+      }
+
+      gsap.killTweensOf([img, info, btn]);
+      if (reducedMotion) {
+        gsap.set([img, info, btn], { opacity: 1, x: 0, y: 0 });
+        return;
+      }
+
+      gsap.timeline({ defaults: { ease: 'power4.out' } })
+        .fromTo(img,
+          { opacity: 0, x: -40 },
+          { opacity: 1, x: 0, duration: 0.9 },
+        ).fromTo(info,
+          { opacity: 0, x: 40 },
+          { opacity: 1, x: 0, duration: 0.9 },
+          '-=0.7',
+        ).fromTo(btn,
+          { opacity: 0, y: 16 },
+          { opacity: 1, y: 0, duration: 0.5 },
+          '-=0.4',
+        );
+    };
+
+    run();
+    return () => {
+      cancelled = true;
+      const img = imgRef.current;
+      const info = infoRef.current;
+      const btn = btnRef.current;
+      gsap.killTweensOf([img, info, btn].filter(Boolean));
+    };
+  }, [id, reducedMotion]);
 
   const handleAcquire = useCallback(() => {
     if (!product) return;
@@ -175,6 +209,7 @@ export default function ProductDetail() {
               src={product.imageUrl}
               alt={product.name}
               fetchPriority="high"
+              sizes="(min-width: 900px) 46vw, 100vw"
               style={{ width: '100%', height: '100%' }}
             />
 
@@ -474,6 +509,7 @@ export default function ProductDetail() {
                   src={p.imageUrl}
                   alt={p.name}
                   fetchPriority="low"
+                  sizes="(min-width: 1024px) 22vw, (min-width: 640px) 32vw, 92vw"
                   style={{ width: '100%', height: '100%' }}
                 />
               </div>

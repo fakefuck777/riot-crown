@@ -6,6 +6,7 @@ import { useCart } from '~/lib/CartContext';
 import { LOCALE_BCP47 } from '~/lib/i18n';
 import { sumCartLineTotals, formatYenTotal, parseDisplayPriceYen } from '~/lib/price';
 import { usePrefersReducedMotion } from '~/hooks/usePrefersReducedMotion';
+import { useFocusTrap } from '~/hooks/useFocusTrap';
 
 import type { CartItem } from '~/lib/cartTypes';
 
@@ -63,10 +64,12 @@ export function CartDrawer({ isOpen, items, onClose, onCheckout }: CartDrawerPro
     return () => window.cancelAnimationFrame(id);
   }, [isOpen, mounted]);
 
-  // Animate in/out after mount
+  // Animate in/out after mount. First open: `isOpen` flips true before `mounted`
+  // is true, so this effect must re-run when `mounted` becomes true — otherwise
+  // the backdrop appears (full-screen blur) but the drawer never slides in.
   useEffect(() => {
     const drawer = drawerRef.current;
-    if (!drawer) return;
+    if (!drawer || !mounted) return;
 
     if (reducedMotion) {
       gsap.set(drawer, { x: isOpen ? '0%' : '100%' });
@@ -81,7 +84,7 @@ export function CartDrawer({ isOpen, items, onClose, onCheckout }: CartDrawerPro
     } else {
       gsap.to(drawer, { x: '100%', duration: 0.35, ease: 'power3.in' });
     }
-  }, [isOpen, reducedMotion]);
+  }, [isOpen, reducedMotion, mounted]);
 
   const triggerAberration = useCallback(() => {
     if (reducedMotion) return;
@@ -103,8 +106,13 @@ export function CartDrawer({ isOpen, items, onClose, onCheckout }: CartDrawerPro
   const total = sumCartLineTotals(items);
   const numberLocale = LOCALE_BCP47[locale];
 
+  useFocusTrap(isOpen && mounted, drawerRef);
+
   return (
     <>
+      <div className="sr-only" aria-live="polite" aria-atomic>
+        {isOpen ? `${pieceCount} ${t.cart.liveRegionPieces}` : ''}
+      </div>
       {/* Chromatic aberration flash — always in DOM, pointer-events none */}
       <div
         ref={aberRef}
@@ -115,12 +123,19 @@ export function CartDrawer({ isOpen, items, onClose, onCheckout }: CartDrawerPro
       {/* Backdrop — pure CSS, no GSAP */}
       <div
         className="fixed inset-0 z-[200]"
+        aria-hidden={!isOpen}
         style={{
           background: 'rgba(5,5,5,0.6)',
-          backdropFilter: 'blur(4px)',
+          // Must turn off when closed: opacity:0 alone still composites backdrop-filter
+          // on some WebKit/Chromium builds and can blur the entire viewport.
+          backdropFilter: isOpen ? 'blur(4px)' : 'none',
+          WebkitBackdropFilter: isOpen ? 'blur(4px)' : 'none',
           opacity: isOpen ? 1 : 0,
           pointerEvents: isOpen ? 'auto' : 'none',
-          transition: 'opacity 0.3s ease',
+          visibility: isOpen ? 'visible' : 'hidden',
+          transition: isOpen
+            ? 'opacity 0.3s ease, visibility 0s linear 0s'
+            : 'opacity 0.3s ease, visibility 0s linear 0.3s',
         }}
         onClick={onClose}
       />

@@ -1,5 +1,5 @@
 'use client';
-import { useRef, useEffect, useCallback, lazy, Suspense } from 'react';
+import { useRef, useEffect, useCallback, lazy, Suspense, useState } from 'react';
 import { gsap } from 'gsap';
 import { useLocale } from '~/lib/LocaleContext';
 import { usePrefersReducedMotion } from '~/hooks/usePrefersReducedMotion';
@@ -23,6 +23,23 @@ export function Hero() {
   const mouseRef     = useRef<[number, number]>([0.5, 0.5]);
   const tiltTarget   = useRef({ x: 0, y: 0 });
   const ctaMagneticRef = useMagnetic<HTMLDivElement>(1.05);
+  const [deferCanvas, setDeferCanvas] = useState(false);
+
+  useEffect(() => {
+    let cancel: (() => void) | undefined;
+    if (typeof window.requestIdleCallback === 'function') {
+      const id = window.requestIdleCallback(() => setDeferCanvas(true), { timeout: 900 });
+      cancel = () => {
+        if (typeof window.cancelIdleCallback === 'function') window.cancelIdleCallback(id);
+      };
+    } else {
+      const id = window.setTimeout(() => setDeferCanvas(true), 320);
+      cancel = () => clearTimeout(id);
+    }
+    return () => {
+      cancel?.();
+    };
+  }, []);
 
   const onMouseMove = useCallback((e: MouseEvent) => {
     const nx = e.clientX / window.innerWidth;
@@ -133,14 +150,16 @@ export function Hero() {
       className="relative w-full h-screen bg-void"
       style={{ willChange: 'transform', overflow: 'hidden' }}
     >
-      {/* WebGL background */}
-      <Suspense fallback={null}>
-        <GraffitiCanvas
-          scrollVelRef={scrollVelRef}
-          mouseRef={mouseRef}
-          className="absolute inset-0 w-full h-full"
-        />
-      </Suspense>
+      {/* WebGL — deferred slightly so first paint stays responsive (LCP / TTI). */}
+      {deferCanvas ? (
+        <Suspense fallback={null}>
+          <GraffitiCanvas
+            scrollVelRef={scrollVelRef}
+            mouseRef={mouseRef}
+            className="absolute inset-0 w-full h-full"
+          />
+        </Suspense>
+      ) : null}
 
       {/* Multi-layer veil — wide bright core so top-of-hero (eyebrow/title) keeps full fluid read */}
       <div className="absolute inset-0 pointer-events-none" style={{

@@ -8,6 +8,8 @@ interface GhostImageProps {
   style?:    React.CSSProperties;
   /** Pass `high` for above-the-fold LCP candidates. */
   fetchPriority?: 'high' | 'low' | 'auto';
+  /** Responsive widths hint for `srcSet`-ready CDNs and browser scheduling. */
+  sizes?: string;
 }
 
 /**
@@ -21,7 +23,7 @@ interface GhostImageProps {
  *
  * Uses IntersectionObserver — images outside the viewport never load.
  */
-export function GhostImage({ src, alt, className, style, fetchPriority = 'auto' }: GhostImageProps) {
+export function GhostImage({ src, alt, className, style, fetchPriority = 'auto', sizes }: GhostImageProps) {
   const isDataUri = useMemo(() => src.startsWith('data:'), [src]);
   const [loaded,  setLoaded]  = useState(isDataUri);
   const [visible, setVisible] = useState(isDataUri);
@@ -67,6 +69,23 @@ export function GhostImage({ src, alt, className, style, fetchPriority = 'auto' 
     return () => observer.disconnect();
   }, [src, isDataUri]);
 
+  // Cached / bfcache: `onLoad` can be skipped after client navigations; recheck
+  // when `visible` flips true so we do not stay stuck on blur(12px).
+  useEffect(() => {
+    if (isDataUri || !visible) return;
+    const img = imgRef.current;
+    if (!img) return;
+    const sync = () => {
+      if (img.complete && img.naturalHeight > 0) setLoaded(true);
+    };
+    sync();
+    const raf = requestAnimationFrame(sync);
+    const failSafe = window.setTimeout(() => setLoaded(true), 12_000);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(failSafe);
+    };
+  }, [visible, src, isDataUri]);
 
   return (
     <div
@@ -80,6 +99,7 @@ export function GhostImage({ src, alt, className, style, fetchPriority = 'auto' 
           ref={imgCallbackRef}
           src={src}
           alt={alt}
+          sizes={sizes}
           loading={fetchPriority === 'high' ? 'eager' : 'lazy'}
           decoding="async"
           fetchPriority={fetchPriority}

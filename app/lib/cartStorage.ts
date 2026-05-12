@@ -1,6 +1,7 @@
 import type { CartItem } from '~/lib/cartTypes';
 
-const STORAGE_KEY = 'riot_crown_cart_v1';
+export const CART_STORAGE_KEY = 'riot_crown_cart_v1';
+const STORAGE_KEY = CART_STORAGE_KEY;
 
 function isCartItem(x: unknown): x is CartItem {
   if (!x || typeof x !== 'object') return false;

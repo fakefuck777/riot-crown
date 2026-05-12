@@ -1,6 +1,9 @@
 import { RemixBrowser } from '@remix-run/react';
 import { startTransition, StrictMode } from 'react';
 import { hydrateRoot } from 'react-dom/client';
+import { initClientMonitoring } from '~/lib/monitoring.client';
+
+initClientMonitoring();
 
 const gaId = import.meta.env.VITE_PUBLIC_GA_MEASUREMENT_ID as string | undefined;
 if (gaId && typeof document !== 'undefined') {

@@ -10,6 +10,8 @@
     "lint": "eslint --no-eslintrc -c .eslintrc.cjs --ext .ts,.tsx .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui",
     "compare:dev": "npm run dev --prefix compare-site",
     "compare:build": "npm run build --prefix compare-site"
   },
@@ -27,7 +29,9 @@
     "three": "^0.165.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@remix-run/dev": "^2.8.0",
+    "@sentry/browser": "^10.53.1",
     "@shopify/cli": "^3.72.0",
     "@shopify/mini-oxygen": "3.0.6",
     "@types/react": "^18.2.0",
@@ -38,6 +42,7 @@
     "typescript": "^5.4.5",
     "vite": "5.2.11",
     "vite-tsconfig-paths": "^4.3.2",
-    "vitest": "^2.1.9"
+    "vitest": "^2.1.9",
+    "web-vitals": "^5.2.0"
   }
 }

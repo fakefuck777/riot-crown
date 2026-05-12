@@ -2,6 +2,10 @@
 
 interface ImportMetaEnv {
   readonly VITE_PUBLIC_GA_MEASUREMENT_ID?: string;
+  /** Optional Sentry browser DSN (client-side only). */
+  readonly VITE_SENTRY_DSN?: string;
+  /** Set to "1" to POST Web Vitals to /api/web-vitals while in dev. */
+  readonly VITE_WEB_VITALS_IN_DEV?: string;
 }
 
 declare module 'react-dom/server.browser' {

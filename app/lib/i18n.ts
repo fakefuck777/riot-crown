@@ -142,6 +142,8 @@ export const translations = {
       total:     'TOTAL',
       acquire:   'ACQUIRE',
       footer:    'FINAL SALE — NO RETURNS — NO REGRETS',
+      /** Screen reader suffix after count when cart drawer opens */
+      liveRegionPieces: 'pieces in cart',
     },
     checkout: {
       protocol:  'RIOT CROWN — ACQUISITION PROTOCOL',
@@ -325,6 +327,7 @@ export const translations = {
       total:     '合计',
       acquire:   '立即结算',
       footer:    '最终销售 — 不接受退货 — 无怨无悔',
+      liveRegionPieces: '件商品在购物车',
     },
     checkout: {
       protocol:  'RIOT CROWN — 结算流程',
@@ -508,6 +511,7 @@ export const translations = {
       total:     '合計',
       acquire:   '入手する',
       footer:    '最終セール — 返品不可 — 後悔なし',
+      liveRegionPieces: '点がカートにあります',
     },
     checkout: {
       protocol:  'RIOT CROWN — 購入プロトコル',
@@ -691,6 +695,7 @@ export const translations = {
       total:     '합계',
       acquire:   '획득하기',
       footer:    '파이널 세일 — 반품 불가 — 후회 없음',
+      liveRegionPieces: '개가 장바구니에 있습니다',
     },
     checkout: {
       protocol:  'RIOT CROWN — 구매 프로토콜',
@@ -875,6 +880,7 @@ export const translations = {
       total:     'TOTAL',
       acquire:   'ACQUÉRIR',
       footer:    'VENTE FINALE — SANS RETOUR — SANS REGRET',
+      liveRegionPieces: 'pièces dans le panier',
     },
     checkout: {
       protocol:  'RIOT CROWN — PROTOCOLE D\'ACQUISITION',

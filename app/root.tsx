@@ -9,6 +9,7 @@ import {
   useRouteError,
   useRouteLoaderData,
   isRouteErrorResponse,
+  Link,
 } from '@remix-run/react';
 import type { LinksFunction } from '@shopify/remix-oxygen';
 import { json, type LoaderFunctionArgs, type MetaFunction } from '@shopify/remix-oxygen';
@@ -24,7 +25,7 @@ import { useInertiaScroll } from '~/hooks/useInertiaScroll';
 import { LocaleProvider, useLocale } from '~/lib/LocaleContext';
 import { SkipToMain } from '~/components/SkipToMain';
 import { CartProvider, useCart } from '~/lib/CartContext';
-import { LOCALE_BCP47 } from '~/lib/i18n';
+import { LOCALE_BCP47, LOCALES } from '~/lib/i18n';
 import { sumCartLineTotals, formatYenTotal } from '~/lib/price';
 import { SITE_DESCRIPTION } from '~/lib/siteMeta';
 import globalStyles from '~/styles/global.css?url';
@@ -47,10 +48,13 @@ export const links: LinksFunction = () => [
   },
 ];
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request, context }: LoaderFunctionArgs) {
   const siteUrl = new URL(request.url).origin;
+  const shopDomain =
+    (context as { env?: { PUBLIC_STORE_DOMAIN?: string } }).env?.PUBLIC_STORE_DOMAIN ?? '';
   return json({
     siteUrl,
+    shopDomain,
     initialLocale: parseLocaleFromCookie(request.headers.get('Cookie')),
   });
 }
@@ -58,6 +62,20 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   const siteUrl = data?.siteUrl ?? '';
   const ogImage = siteUrl ? `${siteUrl}/og-brand.svg` : '/og-brand.svg';
+  const hreflang =
+    siteUrl.length > 0
+      ? [
+          ...LOCALES.map(loc => ({
+            tagName: 'link' as const,
+            rel: 'alternate',
+            hrefLang: LOCALE_BCP47[loc],
+            href: siteUrl,
+          })),
+          { tagName: 'link' as const, rel: 'alternate', hrefLang: 'x-default', href: siteUrl },
+          { tagName: 'link' as const, rel: 'canonical', href: siteUrl },
+        ]
+      : [];
+
   return [
     { title: 'RIOT CROWN | Void Collection SS26' },
     { name: 'description', content: SITE_DESCRIPTION },
@@ -71,6 +89,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
     { name: 'twitter:description', content: SITE_DESCRIPTION },
     { name: 'theme-color', content: '#050505' },
     { name: 'format-detection', content: 'telephone=no' },
+    ...hreflang,
   ];
 };
 
@@ -152,7 +171,14 @@ export function ErrorBoundary() {
         <div className="min-h-screen flex flex-col items-center justify-center px-16">
           <p className="text-label text-chrome mb-8 tracking-ultra-wide">SYSTEM FAULT</p>
           <h1 className="text-brutal text-titanium mb-12">ERROR</h1>
-          <p className="text-data text-chrome max-w-md text-center">{message}</p>
+          <p className="text-data text-chrome max-w-md text-center mb-12">{message}</p>
+          <Link
+            to="/"
+            className="text-label text-gold tracking-ultra-wide border border-gold/35 px-8 py-4 uppercase no-underline transition-colors hover:bg-gold/10"
+            style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem' }}
+          >
+            Return home
+          </Link>
         </div>
       </main>
     </Layout>

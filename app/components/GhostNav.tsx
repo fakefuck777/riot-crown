@@ -425,9 +425,11 @@ export function GhostNav({ onCartOpen, cartCount = 0 }: { onCartOpen: () => void
         }} />
       </div>
 
+      {/* Desktop only: a 1px-tall bar + backdrop-filter on mobile Safari has caused
+          full-viewport blur artifacts; mobile uses the dedicated bar above. */}
       <nav
         ref={navRef}
-        className="fixed top-0 left-0 right-0 z-50"
+        className="fixed top-0 left-0 right-0 z-50 hidden md:block"
         style={{
           height: '1px',
           background: 'rgba(5,5,5,0.93)',
