@@ -4,7 +4,13 @@ import { oxygen } from '@shopify/mini-oxygen/vite';
 import { vitePlugin as remix } from '@remix-run/dev';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
-export default defineConfig({
+/**
+ * Avoid a separate SSR chunk for `virtual:remix/server-build` (see Shopify/hydrogen#2497).
+ * Otherwise Oxygen `worker.mjs` may import `assets/server-build*.js` that the Hydrogen
+ * build step no longer keeps on disk.
+ */
+export default defineConfig(({ isSsrBuild }) => ({
+  base: '/',
   plugins: [
     hydrogen(),
     oxygen(),
@@ -13,6 +19,13 @@ export default defineConfig({
   ],
   build: {
     assetsInlineLimit: 0,
+    ...(isSsrBuild && {
+      rollupOptions: {
+        output: {
+          inlineDynamicImports: true,
+        },
+      },
+    }),
   },
   ssr: {
     noExternal: [
@@ -34,4 +47,4 @@ export default defineConfig({
     include: ['gsap', 'three'],
     exclude: ['@shopify/hydrogen'],
   },
-});
+}));
