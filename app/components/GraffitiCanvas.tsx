@@ -176,7 +176,7 @@ function ShaderPlane({ scrollVelRef, mouseRef }: ShaderPlaneProps) {
     uResolution: { value: new THREE.Vector2(size.width, size.height) },
     uMouse:      { value: new THREE.Vector2(0.5, 0.5) },
     uScrollVel:  { value: 0 },
-  }), []);
+  }), [size.width, size.height]);
 
   // Keep resolution uniform in sync
   useEffect(() => {

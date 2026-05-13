@@ -43,10 +43,12 @@ export function StickyConversionBar() {
 
   return (
     <div
-      className="fixed left-0 right-0 z-[48] flex flex-col items-center gap-2 border-t border-[rgba(201,168,76,0.22)] bg-[rgba(5,5,5,0.94)] px-4 pt-3 backdrop-blur-xl transition-transform duration-300 ease-out"
+      className="sticky-conversion-shell fixed left-0 right-0 z-[48] flex flex-col items-center gap-2 border-t border-[rgba(201,168,76,0.22)] bg-[rgba(5,5,5,0.94)] pt-3 backdrop-blur-xl transition-transform duration-300 ease-out"
       style={{
         bottom: 0,
         paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom, 0px))',
+        paddingLeft: 'max(1rem, env(safe-area-inset-left, 0px))',
+        paddingRight: 'max(1rem, env(safe-area-inset-right, 0px))',
         transform: visible ? 'translateY(0)' : 'translateY(115%)',
         pointerEvents: visible ? 'auto' : 'none',
         boxShadow: '0 -24px 48px rgba(0,0,0,0.45)',

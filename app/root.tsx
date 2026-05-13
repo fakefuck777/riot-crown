@@ -14,7 +14,8 @@ import {
 import type { LinksFunction } from '@shopify/remix-oxygen';
 import { json, type LoaderFunctionArgs, type MetaFunction } from '@shopify/remix-oxygen';
 import type { Locale } from '~/lib/i18n';
-import { parseLocaleFromCookie } from '~/lib/localeCookie';
+import { serializeLocaleCookie } from '~/lib/localeCookie';
+import { resolveLocaleForRequest } from '~/lib/localeDetection';
 import { GrainOverlay }    from '~/components/GrainOverlay';
 import { PointerLux }      from '~/components/PointerLux';
 import { GhostNav }        from '~/components/GhostNav';
@@ -24,6 +25,7 @@ import { StickyConversionBar } from '~/components/StickyConversionBar';
 import { useInertiaScroll } from '~/hooks/useInertiaScroll';
 import { LocaleProvider, useLocale } from '~/lib/LocaleContext';
 import { SkipToMain } from '~/components/SkipToMain';
+import { ViewportModeSync } from '~/components/ViewportModeSync';
 import { CartProvider, useCart } from '~/lib/CartContext';
 import { LOCALE_BCP47, LOCALES } from '~/lib/i18n';
 import { sumCartLineTotals, formatYenTotal } from '~/lib/price';
@@ -52,11 +54,20 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
   const siteUrl = new URL(request.url).origin;
   const shopDomain =
     (context as { env?: { PUBLIC_STORE_DOMAIN?: string } }).env?.PUBLIC_STORE_DOMAIN ?? '';
-  return json({
-    siteUrl,
-    shopDomain,
-    initialLocale: parseLocaleFromCookie(request.headers.get('Cookie')),
-  });
+  const { locale, shouldPersist } = resolveLocaleForRequest(request);
+  const headers = new Headers();
+  if (shouldPersist) {
+    const secure = new URL(request.url).protocol === 'https:';
+    headers.append('Set-Cookie', serializeLocaleCookie(locale, secure));
+  }
+  return json(
+    {
+      siteUrl,
+      shopDomain,
+      initialLocale: locale,
+    },
+    shouldPersist ? { headers } : undefined,
+  );
 }
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
@@ -77,15 +88,15 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
       : [];
 
   return [
-    { title: 'RIOT CROWN | Void Collection SS26' },
+    { title: 'RIOT CROWN | Void Atelier' },
     { name: 'description', content: SITE_DESCRIPTION },
     { property: 'og:type', content: 'website' },
     ...(siteUrl ? [{ property: 'og:url', content: siteUrl }] : []),
-    { property: 'og:title', content: 'RIOT CROWN | Void Collection SS26' },
+    { property: 'og:title', content: 'RIOT CROWN | Void Atelier' },
     { property: 'og:description', content: SITE_DESCRIPTION },
     { property: 'og:image', content: ogImage },
     { name: 'twitter:card', content: 'summary_large_image' },
-    { name: 'twitter:title', content: 'RIOT CROWN' },
+    { name: 'twitter:title', content: 'RIOT CROWN | Void Atelier' },
     { name: 'twitter:description', content: SITE_DESCRIPTION },
     { name: 'theme-color', content: '#050505' },
     { name: 'format-detection', content: 'telephone=no' },
@@ -120,19 +131,48 @@ function AppShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Layout({ children, initialLocale = 'EN' }: { children: React.ReactNode; initialLocale?: Locale }) {
+function Layout({
+  children,
+  initialLocale = 'EN',
+  siteUrl = '',
+}: {
+  children:       React.ReactNode;
+  initialLocale?: Locale;
+  siteUrl?:       string;
+}) {
+  const orgJsonLd =
+    siteUrl.length > 0
+      ? JSON.stringify({
+          '@context':    'https://schema.org',
+          '@type':       'Organization',
+          name:          'RIOT CROWN',
+          url:           siteUrl,
+          logo:          `${siteUrl}/og-brand.svg`,
+          description:   SITE_DESCRIPTION,
+          areaServed: { '@type': 'Place', name: 'Worldwide' },
+        })
+      : '';
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        {/* viewport-fit=cover: safe-area env() on notch devices; interactive-widget: Android resizes layout when keyboard opens */}
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content"
+        />
         <Meta />
+        {orgJsonLd ? (
+          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: orgJsonLd }} />
+        ) : null}
         <Links />
       </head>
       <body className="bg-void text-titanium">
         <LocaleProvider initialLocale={initialLocale}>
           <SkipToMain />
           <SyncDocumentLang />
+          <ViewportModeSync />
           <CartProvider>
             <AppShell>{children}</AppShell>
           </CartProvider>
@@ -145,10 +185,10 @@ function Layout({ children, initialLocale = 'EN' }: { children: React.ReactNode;
 }
 
 export default function App() {
-  const { initialLocale } = useLoaderData<typeof loader>();
+  const { initialLocale, siteUrl } = useLoaderData<typeof loader>();
   return (
-    <Layout initialLocale={initialLocale}>
-      <main id="main-content" tabIndex={-1} className="relative outline-none">
+    <Layout initialLocale={initialLocale} siteUrl={siteUrl}>
+      <main id="main-content" tabIndex={-1} className="relative outline-none mobile-main">
         <Outlet />
       </main>
     </Layout>
@@ -167,7 +207,7 @@ export function ErrorBoundary() {
 
   return (
     <Layout initialLocale={initialLocale}>
-      <main id="main-content" tabIndex={-1} className="relative outline-none">
+      <main id="main-content" tabIndex={-1} className="relative outline-none mobile-main">
         <div className="min-h-screen flex flex-col items-center justify-center px-16">
           <p className="text-label text-chrome mb-8 tracking-ultra-wide">SYSTEM FAULT</p>
           <h1 className="text-brutal text-titanium mb-12">ERROR</h1>

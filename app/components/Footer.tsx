@@ -1,10 +1,8 @@
 'use client';
-import { Link } from '@remix-run/react';
 import { useLocale } from '~/lib/LocaleContext';
-import { LEGAL_PAGE_IDS, getLegalDoc } from '~/lib/legalContent';
 
 export function Footer() {
-  const { t, locale } = useLocale();
+  const { t } = useLocale();
 
   return (
     <footer style={{
@@ -49,23 +47,20 @@ export function Footer() {
               {t.footer.tagline}
             </p>
 
-            <div style={{ display: 'flex', gap: '1.5rem', marginTop: '2rem' }}>
+            <div style={{ display: 'flex', gap: '1.5rem', marginTop: '2rem' }} aria-hidden="true">
               {[
-                { label: 'IG', aria: 'Instagram' },
-                { label: 'TW', aria: 'Twitter / X' },
-                { label: 'TK', aria: 'TikTok' },
+                { label: 'IG' },
+                { label: 'TW' },
+                { label: 'TK' },
               ].map((s) => (
                 <span
                   key={s.label}
-                  role="link"
-                  tabIndex={0}
-                  aria-label={`Riot Crown on ${s.aria}`}
                   style={{
                     fontFamily: 'var(--font-mono)',
                     fontSize: '0.52rem',
                     letterSpacing: '0.15em',
                     color: 'rgba(201,168,76,0.35)',
-                    cursor: 'pointer',
+                    cursor: 'default',
                     transition: 'color 0.2s',
                   }}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(201,168,76,0.8)'; }}
@@ -108,39 +103,6 @@ export function Footer() {
               </ul>
             </div>
           ))}
-        </div>
-
-        {/* Legal & policies */}
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '1.25rem 2rem',
-            marginBottom: '2.5rem',
-            paddingTop: '0.5rem',
-            borderTop: '0.5px solid rgba(242,242,242,0.06)',
-          }}
-        >
-          {LEGAL_PAGE_IDS.map((page) => {
-            const doc = getLegalDoc(page, locale);
-            return (
-              <Link
-                key={page}
-                to={`/legal/${page}`}
-                prefetch="intent"
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '0.52rem',
-                  letterSpacing: '0.18em',
-                  color: 'rgba(168,168,168,0.45)',
-                  textDecoration: 'none',
-                  textTransform: 'uppercase',
-                }}
-              >
-                {doc.title}
-              </Link>
-            );
-          })}
         </div>
 
         <div style={{

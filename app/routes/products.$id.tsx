@@ -1,5 +1,5 @@
 import { useParams, useNavigate, Link } from '@remix-run/react';
-import type { MetaFunction } from '@shopify/remix-oxygen';
+import { json, type LoaderFunctionArgs, type MetaFunction } from '@shopify/remix-oxygen';
 import { useRef, useEffect, useLayoutEffect, useCallback, useState } from 'react';
 import { gsap } from 'gsap';
 import { GhostImage } from '~/components/GhostImage';
@@ -9,8 +9,13 @@ import { useLocale } from '~/lib/LocaleContext';
 import { usePrefersReducedMotion } from '~/hooks/usePrefersReducedMotion';
 import { getProduct, PRODUCTS, getDescription, getDetails } from '~/lib/products';
 
-export const meta: MetaFunction = ({ params }) => {
+export async function loader({ request }: LoaderFunctionArgs) {
+  return json({ siteUrl: new URL(request.url).origin });
+}
+
+export const meta: MetaFunction<typeof loader> = ({ data, params }) => {
   const p = getProduct(params.id ?? '');
+  const siteUrl = data?.siteUrl ?? '';
   if (!p) {
     return [
       { title: 'Artifact Not Found | RIOT CROWN' },
@@ -18,12 +23,21 @@ export const meta: MetaFunction = ({ params }) => {
     ];
   }
   const desc = (p.descriptions.EN ?? p.descriptions.ZH ?? p.name).slice(0, 160);
+  const canonical = siteUrl ? `${siteUrl}/products/${params.id}` : '';
+  const ogImage = siteUrl ? `${siteUrl}/og-brand.svg` : '/og-brand.svg';
   return [
     { title: `${p.name} | RIOT CROWN` },
     { name: 'description', content: desc },
-    { property: 'og:type', content: 'website' },
+    ...(canonical ? [{ tagName: 'link' as const, rel: 'canonical', href: canonical }] : []),
+    { property: 'og:type', content: 'product' },
+    ...(canonical ? [{ property: 'og:url', content: canonical }] : []),
     { property: 'og:title', content: p.name },
     { property: 'og:description', content: desc },
+    { property: 'og:image', content: ogImage },
+    { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:title', content: p.name },
+    { name: 'twitter:description', content: desc },
+    { name: 'twitter:image', content: ogImage },
   ];
 };
 
@@ -69,6 +83,7 @@ export default function ProductDetail() {
     const p = getProduct(id ?? '');
     if (!p) return;
 
+    const tweensOn: (HTMLElement | HTMLButtonElement)[] = [];
     let cancelled = false;
     let attempts = 0;
     const maxAttempts = 12;
@@ -89,6 +104,8 @@ export default function ProductDetail() {
         return;
       }
 
+      tweensOn.length = 0;
+      tweensOn.push(img, info, btn);
       gsap.killTweensOf([img, info, btn]);
       if (reducedMotion) {
         gsap.set([img, info, btn], { opacity: 1, x: 0, y: 0 });
@@ -113,10 +130,7 @@ export default function ProductDetail() {
     run();
     return () => {
       cancelled = true;
-      const img = imgRef.current;
-      const info = infoRef.current;
-      const btn = btnRef.current;
-      gsap.killTweensOf([img, info, btn].filter(Boolean));
+      gsap.killTweensOf(tweensOn);
     };
   }, [id, reducedMotion]);
 
@@ -166,7 +180,7 @@ export default function ProductDetail() {
   const isLowStock = (product.stock ?? 99) <= 3;
 
   return (
-    <div ref={pageRef} className="bg-void" style={{ minHeight: '100vh', paddingTop: '80px' }}>
+    <div ref={pageRef} className="bg-void min-h-dvh-safe" style={{ paddingTop: 'max(5rem, calc(52px + env(safe-area-inset-top, 0px) + 0.75rem))' }}>
 
       {/* Back button */}
       <div className="px-8 md:px-16 lg:px-24 pt-10 pb-6">
@@ -467,7 +481,7 @@ export default function ProductDetail() {
             opacity: 0.2,
           }} />
 
-          {/* SS26 tag */}
+          {/* Line tag */}
           <p style={{
             marginTop: '1.5rem',
             fontFamily: 'var(--font-mono)',

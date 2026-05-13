@@ -4,7 +4,7 @@ import { gsap } from 'gsap';
 import { useLocale } from '~/lib/LocaleContext';
 
 const QUOTES = [
-  { text: '穿上它的那一刻，我不再需要解释自己。',       origin: '匿名买家 — 东京',    lang: 'ZH' },
+  { text: '穿上它的那一刻，我不再需要解释自己。',       origin: '匿名买家 — 多城',    lang: 'ZH' },
   { text: 'This is not jewelry. This is a declaration.', origin: 'Anonymous — London', lang: 'EN' },
   { text: 'Je ne l\'enlève plus. C\'est devenu ma peau.', origin: 'Anonyme — Paris',   lang: 'FR' },
   { text: '手に取った瞬間、これが最後の一点だと確信した。', origin: '匿名 — 大阪',      lang: 'JP' },
@@ -93,7 +93,7 @@ export function Testimonials() {
                 marginBottom: '1.2rem',
                 userSelect: 'none',
               }}>
-                "
+                {'\u201c'}
               </div>
 
               <p style={{

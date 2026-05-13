@@ -98,6 +98,19 @@ export function ProductGrid({ products = PRODUCTS }: ProductGridProps) {
             min-height: 300px !important;
           }
         }
+        @media (max-width: 360px) {
+          .product-collection-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .product-collection-grid > * {
+            min-height: 260px !important;
+          }
+        }
+        @media (max-height: 480px) and (orientation: landscape) {
+          .product-collection-grid > * {
+            min-height: 220px !important;
+          }
+        }
       `}</style>
     </section>
   );

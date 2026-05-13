@@ -93,8 +93,13 @@ export function CheckoutPortal({ isOpen, onClose, total }: CheckoutPortalProps) 
   return (
     <div
       ref={portalRef}
-      className="fixed inset-0 z-[300] flex-col"
-      style={{ display: 'none', background: '#030303' }}
+      className="fixed inset-0 z-[300] flex min-h-0 flex-col h-dvh max-h-dvh"
+      style={{
+        display: 'none',
+        background: '#030303',
+        paddingLeft: 'env(safe-area-inset-left, 0px)',
+        paddingRight: 'env(safe-area-inset-right, 0px)',
+      }}
       role="dialog"
       aria-modal="true"
       aria-labelledby="checkout-step-title"
@@ -111,7 +116,10 @@ export function CheckoutPortal({ isOpen, onClose, total }: CheckoutPortalProps) 
       </div>
 
       {/* Header */}
-      <div className="flex items-center justify-between px-8 md:px-16 pt-10 pb-8">
+      <div
+        className="flex items-center justify-between px-8 md:px-16 pb-8"
+        style={{ paddingTop: 'max(2.5rem, calc(env(safe-area-inset-top, 0px) + 1.25rem))' }}
+      >
         <div>
           <p className="text-label text-chrome tracking-ultra-wide opacity-30 mb-2">
             {t.checkout.protocol}
@@ -149,7 +157,14 @@ export function CheckoutPortal({ isOpen, onClose, total }: CheckoutPortalProps) 
       </div>
 
       {/* Panel */}
-      <div ref={panelRef} className="flex-1 overflow-y-auto px-8 md:px-16 pb-8" style={{ scrollbarWidth: 'none' }}>
+      <div
+        ref={panelRef}
+        className="flex-1 min-h-0 overflow-y-auto px-8 md:px-16"
+        style={{
+          scrollbarWidth: 'none',
+          paddingBottom: 'max(2rem, calc(env(safe-area-inset-bottom, 0px) + 1rem))',
+        }}
+      >
         {step === 'contact'  && <ContactStep  onNext={nextStep} />}
         {step === 'shipping' && <ShippingStep onNext={nextStep} />}
         {step === 'payment'  && <PaymentStep  onNext={nextStep} total={total} />}
@@ -236,7 +251,7 @@ function ShippingStep({ onNext }: { onNext: () => void }) {
     <div className="max-w-lg flex flex-col gap-8">
       <Field label={s.line1}  placeholder={s.line1Ph}  autoComplete="address-line1" />
       <Field label={s.line2}  placeholder={s.line2Ph}  autoComplete="address-line2" />
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 min-[420px]:grid-cols-2 gap-6">
         <Field label={s.city}   placeholder={s.cityPh}   autoComplete="address-level2" />
         <Field label={s.postal} placeholder={s.postalPh} autoComplete="postal-code" />
       </div>
@@ -258,7 +273,7 @@ function PaymentStep({ onNext, total }: { onNext: () => void; total: string }) {
         </p>
       </div>
       <Field label={p.card}     placeholder={p.cardPh}     autoComplete="cc-number" />
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 min-[420px]:grid-cols-2 gap-6">
         <Field label={p.expiry} placeholder={p.expiryPh}   autoComplete="cc-exp" />
         <Field label={p.cvc}    placeholder={p.cvcPh}       autoComplete="cc-csc" />
       </div>

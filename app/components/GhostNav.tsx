@@ -44,6 +44,8 @@ export function GhostNav({ onCartOpen, cartCount = 0 }: { onCartOpen: () => void
   const [showScrollFab, setShowScrollFab] = useState(false);
   const [assistOpen, setAssistOpen]   = useState(false);
   const collapseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** Keeps imperative close (backdrop / Escape) in sync — avoids stale `mobileOpen` in callbacks. */
+  const mobileOpenRef = useRef(false);
 
   useEffect(() => {
     const onScroll = () => {
@@ -68,6 +70,10 @@ export function GhostNav({ onCartOpen, cartCount = 0 }: { onCartOpen: () => void
   }, [assistOpen]);
   useEffect(() => {
     if (mobileOpen) setAssistOpen(false);
+  }, [mobileOpen]);
+
+  useEffect(() => {
+    mobileOpenRef.current = mobileOpen;
   }, [mobileOpen]);
 
   const expand = useCallback(() => {
@@ -134,77 +140,97 @@ export function GhostNav({ onCartOpen, cartCount = 0 }: { onCartOpen: () => void
     if (collapseTimer.current) { clearTimeout(collapseTimer.current); collapseTimer.current = null; }
   }, []);
 
-  const scrollTo = (id: string) => {
+  const openMobileMenu = useCallback(() => {
+    const menu = mobileMenuRef.current;
+    if (!menu || mobileOpenRef.current) return;
+    mobileOpenRef.current = true;
+    setMobileOpen(true);
+    gsap.set(menu, { display: 'flex' });
+    if (reducedMotion) {
+      gsap.set(menu, { opacity: 1, y: 0 });
+      const links = menu.querySelectorAll<HTMLElement>('[data-nav-link]');
+      gsap.set(links, { opacity: 1, x: 0, clearProps: 'transform' });
+      return;
+    }
+    gsap.fromTo(menu,
+      { opacity: 0, y: -10 },
+      { opacity: 1, y: 0, duration: 0.36, ease: 'power3.out' },
+    );
+    const links = menu.querySelectorAll<HTMLElement>('[data-nav-link]');
+    gsap.fromTo(links,
+      { opacity: 0, x: -12 },
+      {
+        opacity: 1,
+        x: 0,
+        duration: 0.34,
+        stagger: 0.055,
+        ease: 'power3.out',
+        delay: 0.06,
+        clearProps: 'transform',
+      },
+    );
+  }, [reducedMotion]);
+
+  const closeMobileMenu = useCallback(() => {
+    const menu = mobileMenuRef.current;
+    if (!menu || !mobileOpenRef.current) return;
+    const links = menu.querySelectorAll<HTMLElement>('[data-nav-link]');
+    gsap.killTweensOf(links);
+    if (reducedMotion) {
+      gsap.set(links, { clearProps: 'all' });
+      gsap.set(menu, { display: 'none' });
+      mobileOpenRef.current = false;
+      setMobileOpen(false);
+      return;
+    }
+    gsap.to(links, {
+      opacity: 0,
+      x: -8,
+      duration: 0.14,
+      stagger: { each: 0.03, from: 'end' },
+      ease: 'power2.in',
+    });
+    gsap.to(menu, {
+      opacity: 0,
+      y: -6,
+      duration: 0.22,
+      ease: 'power2.in',
+      delay: 0.04,
+      onComplete: () => {
+        gsap.set(menu, { display: 'none' });
+        mobileOpenRef.current = false;
+        setMobileOpen(false);
+      },
+    });
+  }, [reducedMotion]);
+
+  const toggleMobile = useCallback(() => {
+    if (mobileOpenRef.current) closeMobileMenu();
+    else openMobileMenu();
+  }, [closeMobileMenu, openMobileMenu]);
+
+  const scrollTo = useCallback((id: string) => {
+    if (mobileOpenRef.current) closeMobileMenu();
     const el = document.getElementById(id);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
-      setMobileOpen(false);
       setAssistOpen(false);
       return;
     }
     if (HOME_SCROLL_IDS.has(id)) {
       navigate({ pathname: '/', hash: id });
-      setMobileOpen(false);
       setAssistOpen(false);
     }
-  };
+  }, [closeMobileMenu, navigate]);
 
-  const toggleMobile = useCallback(() => {
-    const menu = mobileMenuRef.current;
-    if (!menu) return;
-    if (!mobileOpen) {
-      setMobileOpen(true);
-      gsap.set(menu, { display: 'flex' });
-      if (reducedMotion) {
-        gsap.set(menu, { opacity: 1, y: 0 });
-        const links = menu.querySelectorAll<HTMLElement>('[data-nav-link]');
-        gsap.set(links, { opacity: 1, x: 0, clearProps: 'transform' });
-        return;
-      }
-      gsap.fromTo(menu,
-        { opacity: 0, y: -10 },
-        { opacity: 1, y: 0, duration: 0.36, ease: 'power3.out' },
-      );
-      const links = menu.querySelectorAll<HTMLElement>('[data-nav-link]');
-      gsap.fromTo(links,
-        { opacity: 0, x: -12 },
-        {
-          opacity: 1,
-          x: 0,
-          duration: 0.34,
-          stagger: 0.055,
-          ease: 'power3.out',
-          delay: 0.06,
-          clearProps: 'transform',
-        },
-      );
-    } else {
-      const links = menu.querySelectorAll<HTMLElement>('[data-nav-link]');
-      gsap.killTweensOf(links);
-      if (reducedMotion) {
-        const links = menu.querySelectorAll<HTMLElement>('[data-nav-link]');
-        gsap.set(links, { clearProps: 'all' });
-        gsap.set(menu, { display: 'none' });
-        setMobileOpen(false);
-        return;
-      }
-      gsap.to(links, {
-        opacity: 0,
-        x: -8,
-        duration: 0.14,
-        stagger: { each: 0.03, from: 'end' },
-        ease: 'power2.in',
-      });
-      gsap.to(menu, {
-        opacity: 0,
-        y: -6,
-        duration: 0.22,
-        ease: 'power2.in',
-        delay: 0.04,
-        onComplete: () => { gsap.set(menu, { display: 'none' }); setMobileOpen(false); },
-      });
-    }
-  }, [mobileOpen, reducedMotion]);
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeMobileMenu();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [mobileOpen, closeMobileMenu]);
 
   // Close mobile menu on resize to desktop
   useEffect(() => {
@@ -212,6 +238,7 @@ export function GhostNav({ onCartOpen, cartCount = 0 }: { onCartOpen: () => void
       if (window.innerWidth >= 768 && mobileOpen) {
         const menu = mobileMenuRef.current;
         if (menu) gsap.set(menu, { display: 'none' });
+        mobileOpenRef.current = false;
         setMobileOpen(false);
       }
     };
@@ -240,7 +267,7 @@ export function GhostNav({ onCartOpen, cartCount = 0 }: { onCartOpen: () => void
       <div
         className="pointer-events-none fixed left-0 right-0 z-50 md:hidden"
         style={{
-          top: '52px',
+          top: 'calc(52px + env(safe-area-inset-top, 0px))',
           height: '1px',
           background: NAV.mobileHairline,
           opacity: 0.55,
@@ -256,9 +283,10 @@ export function GhostNav({ onCartOpen, cartCount = 0 }: { onCartOpen: () => void
 
       {/* Mobile always-visible bar */}
       <div
-        className="fixed top-0 left-0 right-0 z-50 flex md:hidden items-center justify-between px-6"
+        className={`fixed top-0 left-0 right-0 flex md:hidden items-center justify-between px-6 ${mobileOpen ? 'z-[70]' : 'z-50'}`}
         style={{
-          height: '52px',
+          minHeight: 'calc(52px + env(safe-area-inset-top, 0px))',
+          paddingTop: 'env(safe-area-inset-top, 0px)',
           background: 'rgba(5,5,5,0.95)',
           backdropFilter: 'blur(20px)',
           borderBottom: 'none',
@@ -364,22 +392,36 @@ export function GhostNav({ onCartOpen, cartCount = 0 }: { onCartOpen: () => void
         </div>
       </div>
 
-      {/* Mobile full-screen menu */}
+      {/* Mobile full-screen menu — z below top bar so MENU / hamburger stays tappable to close */}
       <div
         id="ghost-mobile-menu"
         ref={mobileMenuRef}
-        className="fixed inset-0 z-[60] flex-col md:hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-label={t.nav.menuButton}
+        className="fixed inset-0 z-[60] flex flex-col md:hidden"
         style={{
           display: 'none',
-          background: `linear-gradient(185deg, ${NAV.gold(0.045)} 0%, transparent 18%), rgba(3,3,3,0.985)`,
-          backdropFilter: 'blur(28px) saturate(0.45)',
-          WebkitBackdropFilter: 'blur(28px) saturate(0.45)',
-          paddingTop: '80px',
-          paddingLeft: '2rem',
-          paddingRight: '2rem',
         }}
       >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '3rem' }}>
+        <button
+          type="button"
+          className="absolute inset-0 z-0 cursor-default border-0 bg-transparent p-0"
+          aria-label={t.nav.jumpMenuClose}
+          onClick={closeMobileMenu}
+        />
+        <div
+          className="relative z-10 flex min-h-0 flex-1 flex-col pointer-events-none"
+          style={{
+            background: `linear-gradient(185deg, ${NAV.gold(0.045)} 0%, transparent 18%), rgba(3,3,3,0.985)`,
+            backdropFilter: 'blur(28px) saturate(0.45)',
+            WebkitBackdropFilter: 'blur(28px) saturate(0.45)',
+            paddingTop: 'calc(80px + env(safe-area-inset-top, 0px))',
+            paddingLeft: '2rem',
+            paddingRight: '2rem',
+          }}
+        >
+        <div className="pointer-events-auto" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '3rem' }}>
           {NAV_LINKS.map(({ label, id }) => (
             <button
               data-nav-link
@@ -405,10 +447,10 @@ export function GhostNav({ onCartOpen, cartCount = 0 }: { onCartOpen: () => void
             </button>
           ))}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+        <div className="pointer-events-auto" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
           <LanguageSwitcher />
           <button
-            onClick={() => { onCartOpen(); setMobileOpen(false); }}
+            onClick={() => { onCartOpen(); closeMobileMenu(); }}
             style={{
               fontFamily: 'var(--font-mono)', fontSize: '0.72rem', letterSpacing: '0.2em',
               color: '#C9A84C', background: 'none', border: 'none', cursor: 'pointer', textTransform: 'uppercase',
@@ -418,11 +460,16 @@ export function GhostNav({ onCartOpen, cartCount = 0 }: { onCartOpen: () => void
             {t.nav.cart} [{cartCount.toString().padStart(2, '0')}]
           </button>
         </div>
-        <div style={{
-          position: 'absolute', bottom: 0, left: 0, right: 0, height: '1px',
-          background: NAV.menuBottom,
-          opacity: 0.44,
-        }} />
+        <div
+          className="pointer-events-none"
+          style={{
+            position: 'absolute', bottom: 0, left: 0, right: 0, height: '1px',
+            background: NAV.menuBottom,
+            opacity: 0.44,
+          }}
+          aria-hidden
+        />
+        </div>
       </div>
 
       {/* Desktop only: a 1px-tall bar + backdrop-filter on mobile Safari has caused

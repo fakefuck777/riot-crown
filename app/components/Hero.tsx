@@ -147,7 +147,7 @@ export function Hero() {
     <section
       id="hero"
       ref={sectionRef}
-      className="relative w-full h-screen bg-void"
+      className="relative w-full min-h-screen min-h-dvh bg-void"
       style={{ willChange: 'transform', overflow: 'hidden' }}
     >
       {/* WebGL — deferred slightly so first paint stays responsive (LCP / TTI). */}
@@ -256,6 +256,9 @@ export function Hero() {
             textTransform: 'uppercase',
             color: 'rgba(242,242,242,0.45)',
             marginBottom: '0.75rem',
+            maxWidth: 'min(38rem, 92vw)',
+            lineHeight: 1.75,
+            whiteSpace: 'pre-wrap',
           }}>
             {t.hero.subtitle}
           </p>

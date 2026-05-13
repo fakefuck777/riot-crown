@@ -1,20 +1,30 @@
 import { redirect, type LoaderFunctionArgs } from '@shopify/remix-oxygen';
+import { shopifyPolicyUrl } from '~/lib/shopifyPolicyUrls';
 
-const PAGE_TO_PATH: Record<string, string> = {
-  contact: '/legal/contact',
-  'contact-us': '/legal/contact',
-  faq: '/legal/contact',
-  privacy: '/legal/privacy',
-  'privacy-policy': '/legal/privacy',
-  terms: '/legal/terms',
-  'terms-of-service': '/legal/terms',
-  returns: '/legal/returns',
-  'shipping-returns': '/legal/returns',
-};
-
-export function loader({ params }: LoaderFunctionArgs) {
+export function loader({ params, context }: LoaderFunctionArgs) {
   const key = (params.pageHandle ?? '').toLowerCase();
-  return redirect(PAGE_TO_PATH[key] ?? '/');
+  const domain =
+    (context as { env?: { PUBLIC_STORE_DOMAIN?: string } }).env?.PUBLIC_STORE_DOMAIN?.trim() ?? '';
+
+  if (['contact', 'contact-us', 'faq'].includes(key)) {
+    return redirect('/');
+  }
+
+  if (!domain) return redirect('/');
+
+  switch (key) {
+    case 'privacy':
+    case 'privacy-policy':
+      return redirect(shopifyPolicyUrl(domain, 'privacy-policy'));
+    case 'terms':
+    case 'terms-of-service':
+      return redirect(shopifyPolicyUrl(domain, 'terms-of-service'));
+    case 'returns':
+    case 'shipping-returns':
+      return redirect(shopifyPolicyUrl(domain, 'refund-policy'));
+    default:
+      return redirect('/');
+  }
 }
 
 export default function PageHandleStub() {

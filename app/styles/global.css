@@ -44,7 +44,14 @@ html {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   height: 100%;
+  min-height: 100%;
+  min-height: 100dvh;
   scroll-behavior: smooth;
+  overflow-x: clip;
+  /* Prevent iOS Safari from inflating small type and breaking editorial layouts */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  color-scheme: dark;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -61,14 +68,41 @@ html {
 
 body {
   min-height: 100%;
-  overflow-x: hidden;
+  min-height: 100dvh;
+  overflow-x: clip;
   background: var(--void);
+  /* Coarse pointers: avoid accidental horizontal pans stealing vertical scroll */
+  touch-action: pan-y pinch-zoom;
+}
+
+@media (pointer: fine) {
+  body {
+    touch-action: auto;
+  }
 }
 
 /* ─── SCROLL CONTAINER ────────────────────────────────────────── */
 #scroll-container {
   position: relative;
   width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Fixed mobile nav (52px) + Dynamic Island / notch — anchor in-page targets */
+#main-content.mobile-main {
+  scroll-margin-top: calc(52px + env(safe-area-inset-top, 0px));
+}
+
+@media (min-width: 768px) {
+  #main-content.mobile-main {
+    scroll-margin-top: 80px;
+  }
+}
+
+/* Full viewport: vh fallback + dvh (dynamic toolbar / address bar) */
+.min-h-dvh-safe {
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* ─── SELECTION ───────────────────────────────────────────────── */
@@ -92,8 +126,8 @@ body {
 /* ─── SKIP LINK ───────────────────────────────────────────────── */
 .skip-to-main {
   position: fixed;
-  left: 1rem;
-  top: 1rem;
+  left: max(1rem, env(safe-area-inset-left, 0px));
+  top: max(1rem, env(safe-area-inset-top, 0px));
   z-index: 10001;
   padding: 0.65rem 1rem;
   transform: translateY(-180%);
@@ -137,8 +171,10 @@ body {
 #grain-canvas {
   position: fixed;
   inset: 0;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
+  height: 100dvh;
+  max-height: 100dvh;
   pointer-events: none;
   z-index: 36;
   mix-blend-mode: overlay;
@@ -286,6 +322,13 @@ body {
   outline-offset: 2px;
 }
 
+/* Subtle tap feedback on real devices (does not replace visible focus) */
+button,
+a[href],
+[role='button'] {
+  -webkit-tap-highlight-color: rgba(201, 168, 76, 0.1);
+}
+
 /* ─── RESPONSIVE GRIDS ────────────────────────────────────────── */
 @media (max-width: 768px) {
   .testimonials-grid {
@@ -325,4 +368,43 @@ body {
   .checkout-submit {
     width: 100% !important;
   }
+}
+
+/* ═══ Adaptive UI states (<html data-*> from ViewportModeSync) ═══
+   Different handsets / orientations / chrome heights switch these without UA sniffing. */
+
+/* Very narrow phones — shrink display-scale type so nothing clips horizontally */
+html[data-vw="xs"] .text-brutal {
+  font-size: clamp(2.85rem, 15vw, 10rem) !important;
+}
+
+html[data-vw="sm"] .text-brutal {
+  font-size: clamp(3.5rem, 13vw, 14rem) !important;
+}
+
+/* Landscape + touch on phone-width: shorter hero fold */
+html[data-orientation="landscape"][data-pointer="coarse"][data-vw="xs"] #hero,
+html[data-orientation="landscape"][data-pointer="coarse"][data-vw="sm"] #hero {
+  min-height: 72vh !important;
+  min-height: 72dvh !important;
+}
+
+html[data-orientation="landscape"][data-aspect="ultra-wide"] #hero .text-brutal {
+  font-size: clamp(2.75rem, 11vh, 8rem) !important;
+}
+
+/* Ultra-tall portrait (many full-screen phones): slightly compress vertical section padding */
+html[data-aspect="ultra-tall"][data-orientation="portrait"] #collection {
+  padding-top: 4.5rem !important;
+  padding-bottom: 4.5rem !important;
+}
+
+/* Keyboard or large browser UI — compact bottom bar: less chrome, hide fine print */
+html[data-viewport-chrome="compact"] .sticky-conversion-shell {
+  gap: 0.35rem;
+  padding-top: 0.35rem;
+}
+
+html[data-viewport-chrome="compact"] .sticky-conversion-shell > p {
+  display: none;
 }

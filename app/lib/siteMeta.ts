@@ -1,3 +1,3 @@
 /** Single source of truth for `<meta name="description">` and OG/Twitter fallbacks. */
 export const SITE_DESCRIPTION =
-  'RIOT CROWN — Tokyo-cast limited jewelry (18K, sterling, titanium). SS26 Void Collection; secure in-app checkout.';
+  'RIOT CROWN — a global atelier for bespoke jewelry: longing set in metal, city by city. Void Atelier; quiet worldwide delivery; checkout in-app.';

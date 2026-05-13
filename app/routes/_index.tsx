@@ -11,7 +11,7 @@ import { Testimonials } from '~/components/Testimonials';
 import { Footer } from '~/components/Footer';
 
 export const meta: MetaFunction = () => [
-  { title: 'RIOT CROWN — Void Collection SS26' },
+  { title: 'RIOT CROWN — Void Atelier' },
   {
     name: 'description',
     content: SITE_DESCRIPTION,
@@ -21,11 +21,30 @@ export const meta: MetaFunction = () => [
 function HomeJsonLd({ siteUrl }: { siteUrl: string }) {
   const payload = {
     '@context': 'https://schema.org',
-    '@type': 'Organization',
-    name: 'RIOT CROWN',
-    url: siteUrl,
-    logo: `${siteUrl}/og-brand.svg`,
-    description: SITE_DESCRIPTION,
+    '@graph': [
+      {
+        '@type': 'Organization',
+        name: 'RIOT CROWN',
+        url: siteUrl,
+        logo: `${siteUrl}/og-brand.svg`,
+        description: SITE_DESCRIPTION,
+      },
+      {
+        '@type': 'WebSite',
+        name: 'RIOT CROWN',
+        url: siteUrl,
+        description: SITE_DESCRIPTION,
+        publisher: { '@type': 'Organization', name: 'RIOT CROWN', url: siteUrl },
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: {
+            '@type': 'EntryPoint',
+            urlTemplate: `${siteUrl}/search?q={search_term_string}`,
+          },
+          'query-input': 'required name=search_term_string',
+        },
+      },
+    ],
   };
   return (
     <script

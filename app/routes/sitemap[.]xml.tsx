@@ -1,6 +1,5 @@
 import type { LoaderFunctionArgs } from '@shopify/remix-oxygen';
 import { PRODUCTS } from '~/lib/products';
-import { LEGAL_PAGE_IDS } from '~/lib/legalContent';
 
 function xmlEscape(s: string): string {
   return s
@@ -14,15 +13,16 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const origin = new URL(request.url).origin;
   const paths = [
     '/',
+    '/search',
     ...PRODUCTS.map(p => `/products/${p.id}`),
-    ...LEGAL_PAGE_IDS.map(p => `/legal/${p}`),
   ];
   const body = [
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-    ...paths.map(
-      path => `<url><loc>${xmlEscape(`${origin}${path}`)}</loc><changefreq>weekly</changefreq><priority>${path === '/' ? '1.0' : '0.7'}</priority></url>`,
-    ),
+    ...paths.map((path) => {
+      const priority = path === '/' ? '1.0' : path === '/search' ? '0.5' : '0.7';
+      return `<url><loc>${xmlEscape(`${origin}${path}`)}</loc><changefreq>weekly</changefreq><priority>${priority}</priority></url>`;
+    }),
     '</urlset>',
   ].join('');
 

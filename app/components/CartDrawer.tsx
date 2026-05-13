@@ -147,9 +147,11 @@ export function CartDrawer({ isOpen, items, onClose, onCheckout }: CartDrawerPro
           role="dialog"
           aria-modal="true"
           aria-labelledby="cart-drawer-title"
-          className="fixed top-0 right-0 h-full z-[201] flex flex-col"
+          className="fixed top-0 right-0 z-[201] flex min-h-0 flex-col h-dvh max-h-dvh"
           style={{
-            width: 'min(480px, 100vw)',
+            width: 'min(480px, 100%)',
+            paddingTop: 'env(safe-area-inset-top, 0px)',
+            paddingBottom: 'env(safe-area-inset-bottom, 0px)',
             background: 'rgba(8,8,8,0.95)',
             backdropFilter: 'blur(40px) saturate(0.3)',
             WebkitBackdropFilter: 'blur(40px) saturate(0.3)',
@@ -280,16 +282,16 @@ function CartLineItem({ item, numberLocale }: { item: CartItem; numberLocale: st
             {item.size}
           </p>
         ) : null}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginTop: '0.75rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginTop: '0.75rem', flexWrap: 'wrap' }}>
           <button type="button" onClick={() => updateQty(item.id, item.qty - 1, sizeKey)} aria-label="Decrease quantity"
-            style={{ width: '22px', height: '22px', background: 'rgba(242,242,242,0.06)', border: '0.5px solid rgba(242,242,242,0.12)', color: '#F2F2F2', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            style={{ minWidth: '44px', minHeight: '44px', background: 'rgba(242,242,242,0.06)', border: '0.5px solid rgba(242,242,242,0.12)', color: '#F2F2F2', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '2px' }}>
             −
           </button>
           <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'rgba(242,242,242,0.5)', minWidth: '18px', textAlign: 'center' }}>
             {item.qty.toString().padStart(2, '0')}
           </span>
           <button type="button" onClick={() => updateQty(item.id, item.qty + 1, sizeKey)} aria-label="Increase quantity"
-            style={{ width: '22px', height: '22px', background: 'rgba(242,242,242,0.06)', border: '0.5px solid rgba(242,242,242,0.12)', color: '#F2F2F2', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            style={{ minWidth: '44px', minHeight: '44px', background: 'rgba(242,242,242,0.06)', border: '0.5px solid rgba(242,242,242,0.12)', color: '#F2F2F2', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '2px' }}>
             +
           </button>
           <button type="button" onClick={handleRemove} aria-label={`Remove ${item.name}`}

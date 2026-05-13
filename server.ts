@@ -7,6 +7,7 @@ import {
   cartSetIdDefault,
 } from '@shopify/hydrogen';
 import { getStorefrontHeaders } from '~/lib/storefrontHeaders';
+import { getStorefrontI18n } from '~/lib/storefrontI18n';
 import type {ServerBuild} from '@remix-run/server-runtime';
 import {
   createCookieSessionStorage,
@@ -31,7 +32,7 @@ export default {
       const {storefront} = createStorefrontClient({
         cache,
         waitUntil,
-        i18n: {language: 'EN', country: 'US'},
+        i18n: getStorefrontI18n(env),
         publicStorefrontToken: env.PUBLIC_STOREFRONT_API_TOKEN,
         storeDomain: env.PUBLIC_STORE_DOMAIN,
         storefrontHeaders: getStorefrontHeaders(request),
@@ -98,4 +99,6 @@ interface HydrogenWorkerEnv {
   PUBLIC_STOREFRONT_API_TOKEN: string;
   PUBLIC_STORE_DOMAIN: string;
   PUBLIC_CHECKOUT_DOMAIN?: string;
+  PUBLIC_STOREFRONT_LANGUAGE?: string;
+  PUBLIC_STOREFRONT_COUNTRY?: string;
 }

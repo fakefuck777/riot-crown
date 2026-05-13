@@ -48,12 +48,17 @@ export function GrainOverlay() {
     const fps     = getGrainFps();
     const interval = 1000 / fps;
 
+    const viewportW = () => window.visualViewport?.width ?? window.innerWidth;
+    const viewportH = () => window.visualViewport?.height ?? window.innerHeight;
+
     const resize = () => {
-      canvas.width  = Math.floor(window.innerWidth  * scale);
-      canvas.height = Math.floor(window.innerHeight * scale);
+      canvas.width  = Math.floor(viewportW() * scale);
+      canvas.height = Math.floor(viewportH() * scale);
     };
     resize();
     window.addEventListener('resize', resize);
+    window.visualViewport?.addEventListener('resize', resize);
+    window.visualViewport?.addEventListener('scroll', resize);
 
     let lastTime = 0;
 
@@ -88,6 +93,8 @@ export function GrainOverlay() {
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       window.removeEventListener('resize', resize);
+      window.visualViewport?.removeEventListener('resize', resize);
+      window.visualViewport?.removeEventListener('scroll', resize);
     };
   }, [reducedMotion]);
 
@@ -95,12 +102,12 @@ export function GrainOverlay() {
     return (
       <div
         id="grain-canvas"
+        className="min-h-dvh-safe"
         aria-hidden
         style={{
           position: 'fixed',
           inset: 0,
-          width: '100vw',
-          height: '100vh',
+          width: '100%',
           pointerEvents: 'none',
           zIndex: 36,
           mixBlendMode: 'overlay',
@@ -115,12 +122,8 @@ export function GrainOverlay() {
     <canvas
       ref={canvasRef}
       id="grain-canvas"
+      className="min-h-dvh-safe"
       aria-hidden="true"
-      style={{
-        // Stretch half-res canvas back to full viewport on mobile
-        width:  '100vw',
-        height: '100vh',
-      }}
     />
   );
 }
