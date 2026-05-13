@@ -102,10 +102,17 @@ export function Footer() {
                       fontFamily: 'var(--font-mono)',
                       fontSize: '0.58rem',
                       letterSpacing: '0.06em',
-                      color: 'rgba(242,242,242,0.3)',
-                      cursor: 'pointer',
+                      color: 'rgba(242,242,242,0.62)',
+                      cursor: 'default',
                       transition: 'color 0.2s',
-                    }}>
+                    }}
+                      onMouseEnter={e => {
+                        (e.currentTarget as HTMLElement).style.color = 'rgba(242,242,242,0.92)';
+                      }}
+                      onMouseLeave={e => {
+                        (e.currentTarget as HTMLElement).style.color = 'rgba(242,242,242,0.62)';
+                      }}
+                    >
                       {link}
                     </span>
                   </li>

@@ -1,7 +1,9 @@
 'use client';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 import { useLocale } from '~/lib/LocaleContext';
+import { usePrefersReducedMotion } from '~/hooks/usePrefersReducedMotion';
+import { observeRevealOnce } from '~/lib/motionReveal';
 
 const QUOTES = [
   { text: '不是首飾，是訊號。亮，但不討好。', origin: '匿名買家 — 多城', lang: 'ZH' },
@@ -14,34 +16,39 @@ const QUOTES = [
 
 export function Testimonials() {
   const { t } = useLocale();
+  const reducedMotion = usePrefersReducedMotion();
   const sectionRef = useRef<HTMLElement>(null);
   const itemsRef   = useRef<(HTMLDivElement | null)[]>([]);
   const played     = useRef(false);
 
+  useLayoutEffect(() => {
+    if (!reducedMotion) return;
+    if (played.current) return;
+    played.current = true;
+    itemsRef.current.forEach(el => {
+      if (el) gsap.set(el, { opacity: 1, y: 0 });
+    });
+  }, [reducedMotion]);
+
   useEffect(() => {
+    if (reducedMotion) return;
     const section = sectionRef.current;
     if (!section) return;
 
     const play = () => {
       if (played.current) return;
       played.current = true;
-
       itemsRef.current.forEach((el, i) => {
         if (!el) return;
         gsap.fromTo(el,
           { opacity: 0, y: 32 },
-          { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out', delay: i * 0.1 }
+          { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out', delay: i * 0.1 },
         );
       });
     };
 
-    const observer = new IntersectionObserver(
-      (entries) => { if (entries[0].isIntersecting) play(); },
-      { threshold: 0.1 }
-    );
-    observer.observe(section);
-    return () => observer.disconnect();
-  }, []);
+    return observeRevealOnce(section, play, { threshold: 0.08, failSafeMs: 4000 });
+  }, [reducedMotion]);
 
   return (
     <section

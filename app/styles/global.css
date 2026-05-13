@@ -83,6 +83,12 @@ body {
   touch-action: pan-y pinch-zoom;
 }
 
+/* Route shell: avoid any flash of UA default paper behind fixed layers (mobile Safari). */
+#main-content {
+  background-color: var(--void);
+  min-height: min(100dvh, 100vh);
+}
+
 @media (pointer: fine) {
   body {
     touch-action: auto;
@@ -147,7 +153,10 @@ body {
   font-size: 0.55rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
   color: #f2f2f2;
+  -webkit-text-fill-color: #f2f2f2;
   background: rgba(5, 5, 5, 0.92);
   border: 0.5px solid rgba(255, 18, 147, 0.35);
   backdrop-filter: blur(12px);

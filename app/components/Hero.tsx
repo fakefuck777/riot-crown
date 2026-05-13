@@ -1,5 +1,5 @@
 'use client';
-import { useRef, useEffect, useCallback, lazy, Suspense, useState } from 'react';
+import { useRef, useEffect, useLayoutEffect, useCallback, lazy, Suspense, useState } from 'react';
 import { gsap } from 'gsap';
 import { useLocale } from '~/lib/LocaleContext';
 import { usePrefersReducedMotion } from '~/hooks/usePrefersReducedMotion';
@@ -12,6 +12,7 @@ const GraffitiCanvas = lazy(() =>
 export function Hero() {
   const { t } = useLocale();
   const reducedMotion = usePrefersReducedMotion();
+  const heroRootRef  = useRef<HTMLElement>(null);
   const sectionRef   = useRef<HTMLDivElement>(null);
   const titleRef     = useRef<HTMLHeadingElement>(null);
   const subtitleRef  = useRef<HTMLParagraphElement>(null);
@@ -83,8 +84,11 @@ export function Hero() {
     return () => { window.removeEventListener('mousemove', onMouseMove); cancelAnimationFrame(rafId); };
   }, [onMouseMove, reducedMotion]);
 
-  // Entrance — staggered, architectural
-  useEffect(() => {
+  // Entrance — staggered; layout effect avoids first paint stuck at opacity:0; context cleans StrictMode remounts.
+  useLayoutEffect(() => {
+    const root = heroRootRef.current;
+    if (!root) return;
+
     if (reducedMotion) {
       gsap.set(
         [
@@ -94,57 +98,80 @@ export function Hero() {
           subtitleRef.current,
           ctaBlockRef.current,
           scrollRef.current,
-        ],
+        ].filter(Boolean),
         { opacity: 1, x: 0, y: 0, skewY: 0, scaleX: 1, clearProps: 'transform' },
       );
       return;
     }
 
-    const tl = gsap.timeline({ delay: 0.1 });
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ delay: 0.1 });
 
-    // Eyebrow slides in from left
-    tl.fromTo(eyebrowRef.current,
-      { opacity: 0, x: -20 },
-      { opacity: 1, x: 0, duration: 1.0, ease: 'power3.out' }
-    );
+      tl.fromTo(eyebrowRef.current,
+        { opacity: 0, x: -20 },
+        { opacity: 1, x: 0, duration: 1.0, ease: 'power3.out' },
+      );
 
-    // Title slams in — heavy, no bounce
-    tl.fromTo(titleRef.current,
-      { opacity: 0, y: 60, skewY: 3 },
-      { opacity: 1, y: 0, skewY: 0, duration: 1.4, ease: 'power4.out' },
-      '-=0.5'
-    );
+      tl.fromTo(titleRef.current,
+        { opacity: 0, y: 60, skewY: 3 },
+        { opacity: 1, y: 0, skewY: 0, duration: 1.4, ease: 'power4.out' },
+        '-=0.5',
+      );
 
-    // Divider draws across
-    tl.fromTo(dividerRef.current,
-      { scaleX: 0, opacity: 0 },
-      { scaleX: 1, opacity: 1, duration: 0.8, ease: 'power3.out', transformOrigin: 'left center' },
-      '-=0.6'
-    );
+      tl.fromTo(dividerRef.current,
+        { scaleX: 0, opacity: 0 },
+        { scaleX: 1, opacity: 1, duration: 0.8, ease: 'power3.out', transformOrigin: 'left center' },
+        '-=0.6',
+      );
 
-    // Subtitle fades up
-    tl.fromTo(subtitleRef.current,
-      { opacity: 0, y: 16 },
-      { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out' },
-      '-=0.5'
-    );
+      tl.fromTo(subtitleRef.current,
+        { opacity: 0, y: 16 },
+        { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out' },
+        '-=0.5',
+      );
 
-    tl.fromTo(ctaBlockRef.current,
-      { opacity: 0, y: 20 },
-      { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out' },
-      '-=0.45'
-    );
+      tl.fromTo(ctaBlockRef.current,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out' },
+        '-=0.45',
+      );
 
-    // Scroll indicator
-    tl.fromTo(scrollRef.current,
-      { opacity: 0 },
-      { opacity: 1, duration: 0.6, ease: 'power2.out' },
-      '-=0.3'
-    );
+      tl.fromTo(scrollRef.current,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.6, ease: 'power2.out' },
+        '-=0.3',
+      );
+    }, root);
+
+    return () => ctx.revert();
+  }, [reducedMotion]);
+
+  // If GSAP never completes (rare WebKit / extension edge cases), never leave hero copy invisible.
+  useEffect(() => {
+    if (reducedMotion) return;
+    const targets = [
+      eyebrowRef.current,
+      titleRef.current,
+      dividerRef.current,
+      subtitleRef.current,
+      ctaBlockRef.current,
+      scrollRef.current,
+    ].filter(Boolean) as HTMLElement[];
+
+    const t = window.setTimeout(() => {
+      const title = titleRef.current;
+      if (!title) return;
+      const o = parseFloat(window.getComputedStyle(title).opacity);
+      if (o < 0.08) {
+        gsap.set(targets, { opacity: 1, x: 0, y: 0, skewY: 0, scaleX: 1, clearProps: 'transform' });
+      }
+    }, 3200);
+    return () => window.clearTimeout(t);
   }, [reducedMotion]);
 
   return (
     <section
+      ref={heroRootRef}
       id="hero"
       data-riot-hero="split-webgl-v2"
       className="relative isolate w-full min-h-screen min-h-dvh bg-void"
@@ -180,9 +207,9 @@ export function Hero() {
         <div className="absolute inset-0 pointer-events-none" style={{
         background: `
           radial-gradient(ellipse 92% 72% at 50% 36%,
-            rgba(5,5,5,0.0) 0%,
-            rgba(5,5,5,0.38) 52%,
-            rgba(5,5,5,0.88) 100%
+            rgba(5,5,5,0.14) 0%,
+            rgba(5,5,5,0.42) 48%,
+            rgba(5,5,5,0.92) 100%
           )
         `,
         }} />

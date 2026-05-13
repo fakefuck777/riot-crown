@@ -1,8 +1,9 @@
 'use client';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 import { useLocale } from '~/lib/LocaleContext';
 import { usePrefersReducedMotion } from '~/hooks/usePrefersReducedMotion';
+import { observeRevealOnce } from '~/lib/motionReveal';
 
 export function Manifesto() {
   const { t } = useLocale();
@@ -12,21 +13,24 @@ export function Manifesto() {
   const rulerRef   = useRef<HTMLDivElement>(null);
   const played     = useRef(false);
 
+  useLayoutEffect(() => {
+    if (!reducedMotion) return;
+    if (played.current) return;
+    played.current = true;
+    linesRef.current.forEach(el => {
+      if (el) gsap.set(el, { opacity: 1, y: 0, skewY: 0 });
+    });
+    if (rulerRef.current) gsap.set(rulerRef.current, { opacity: 1, scaleX: 1 });
+  }, [reducedMotion]);
+
   useEffect(() => {
+    if (reducedMotion) return;
     const section = sectionRef.current;
     if (!section) return;
 
     const play = () => {
       if (played.current) return;
       played.current = true;
-
-      if (reducedMotion) {
-        linesRef.current.forEach(el => {
-          if (el) gsap.set(el, { opacity: 1, y: 0, skewY: 0 });
-        });
-        if (rulerRef.current) gsap.set(rulerRef.current, { opacity: 1, scaleX: 1 });
-        return;
-      }
 
       const tl = gsap.timeline();
       linesRef.current.forEach((el, i) => {
@@ -35,24 +39,19 @@ export function Manifesto() {
         tl.fromTo(el,
           { opacity: 0, y: 28, skewY: 1.5 },
           { opacity: 1, y: 0, skewY: 0, duration: i === 1 ? 1.05 : 1.1, ease },
-          i === 0 ? 0 : '-=0.65'
+          i === 0 ? 0 : '-=0.65',
         );
       });
       if (rulerRef.current) {
         tl.fromTo(rulerRef.current,
           { scaleX: 0, opacity: 0 },
           { scaleX: 1, opacity: 1, duration: 0.9, ease: 'power3.out', transformOrigin: 'left center' },
-          '-=0.5'
+          '-=0.5',
         );
       }
     };
 
-    const observer = new IntersectionObserver(
-      (entries) => { if (entries[0].isIntersecting) play(); },
-      { threshold: 0.15 }
-    );
-    observer.observe(section);
-    return () => observer.disconnect();
+    return observeRevealOnce(section, play, { threshold: 0.12, failSafeMs: 4000 });
   }, [reducedMotion]);
 
   const lines = [

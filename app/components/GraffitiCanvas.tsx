@@ -1,8 +1,10 @@
 'use client';
 import { useRef, useMemo, useEffect } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Canvas, useFrame, useThree, invalidate } from '@react-three/fiber';
 import * as THREE from 'three';
 import { usePrefersReducedMotion } from '~/hooks/usePrefersReducedMotion';
+import { useDocumentVisible } from '~/hooks/useDocumentVisible';
+import { HeroCinematicPost } from '~/components/HeroCinematicPost';
 
 // ─── GLSL ─────────────────────────────────────────────────────────────────────
 
@@ -141,7 +143,9 @@ const fragmentShader = /* glsl */`
 
     float totalPaint = clamp(paintMass * 0.8 + dripMask * 0.96, 0.0, 1.0);
 
-    vec2  lightDir   = normalize(uMouse - uv + vec2(0.28, 0.58));
+    vec2  ldRaw      = uMouse - uv + vec2(0.28, 0.58);
+    float ldLen      = length(ldRaw);
+    vec2  lightDir   = ldLen > 1e-4 ? normalize(ldRaw) : normalize(vec2(0.28, 0.96));
     float spec       = specular(nq * 3.8, lightDir, 44.0);
     float specChrome = specular(nq * 7.6, lightDir, 108.0);
     float microGlint = specular(nq * 14.0 + uTime * 0.02, lightDir, 220.0) * 0.42;
@@ -152,14 +156,19 @@ const fragmentShader = /* glsl */`
                   + vec3(1.0, 0.92, 0.98) * microGlint;
 
     float glow = totalPaint * (1.0 - totalPaint) * 2.95;
-    vec3  glowColor = neonPink * glow * (1.0 + uScrollVel * 2.0);
+    vec3  glowColor = neonPink * glow * (1.0 + uScrollVel * 2.0) * 0.82;
 
     color = mix(color, litPaint, totalPaint);
     color += glowColor;
 
-    float vignette = 1.0 - smoothstep(0.4, 1.38,
-                       length((vUv - 0.5) * vec2(1.0, 1.04)));
-    color *= vignette;
+    float peakPre = max(max(color.r, color.g), color.b);
+    color += paintColor * smoothstep(0.42, 1.0, peakPre) * 0.052;
+
+    vec2 vigUv = (vUv - 0.5) * vec2(1.14, 0.97);
+    float dist = length(vigUv);
+    float breathe = 0.018 * sin(uTime * 0.37);
+    float vignette = pow(1.0 - smoothstep(0.33 + breathe, 1.36, dist), 1.14);
+    color = mix(color * 0.84, color, vignette);
 
     float d = fract(sin(dot(gl_FragCoord.xy * 0.31 + uTime * 37.0, vec2(12.9898, 78.233))) * 43758.5453123);
     color += (d - 0.5) * 0.0038;
@@ -220,6 +229,38 @@ function ShaderPlane({ scrollVelRef, mouseRef }: ShaderPlaneProps) {
   );
 }
 
+/** WebGL context loss must call preventDefault to allow restore; wake loop after restore. */
+function CanvasGpuLifecycle() {
+  const { gl } = useThree();
+
+  useEffect(() => {
+    const canvas = gl.domElement;
+    const onLost = (e: Event) => {
+      e.preventDefault();
+    };
+    const onRestored = () => {
+      gl.setClearColor('#050505', 1);
+      invalidate();
+    };
+    canvas.addEventListener('webglcontextlost', onLost);
+    canvas.addEventListener('webglcontextrestored', onRestored);
+    return () => {
+      canvas.removeEventListener('webglcontextlost', onLost);
+      canvas.removeEventListener('webglcontextrestored', onRestored);
+    };
+  }, [gl]);
+
+  useEffect(() => {
+    const wake = () => {
+      if (!document.hidden) invalidate();
+    };
+    document.addEventListener('visibilitychange', wake);
+    return () => document.removeEventListener('visibilitychange', wake);
+  }, []);
+
+  return null;
+}
+
 // ─── Public component ─────────────────────────────────────────────────────────
 
 interface GraffitiCanvasProps {
@@ -239,6 +280,7 @@ function heroCanvasDpr(): [number, number] {
 
 export function GraffitiCanvas({ scrollVelRef, mouseRef, className }: GraffitiCanvasProps) {
   const reducedMotion = usePrefersReducedMotion();
+  const tabVisible = useDocumentVisible();
 
   if (reducedMotion) {
     return (
@@ -266,14 +308,16 @@ export function GraffitiCanvas({ scrollVelRef, mouseRef, className }: GraffitiCa
       camera={{ position: [0, 0, 1], near: 0.1, far: 10 }}
       dpr={dpr}
       resize={{ scroll: true, debounce: { scroll: 50, resize: 0 } }}
-      frameloop="always"
+      frameloop={tabVisible ? 'always' : 'never'}
       onCreated={({ gl }) => {
         gl.setClearColor('#050505', 1);
         gl.outputColorSpace = THREE.SRGBColorSpace;
         gl.toneMapping = THREE.NoToneMapping;
       }}
     >
+      <CanvasGpuLifecycle />
       <ShaderPlane scrollVelRef={scrollVelRef} mouseRef={mouseRef} />
+      <HeroCinematicPost scrollVelRef={scrollVelRef} />
     </Canvas>
   );
 }

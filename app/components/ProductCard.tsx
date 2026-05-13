@@ -6,6 +6,7 @@ import { GhostImage } from '~/components/GhostImage';
 import { useLocale } from '~/lib/LocaleContext';
 import { useCart } from '~/lib/CartContext';
 import { usePrefersReducedMotion } from '~/hooks/usePrefersReducedMotion';
+import { useFinePointer } from '~/hooks/useFinePointer';
 import type { ProductData } from '~/lib/products';
 
 export type { ProductData } from '~/lib/products';
@@ -29,6 +30,7 @@ export function ProductCard({
   const { t } = useLocale();
   const { addToCart } = useCart();
   const reducedMotion = usePrefersReducedMotion();
+  const finePointer = useFinePointer();
 
   const handleAcquire = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -92,6 +94,23 @@ export function ProductCard({
     }
   }, [playClick, reducedMotion]);
 
+  const onTouchGlow = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    if (finePointer || reducedMotion) return;
+    const card = cardRef.current;
+    const glow = glowRef.current;
+    if (!card || !glow) return;
+    const t = e.touches[0];
+    if (!t) return;
+    const rect = card.getBoundingClientRect();
+    const px = ((t.clientX - rect.left) / rect.width) * 100;
+    const py = ((t.clientY - rect.top) / rect.height) * 100;
+    glow.style.background =
+      `radial-gradient(circle at ${px}% ${py}%, rgba(255,18,147,0.26) 0%, rgba(110,203,255,0.08) 38%, transparent 58%)`;
+    window.setTimeout(() => {
+      glow.style.background = 'transparent';
+    }, 480);
+  }, [finePointer, reducedMotion]);
+
   const onMouseLeave = useCallback(() => {
     const card = cardRef.current, img = imageRef.current;
     const overlay = overlayRef.current, info = infoRef.current;
@@ -129,9 +148,10 @@ export function ProductCard({
         transformStyle: 'preserve-3d',
       }}
       onClick={onClick}
-      onMouseMove={onMouseMove}
-      onMouseEnter={onMouseEnter}
+      onMouseMove={finePointer ? onMouseMove : undefined}
+      onMouseEnter={finePointer ? onMouseEnter : undefined}
       onMouseLeave={onMouseLeave}
+      onTouchStart={onTouchGlow}
     >
       <div
         className="pointer-events-none absolute left-3 top-3 z-20 h-3 w-3 border-l border-t border-[rgba(201,168,76,0.55)] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
