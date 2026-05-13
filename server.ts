@@ -33,6 +33,7 @@ export default {
         cache,
         waitUntil,
         i18n: getStorefrontI18n(env),
+        // Oxygen secrets: exact keys `PUBLIC_STOREFRONT_API_TOKEN` + `PUBLIC_STORE_DOMAIN` (see .env.example).
         publicStorefrontToken: env.PUBLIC_STOREFRONT_API_TOKEN,
         storeDomain: env.PUBLIC_STORE_DOMAIN,
         storefrontHeaders: getStorefrontHeaders(request),

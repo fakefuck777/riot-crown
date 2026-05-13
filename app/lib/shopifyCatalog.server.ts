@@ -5,6 +5,62 @@ import { PRODUCTS, type ProductData } from '~/lib/products';
 
 const CATALOG_FIRST = 48;
 
+/**
+ * Serialize Storefront / network errors — GraphQL errors often have extensions;
+ * plain `Error` may stringify to `{}` in console.
+ */
+function serializeStorefrontErrors(errors: unknown): unknown[] {
+  if (!Array.isArray(errors)) return [{ raw: errors }];
+  return errors.map((err) => {
+    if (err == null) return { value: null };
+    if (typeof err === 'string') return { message: err };
+    if (typeof err !== 'object') return { value: String(err) };
+    const o = err as Record<string, unknown> & {
+      message?: string;
+      stack?: string;
+      name?: string;
+      locations?: unknown;
+      path?: unknown;
+      extensions?: unknown;
+    };
+    return {
+      name: o.name,
+      message: o.message ?? '(empty message — see stack/extensions)',
+      stack: o.stack,
+      locations: o.locations,
+      path: o.path,
+      extensions: o.extensions,
+      keys: Object.keys(o),
+    };
+  });
+}
+
+function logStorefrontFailure(
+  label: string,
+  extra: Record<string, unknown>,
+  errors?: unknown,
+  caught?: unknown,
+): void {
+  const payload = {
+    ...extra,
+    graphQLErrors: errors != null ? serializeStorefrontErrors(errors) : undefined,
+    caught:
+      caught == null
+        ? undefined
+        : caught instanceof Error
+          ? {
+              name: caught.name,
+              message: caught.message || '(empty)',
+              stack: caught.stack,
+              cause: caught.cause != null ? String(caught.cause) : undefined,
+            }
+          : String(caught),
+  };
+  console.error(`[${label}]`, JSON.stringify(payload, null, 2));
+}
+
+/** Oxygen / server must set exactly `PUBLIC_STOREFRONT_API_TOKEN` (not …APITOKEN). Wired in `server.ts` → `createStorefrontClient`. */
+
 const SIZE_CYCLE: ProductData['size'][] = [
   'large', 'tall', 'wide', 'standard', 'tall', 'standard',
 ];
@@ -26,8 +82,6 @@ const CATALOG_PRODUCTS_QUERY = `#graphql
           url(transform: { maxWidth: 1200, maxHeight: 1600 })
           altText
         }
-        totalInventory
-        tracksInventory
         priceRange {
           minVariantPrice { amount currencyCode }
         }
@@ -64,8 +118,6 @@ const COLLECTION_PRODUCTS_QUERY = `#graphql
             url(transform: { maxWidth: 1200, maxHeight: 1600 })
             altText
           }
-          totalInventory
-          tracksInventory
           priceRange {
             minVariantPrice { amount currencyCode }
           }
@@ -101,8 +153,6 @@ const PRODUCT_BY_HANDLE_QUERY = `#graphql
         url(transform: { maxWidth: 1600, maxHeight: 2000 })
         altText
       }
-      totalInventory
-      tracksInventory
       priceRange {
         minVariantPrice { amount currencyCode }
       }
@@ -187,8 +237,6 @@ type SfProductNode = {
   productType: string;
   tags: string[];
   featuredImage: { url: string; altText: string | null } | null;
-  totalInventory: number | null;
-  tracksInventory: boolean;
   priceRange: { minVariantPrice: { amount: string; currencyCode: string } };
   variants: { nodes: SfVariant[] };
 };
@@ -225,10 +273,8 @@ function mapNode(node: SfProductNode, index: number): ProductData {
     node.featuredImage?.url ??
     makeSVG(String(index + 1).padStart(2, '0'), 600, 800, '#C9A84C', label);
 
-  let stock: number | undefined;
-  if (node.tracksInventory && node.totalInventory != null) {
-    stock = node.totalInventory;
-  }
+  /** Omit totalInventory in query — requires extra Storefront scopes and can fail the whole request. */
+  const stock: number | undefined = undefined;
 
   const sizes = variantSizes(variants);
   const variantIdsBySize = variantSizeToIdMap(variants);
@@ -280,15 +326,11 @@ export async function loadStoreCatalog(
       return { products: shop, source: 'shopify' };
     }
   } catch (e) {
-    console.error('[loadStoreCatalog]', e);
+    logStorefrontFailure('loadStoreCatalog', { note: 'unexpected throw' }, undefined, e);
   }
   return { products: PRODUCTS, source: 'demo' };
 }
 
-/**
- * Load catalog for the storefront: Shopify products when API returns data,
- * otherwise empty (caller merges demo `PRODUCTS` if desired).
- */
 export async function fetchShopifyCatalog(
   storefront: Storefront,
   opts?: { collectionHandle?: string },
@@ -297,33 +339,56 @@ export async function fetchShopifyCatalog(
   let nodes: SfProductNode[] = [];
 
   if (handle) {
-    const { data, errors } = await storefront.query(COLLECTION_PRODUCTS_QUERY, {
-      variables: { handle, first: CATALOG_FIRST },
-      cache: CacheShort(),
-    });
-    if (errors?.length) {
-      console.error('[fetchShopifyCatalog] collection errors', errors);
+    try {
+      const { data, errors } = await storefront.query(COLLECTION_PRODUCTS_QUERY, {
+        variables: { handle, first: CATALOG_FIRST },
+        cache: CacheShort(),
+      });
+      if (errors?.length) {
+        logStorefrontFailure('fetchShopifyCatalog.collection', { collectionHandle: handle }, errors);
+      }
+      const col = (data as { collection?: { products?: { nodes: SfProductNode[] } } } | null)?.collection;
+      if (!col && !errors?.length) {
+        console.warn(
+          `[fetchShopifyCatalog] collection(handle="${handle}") returned null — check collection handle in Shopify admin (URL slug) and PUBLIC_HOME_COLLECTION_HANDLE env.`,
+        );
+      }
+      nodes = col?.products?.nodes ?? [];
+    } catch (e) {
+      logStorefrontFailure('fetchShopifyCatalog.collection.exception', { collectionHandle: handle }, undefined, e);
     }
-    const col = (data as { collection?: { products?: { nodes: SfProductNode[] } } } | null)?.collection;
-    nodes = col?.products?.nodes ?? [];
     if (nodes.length === 0) {
-      const { data: d2, errors: e2 } = await storefront.query(CATALOG_PRODUCTS_QUERY, {
+      try {
+        const { data: d2, errors: e2 } = await storefront.query(CATALOG_PRODUCTS_QUERY, {
+          variables: { first: CATALOG_FIRST },
+          cache: CacheShort(),
+        });
+        if (e2?.length) {
+          logStorefrontFailure(
+            'fetchShopifyCatalog.productsFallback',
+            { reason: 'collection empty or missing', triedCollection: handle },
+            e2,
+          );
+        }
+        nodes =
+          (d2 as { products?: { nodes: SfProductNode[] } } | null)?.products?.nodes ?? [];
+      } catch (e) {
+        logStorefrontFailure('fetchShopifyCatalog.productsFallback.exception', {}, undefined, e);
+      }
+    }
+  } else {
+    try {
+      const { data, errors } = await storefront.query(CATALOG_PRODUCTS_QUERY, {
         variables: { first: CATALOG_FIRST },
         cache: CacheShort(),
       });
-      if (e2?.length) console.error('[fetchShopifyCatalog] products fallback errors', e2);
-      nodes =
-        (d2 as { products?: { nodes: SfProductNode[] } } | null)?.products?.nodes ?? [];
+      if (errors?.length) {
+        logStorefrontFailure('fetchShopifyCatalog.products', { mode: 'allPublishedProducts' }, errors);
+      }
+      nodes = (data as { products?: { nodes: SfProductNode[] } } | null)?.products?.nodes ?? [];
+    } catch (e) {
+      logStorefrontFailure('fetchShopifyCatalog.products.exception', { mode: 'allPublishedProducts' }, undefined, e);
     }
-  } else {
-    const { data, errors } = await storefront.query(CATALOG_PRODUCTS_QUERY, {
-      variables: { first: CATALOG_FIRST },
-      cache: CacheShort(),
-    });
-    if (errors?.length) {
-      console.error('[fetchShopifyCatalog] products errors', errors);
-    }
-    nodes = (data as { products?: { nodes: SfProductNode[] } } | null)?.products?.nodes ?? [];
   }
 
   return nodes.map((n, i) => mapNode(n, i));
@@ -334,14 +399,25 @@ export async function fetchShopifyProductByHandle(
   handle: string,
 ): Promise<ProductData | undefined> {
   if (!handle.trim()) return undefined;
-  const { data, errors } = await storefront.query(PRODUCT_BY_HANDLE_QUERY, {
-    variables: { handle: handle.trim() },
-    cache: CacheShort(),
-  });
-  if (errors?.length) {
-    console.error('[fetchShopifyProductByHandle] errors', errors);
+  const h = handle.trim();
+  try {
+    const { data, errors } = await storefront.query(PRODUCT_BY_HANDLE_QUERY, {
+      variables: { handle: h },
+      cache: CacheShort(),
+    });
+    if (errors?.length) {
+      logStorefrontFailure('fetchShopifyProductByHandle', { handle: h }, errors);
+    }
+    const node = (data as { product?: SfProductNode | null } | null)?.product;
+    if (!node && !errors?.length) {
+      console.warn(
+        `[fetchShopifyProductByHandle] product(handle="${h}") is null — use the product SEO handle from Shopify admin, not the numeric admin id.`,
+      );
+    }
+    if (!node) return undefined;
+    return mapNode(node, 0);
+  } catch (e) {
+    logStorefrontFailure('fetchShopifyProductByHandle.exception', { handle: h }, undefined, e);
+    return undefined;
   }
-  const node = (data as { product?: SfProductNode | null } | null)?.product;
-  if (!node) return undefined;
-  return mapNode(node, 0);
 }
