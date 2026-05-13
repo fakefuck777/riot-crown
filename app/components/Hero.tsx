@@ -26,20 +26,10 @@ export function Hero() {
   const ctaMagneticRef = useMagnetic<HTMLDivElement>(1.05);
   const [deferCanvas, setDeferCanvas] = useState(false);
 
+  /** 下一帧再挂 WebGL，避免与首屏排版抢主线程；比 idle 420ms 更早出现画面。 */
   useEffect(() => {
-    let cancel: (() => void) | undefined;
-    if (typeof window.requestIdleCallback === 'function') {
-      const id = window.requestIdleCallback(() => setDeferCanvas(true), { timeout: 420 });
-      cancel = () => {
-        if (typeof window.cancelIdleCallback === 'function') window.cancelIdleCallback(id);
-      };
-    } else {
-      const id = window.setTimeout(() => setDeferCanvas(true), 140);
-      cancel = () => clearTimeout(id);
-    }
-    return () => {
-      cancel?.();
-    };
+    const id = window.requestAnimationFrame(() => setDeferCanvas(true));
+    return () => window.cancelAnimationFrame(id);
   }, []);
 
   const onMouseMove = useCallback((e: MouseEvent) => {
@@ -183,14 +173,34 @@ export function Hero() {
         aria-hidden
       >
         {deferCanvas ? (
-          <Suspense fallback={null}>
+          <Suspense
+            fallback={
+              <div
+                className="absolute inset-0 h-full min-h-dvh w-full bg-[#050505]"
+                style={{
+                  background:
+                    'radial-gradient(ellipse 80% 55% at 50% 40%, rgba(255,18,147,0.12), transparent 62%), #050505',
+                }}
+                aria-hidden
+              />
+            }
+          >
             <GraffitiCanvas
               scrollVelRef={scrollVelRef}
               mouseRef={mouseRef}
               className="absolute inset-0 h-full min-h-dvh w-full"
             />
           </Suspense>
-        ) : null}
+        ) : (
+          <div
+            className="absolute inset-0 h-full min-h-dvh w-full bg-[#050505]"
+            style={{
+              background:
+                'radial-gradient(ellipse 80% 55% at 50% 40%, rgba(255,18,147,0.08), transparent 62%), #050505',
+            }}
+            aria-hidden
+          />
+        )}
       </div>
 
       {/* Foreground: veils + copy — subtle parallax tilt only here */}

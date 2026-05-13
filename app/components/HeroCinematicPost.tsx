@@ -11,6 +11,7 @@ import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js';
 import { getHeroGpuTier } from '~/lib/heroGpuProfile';
+import { supportsHeroHalfFloatTargets } from '~/lib/heroPostCapability';
 
 const MAX_DPR = 3;
 
@@ -22,6 +23,7 @@ const chromaticShader = {
   },
   vertexShader: CopyShader.vertexShader,
   fragmentShader: /* glsl */`
+    precision highp float;
     uniform sampler2D tDiffuse;
     uniform float amount;
     varying vec2 vUv;
@@ -53,6 +55,14 @@ export function HeroCinematicPost({ scrollVelRef }: HeroCinematicPostProps) {
   const smaaRef = useRef<SMAAPass | null>(null);
 
   useLayoutEffect(() => {
+    if (!supportsHeroHalfFloatTargets(gl)) {
+      composerRef.current = null;
+      bloomRef.current = null;
+      chromaticRef.current = null;
+      smaaRef.current = null;
+      return;
+    }
+
     const iw = typeof window !== 'undefined' ? window.innerWidth : 1280;
     const ih = typeof window !== 'undefined' ? window.innerHeight : 720;
     const w = Math.max(8, Math.floor(size.width) || iw);
@@ -62,10 +72,10 @@ export function HeroCinematicPost({ scrollVelRef }: HeroCinematicPostProps) {
     const bw = Math.max(32, Math.floor(w * bloomScale));
     const bh = Math.max(32, Math.floor(h * bloomScale));
 
-    const bloomStrength = tier === 'high' ? 0.34 : tier === 'mid' ? 0.28 : 0.22;
-    const bloom = new UnrealBloomPass(new THREE.Vector2(bw, bh), bloomStrength, 0.44, 0.22);
-
-    const film = new FilmPass(tier === 'high' ? 0.055 : tier === 'mid' ? 0.048 : 0.034, false);
+    const bloomStrength = tier === 'high' ? 0.28 : tier === 'mid' ? 0.22 : 0.17;
+    const bloomThreshold = 0.3;
+    const bloom = new UnrealBloomPass(new THREE.Vector2(bw, bh), bloomStrength, 0.42, bloomThreshold);
+    const film = new FilmPass(tier === 'high' ? 0.048 : tier === 'mid' ? 0.042 : 0.03, false);
 
     const chromatic = new ShaderPass(chromaticShader);
     chromatic.uniforms.amount.value =
@@ -127,9 +137,9 @@ export function HeroCinematicPost({ scrollVelRef }: HeroCinematicPostProps) {
 
     if (bloom && scrollVelRef) {
       const v = Math.min(1, Math.max(0, scrollVelRef.current));
-      const base = tier === 'high' ? 0.34 : tier === 'mid' ? 0.28 : 0.22;
-      bloom.strength = base + v * 0.55;
-      bloom.radius = 0.44 + v * 0.12;
+      const base = tier === 'high' ? 0.28 : tier === 'mid' ? 0.22 : 0.17;
+      bloom.strength = base + v * 0.32;
+      bloom.radius = 0.42 + v * 0.1;
     }
 
     composer.render(delta);
