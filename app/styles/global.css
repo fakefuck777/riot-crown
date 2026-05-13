@@ -177,8 +177,8 @@ body {
   max-height: 100dvh;
   pointer-events: none;
   z-index: 36;
-  mix-blend-mode: overlay;
-  opacity: 0.055;
+  mix-blend-mode: soft-light;
+  opacity: 0.047;
 }
 
 /* ─── TYPOGRAPHY ──────────────────────────────────────────────── */

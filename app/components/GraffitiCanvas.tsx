@@ -92,34 +92,44 @@ const fragmentShader = /* glsl */`
     return spec;
   }
 
+  // Soft highlight roll-off + slight saturation lift (in-glass “luxury” grade)
+  vec3 tonemapLuxury(vec3 c) {
+    c = max(c, vec3(1e-4));
+    c = pow(c, vec3(0.97));
+    vec3 num = c * (c * vec3(2.02) + vec3(0.06));
+    vec3 den = c * (c * vec3(2.43) + vec3(0.59)) + vec3(0.14);
+    vec3 x = num / den;
+    float l = dot(x, vec3(0.299, 0.587, 0.114));
+    x = mix(vec3(l), x, 1.035);
+    return clamp(x, 0.0, 1.0);
+  }
+
   void main() {
     vec2 uv = vUv;
 
-    // Mouse influence — fluid across full height (top used to be nearly static)
-    vec2 mouseOffset = (uMouse - 0.5) * 0.14;
-    float mouseFalloff = mix(0.42, 1.0, 1.0 - uv.y);
+    // Mouse influence — slightly softer for calmer parallax read
+    vec2 mouseOffset = (uMouse - 0.5) * 0.11;
+    float mouseFalloff = mix(0.38, 1.0, 1.0 - uv.y);
     uv += mouseOffset * mouseFalloff;
 
-    // Scroll velocity warps the drip speed and turbulence
-    float scrollBoost = 1.0 + uScrollVel * 4.0;
+    // Aspect-corrected coords for noise only (drips stay screen-locked)
+    float asp = uResolution.x / max(uResolution.y, 1.0);
+    vec2 nq = vec2(uv.x * asp, uv.y);
 
-    // ── Base: absolute vantablack ──────────────────────────────────────────
-    vec3 color = vec3(0.02, 0.02, 0.02);
+    float scrollBoost = 1.0 + uScrollVel * 3.4;
 
-    // ── Paint mass — slightly taller field so upper hero feels as “full” as center
-    float paintMass = fbm(uv * vec2(1.15, 0.95) + vec2(uTime * 0.04, 0.0), 5);
-    paintMass = smoothstep(0.04, 0.52, paintMass + uScrollVel * 0.32);
+    vec3 color = vec3(0.018, 0.018, 0.022);
 
-    // ── Neon pink base color ───────────────────────────────────────────────
-    vec3 neonPink   = vec3(1.0,  0.07, 0.57);   // #FF1293
-    vec3 neonHot    = vec3(1.0,  0.0,  0.38);   // deeper magenta
-    vec3 chromeTint = vec3(0.85, 0.85, 0.92);   // liquid chrome
+    float paintMass = fbm(nq * vec2(1.12, 0.96) + vec2(uTime * 0.035, 0.0), 5);
+    paintMass = smoothstep(0.035, 0.5, paintMass + uScrollVel * 0.28);
 
-    // Color varies with noise — hot core, chrome edges
-    float colorNoise = fbm(uv * 2.5 + uTime * 0.06, 3) * 0.5 + 0.5;
+    vec3 neonPink   = vec3(1.0,  0.08, 0.56);
+    vec3 neonHot    = vec3(0.98, 0.02, 0.36);
+    vec3 chromeTint = vec3(0.82, 0.84, 0.92);
+
+    float colorNoise = fbm(nq * 2.45 + uTime * 0.055, 3) * 0.5 + 0.5;
     vec3  paintColor = mix(neonHot, neonPink, colorNoise);
 
-    // ── Drip streaks — 8 independent drips ────────────────────────────────
     float dripMask = 0.0;
     dripMask += drip(uv, 0.12, 0.18 * scrollBoost, 0.018);
     dripMask += drip(uv, 0.27, 0.14 * scrollBoost, 0.012);
@@ -131,30 +141,32 @@ const fragmentShader = /* glsl */`
     dripMask += drip(uv, 0.91, 0.17 * scrollBoost, 0.016);
     dripMask = clamp(dripMask, 0.0, 1.0);
 
-    float totalPaint = clamp(paintMass * 0.7 + dripMask * 0.9, 0.0, 1.0);
+    float totalPaint = clamp(paintMass * 0.72 + dripMask * 0.88, 0.0, 1.0);
 
-    // ── Metallic specular highlight ────────────────────────────────────────
-    vec2  lightDir  = normalize(uMouse - uv + vec2(0.3, 0.6));
-    float spec      = specular(uv * 4.0, lightDir, 48.0);
-    float specChrome = specular(uv * 8.0, lightDir, 120.0);
+    vec2  lightDir   = normalize(uMouse - uv + vec2(0.28, 0.58));
+    float spec       = specular(nq * 3.8, lightDir, 44.0);
+    float specChrome = specular(nq * 7.6, lightDir, 108.0);
+    float microGlint = specular(nq * 14.0 + uTime * 0.02, lightDir, 220.0) * 0.35;
 
-    // Chrome veins inside the paint
     vec3 litPaint = paintColor
-                  + chromeTint * spec * 0.6
-                  + vec3(1.0) * specChrome * 0.4;
+                  + chromeTint * spec * 0.55
+                  + vec3(0.98, 0.99, 1.0) * specChrome * 0.38
+                  + vec3(1.0, 0.95, 0.98) * microGlint;
 
-    // ── Glow bloom — soft halo around paint edges ──────────────────────────
-    float glow = totalPaint * (1.0 - totalPaint) * 2.5;
-    vec3  glowColor = neonPink * glow * (1.0 + uScrollVel * 2.0);
+    float glow = totalPaint * (1.0 - totalPaint) * 2.35;
+    vec3  glowColor = neonPink * glow * (1.0 + uScrollVel * 1.75);
 
-    // ── Composite ─────────────────────────────────────────────────────────
     color = mix(color, litPaint, totalPaint);
     color += glowColor;
 
-    // Vignette — gentle; old vertical squeeze (1.3) dimmed the top too much vs title area
-    float vignette = 1.0 - smoothstep(0.45, 1.35,
-                       length((vUv - 0.5) * vec2(1.0, 1.05)));
+    float vignette = 1.0 - smoothstep(0.42, 1.42,
+                       length((vUv - 0.5) * vec2(1.0, 1.04)));
     color *= vignette;
+
+    float d = fract(sin(dot(gl_FragCoord.xy * 0.31 + uTime * 37.0, vec2(12.9898, 78.233))) * 43758.5453123);
+    color += (d - 0.5) * 0.0038;
+
+    color = tonemapLuxury(color);
 
     gl_FragColor = vec4(color, 1.0);
   }
@@ -187,8 +199,8 @@ function ShaderPlane({ scrollVelRef, mouseRef }: ShaderPlaneProps) {
     uniforms.uTime.value = clock.getElapsedTime();
     const tx = mouseRef.current[0];
     const ty = mouseRef.current[1];
-    const mx = uniforms.uMouse.value.x + (tx - uniforms.uMouse.value.x) * 0.11;
-    const my = uniforms.uMouse.value.y + (ty - uniforms.uMouse.value.y) * 0.11;
+    const mx = uniforms.uMouse.value.x + (tx - uniforms.uMouse.value.x) * 0.068;
+    const my = uniforms.uMouse.value.y + (ty - uniforms.uMouse.value.y) * 0.068;
     uniforms.uMouse.value.set(mx, my);
     uniforms.uScrollVel.value += (scrollVelRef.current - uniforms.uScrollVel.value) * 0.08;
   });
@@ -201,6 +213,7 @@ function ShaderPlane({ scrollVelRef, mouseRef }: ShaderPlaneProps) {
         fragmentShader={fragmentShader}
         uniforms={uniforms}
         depthWrite={false}
+        toneMapped={false}
       />
     </mesh>
   );
@@ -212,6 +225,15 @@ interface GraffitiCanvasProps {
   scrollVelRef: React.MutableRefObject<number>;
   mouseRef:     React.MutableRefObject<[number, number]>;
   className?:   string;
+}
+
+/** Max physical-pixel ratio for the hero fluid — 3× covers Retina / most flagship OLEDs with diminishing returns beyond. */
+const MAX_HERO_DPR = 3;
+
+function heroCanvasDpr(): [number, number] {
+  if (typeof window === 'undefined') return [1, 2];
+  const raw = window.devicePixelRatio || 1;
+  return [1, Math.min(MAX_HERO_DPR, Math.max(1, raw))];
 }
 
 export function GraffitiCanvas({ scrollVelRef, mouseRef, className }: GraffitiCanvasProps) {
@@ -227,18 +249,28 @@ export function GraffitiCanvas({ scrollVelRef, mouseRef, className }: GraffitiCa
     );
   }
 
-  // Cap dpr: 1.5 on desktop (full quality), 1.0 on mobile (saves ~44% fill)
-  const dpr = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
-    ? [1, 1] as [number, number]
-    : [1, 1.5] as [number, number];
+  const dpr = heroCanvasDpr();
 
   return (
     <Canvas
       className={className}
       style={{ display: 'block', width: '100%', height: '100%' }}
-      gl={{ antialias: false, alpha: false, powerPreference: 'high-performance' }}
+      gl={{
+        antialias: true,
+        alpha: false,
+        powerPreference: 'high-performance',
+        stencil: false,
+        depth: true,
+      }}
       camera={{ position: [0, 0, 1], near: 0.1, far: 10 }}
       dpr={dpr}
+      resize={{ scroll: true, debounce: { scroll: 50, resize: 0 } }}
+      frameloop="always"
+      onCreated={({ gl }) => {
+        gl.setClearColor('#050505', 1);
+        gl.outputColorSpace = THREE.SRGBColorSpace;
+        gl.toneMapping = THREE.NoToneMapping;
+      }}
     >
       <ShaderPlane scrollVelRef={scrollVelRef} mouseRef={mouseRef} />
     </Canvas>

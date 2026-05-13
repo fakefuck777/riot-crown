@@ -27,11 +27,11 @@ export function ScarcityEngine() {
   useEffect(() => {
     const el = heartRef.current;
     if (!el || reducedMotion) return;
-    const tl = gsap.timeline({ repeat: -1, repeatDelay: 1.6 });
-    tl.to(el, { scaleX: 1.7, scaleY: 1.5, duration: 0.07, ease: 'power2.out' })
-      .to(el, { scaleX: 0.85, scaleY: 0.75, duration: 0.09, ease: 'power2.in' })
-      .to(el, { scaleX: 1.35, scaleY: 1.25, duration: 0.06, ease: 'power2.out' })
-      .to(el, { scaleX: 1, scaleY: 1, duration: 0.3, ease: 'elastic.out(1, 0.5)' });
+    const tl = gsap.timeline({ repeat: -1, repeatDelay: 2.0 });
+    tl.to(el, { scaleX: 1.22, scaleY: 1.14, duration: 0.12, ease: 'power2.out' })
+      .to(el, { scaleX: 0.94, scaleY: 0.9, duration: 0.14, ease: 'power2.inOut' })
+      .to(el, { scaleX: 1.08, scaleY: 1.05, duration: 0.16, ease: 'power2.out' })
+      .to(el, { scaleX: 1, scaleY: 1, duration: 0.45, ease: 'power3.out' });
     return () => { tl.kill(); };
   }, [reducedMotion]);
 

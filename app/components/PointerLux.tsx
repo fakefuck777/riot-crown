@@ -31,7 +31,7 @@ export function PointerLux() {
       raf.current = requestAnimationFrame(tick);
       const g = glowRef.current;
       if (!g) return;
-      const lerp = 0.075;
+      const lerp = 0.052;
       pos.current.x += (target.current.x - pos.current.x) * lerp;
       pos.current.y += (target.current.y - pos.current.y) * lerp;
       g.style.transform = `translate3d(${pos.current.x}px, ${pos.current.y}px, 0) translate(-50%, -50%)`;
@@ -54,18 +54,18 @@ export function PointerLux() {
     >
       <div
         ref={glowRef}
-        className="absolute left-0 top-0 h-[min(52vw,720px)] w-[min(52vw,720px)] rounded-full"
+        className="absolute left-0 top-0 h-[min(58vw,820px)] w-[min(58vw,820px)] rounded-full"
         style={{
           background: `
             radial-gradient(circle closest-side,
-              rgba(201,168,76,0.14) 0%,
-              rgba(255,18,147,0.06) 38%,
-              transparent 72%)
+              rgba(201,168,76,0.11) 0%,
+              rgba(255,18,147,0.045) 42%,
+              transparent 78%)
           `,
-          filter: 'blur(48px)',
+          filter: 'blur(64px)',
           mixBlendMode: 'screen',
           willChange: 'transform',
-          opacity: 0.9,
+          opacity: 0.82,
         }}
       />
     </div>

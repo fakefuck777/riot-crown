@@ -2,30 +2,38 @@ import { useEffect, useRef } from 'react';
 import { usePrefersReducedMotion } from '~/hooks/usePrefersReducedMotion';
 
 /**
- * Device tier detection.
- * High-end:  hardwareConcurrency >= 8 AND not coarse pointer → 24fps grain
- * Mid:       hardwareConcurrency 4–7 OR high-res mobile      → 18fps grain
- * Low/mobile: coarse pointer OR concurrency < 4              → 12fps grain
- *
- * GraffitiCanvas dpr is capped separately in GraffitiCanvas.tsx.
+ * Film grain FPS — quality-first tiers (CPU fills pixels; cap fps on low tier).
  */
 function getGrainFps(): number {
-  if (typeof window === 'undefined') return 24;
+  if (typeof window === 'undefined') return 28;
   const mobile = window.matchMedia('(pointer: coarse)').matches;
   const cores  = navigator.hardwareConcurrency ?? 4;
-  if (mobile)       return 12;
-  if (cores >= 8)   return 24;
-  return 18;
+  if (mobile) {
+    if (cores >= 8) return 20;
+    if (cores >= 6) return 18;
+    return 15;
+  }
+  if (cores >= 8) return 28;
+  if (cores >= 4) return 24;
+  return 20;
 }
 
 /**
- * Canvas-based animated film grain — adaptive FPS.
- * 24fps on high-end desktop (ROG/X270 class).
- * 18fps on mid-tier.
- * 12fps on mobile — still reads as film, saves ~40% GPU time.
- *
- * Canvas is half-resolution on mobile (scaled up via CSS) to halve
- * the pixel fill cost while keeping the grain coarse and tactile.
+ * Internal grain buffer scale (1 = full viewport pixels). Touch devices use <1
+ * then CSS-stretch; higher = finer grain when “畫質極致” is requested.
+ */
+function getGrainInternalScale(): number {
+  if (typeof window === 'undefined') return 1;
+  const mobile = window.matchMedia('(pointer: coarse)').matches;
+  const cores  = navigator.hardwareConcurrency ?? 4;
+  if (!mobile) return 1;
+  if (cores >= 8) return 0.88;
+  if (cores >= 6) return 0.78;
+  return 0.68;
+}
+
+/**
+ * Canvas-based animated film grain — adaptive FPS + resolution.
  */
 export function GrainOverlay() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -39,12 +47,14 @@ export function GrainOverlay() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx    = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d');
     if (!ctx) return;
+    if ('imageSmoothingQuality' in ctx) {
+      ctx.imageSmoothingQuality = 'high';
+    }
+    ctx.imageSmoothingEnabled = true;
 
-    const mobile  = window.matchMedia('(pointer: coarse)').matches;
-    // Half-res on mobile — CSS stretches it back to full viewport
-    const scale   = mobile ? 0.5 : 1.0;
+    const scale   = getGrainInternalScale();
     const fps     = getGrainFps();
     const interval = 1000 / fps;
 
@@ -110,8 +120,8 @@ export function GrainOverlay() {
           width: '100%',
           pointerEvents: 'none',
           zIndex: 36,
-          mixBlendMode: 'overlay',
-          opacity: 0.04,
+          mixBlendMode: 'soft-light',
+          opacity: 0.035,
           background: '#080808',
         }}
       />

@@ -44,11 +44,11 @@ export function ProductCard({
     const dx = (e.clientX - rect.left - rect.width  / 2) / rect.width;
     const dy = (e.clientY - rect.top  - rect.height / 2) / rect.height;
 
-    gsap.to(img, { x: dx * 18, y: dy * 18, duration: 1.6, ease: 'power3.out', overwrite: 'auto' });
+    gsap.to(img, { x: dx * 14, y: dy * 14, duration: 1.75, ease: 'power3.out', overwrite: 'auto' });
     gsap.to(card, {
-      rotationY: dx * 5, rotationX: -dy * 5,
-      transformPerspective: 1000,
-      duration: 1.2, ease: 'power3.out', overwrite: 'auto',
+      rotationY: dx * 3.8, rotationX: -dy * 3.8,
+      transformPerspective: 1280,
+      duration: 1.35, ease: 'power3.out', overwrite: 'auto',
     });
 
     if (glowRef.current) {
@@ -79,7 +79,7 @@ export function ProductCard({
       .to(overlay, { opacity: 0.6, duration: 0.05, ease: 'none' })
       .to(overlay, { opacity: 0.35, duration: 0.25, ease: 'power3.out' });
 
-    gsap.to(card, { scale: 1.012, duration: 0.5, ease: 'power3.out', overwrite: 'auto' });
+    gsap.to(card, { scale: 1.008, duration: 0.55, ease: 'power3.out', overwrite: 'auto' });
 
     if (info) {
       gsap.to(info, { y: -4, duration: 0.4, ease: 'power3.out' });
@@ -108,7 +108,7 @@ export function ProductCard({
 
     gsap.to([card, img], {
       x: 0, y: 0, rotationX: 0, rotationY: 0, scale: 1,
-      duration: 1.4, ease: 'elastic.out(1, 0.55)', overwrite: 'auto',
+      duration: 1.05, ease: 'power4.out', overwrite: 'auto',
     });
     gsap.to(overlay, { opacity: 0, duration: 0.4, ease: 'power2.out' });
     if (glowRef.current) glowRef.current.style.background = 'transparent';
@@ -122,14 +122,23 @@ export function ProductCard({
     <div
       ref={cardRef}
       className="relative overflow-hidden group w-full h-full"
-      style={{ willChange: 'transform', cursor: 'pointer', background: '#080808' }}
+      style={{
+        willChange: 'transform',
+        cursor: 'pointer',
+        background: '#080808',
+        transformStyle: 'preserve-3d',
+      }}
       onClick={onClick}
       onMouseMove={onMouseMove}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
       {/* Image */}
-      <div ref={imageRef} className="absolute inset-0" style={{ willChange: 'transform' }}>
+      <div
+        ref={imageRef}
+        className="absolute inset-0"
+        style={{ willChange: 'transform', transform: 'translateZ(0.01px)' }}
+      >
         <GhostImage
           src={product.imageUrl}
           alt={product.name}

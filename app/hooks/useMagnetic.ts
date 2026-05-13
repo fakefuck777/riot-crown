@@ -20,11 +20,11 @@ export function useMagnetic<T extends HTMLElement>(strength = 1) {
       const cy = r.top + r.height / 2;
       const nx = ((e.clientX - cx) / Math.max(r.width / 2, 1)) * max;
       const ny = ((e.clientY - cy) / Math.max(r.height / 2, 1)) * max;
-      gsap.to(el, { x: nx, y: ny, duration: 0.45, ease: 'power3.out', overwrite: 'auto' });
+      gsap.to(el, { x: nx, y: ny, duration: 0.52, ease: 'power3.out', overwrite: 'auto' });
     };
 
     const onLeave = () => {
-      gsap.to(el, { x: 0, y: 0, duration: 0.75, ease: 'elastic.out(1, 0.55)', overwrite: 'auto' });
+      gsap.to(el, { x: 0, y: 0, duration: 0.88, ease: 'power4.out', overwrite: 'auto' });
     };
 
     el.addEventListener('mousemove', onMove);

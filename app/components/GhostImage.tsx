@@ -111,10 +111,10 @@ export function GhostImage({ src, alt, className, style, fetchPriority = 'auto',
             objectFit: 'cover',
             display: 'block',
             filter: loaded
-              ? 'contrast(1.05) brightness(0.9)'
-              : 'contrast(1.05) brightness(0.9) blur(12px)',
-            transform: loaded ? 'scale(1)' : 'scale(1.04)',
-            transition: 'filter 900ms cubic-bezier(0.16,1,0.3,1), transform 900ms cubic-bezier(0.16,1,0.3,1)',
+              ? 'contrast(1.04) saturate(1.06) brightness(0.91)'
+              : 'contrast(1.04) saturate(1.06) brightness(0.91) blur(14px)',
+            transform: loaded ? 'scale(1)' : 'scale(1.035)',
+            transition: 'filter 1050ms cubic-bezier(0.16,1,0.3,1), transform 1050ms cubic-bezier(0.16,1,0.3,1)',
           }}
         />
       )}
@@ -129,7 +129,7 @@ export function GhostImage({ src, alt, className, style, fetchPriority = 'auto',
           // Dark base
           background: '#080808',
           opacity: loaded ? 0 : 1,
-          transition: 'opacity 900ms cubic-bezier(0.16,1,0.3,1)',
+          transition: 'opacity 1050ms cubic-bezier(0.16,1,0.3,1)',
         }}
       />
 
@@ -144,7 +144,7 @@ export function GhostImage({ src, alt, className, style, fetchPriority = 'auto',
           backgroundSize: '160px 160px',
           mixBlendMode: 'overlay',
           opacity: loaded ? 0 : 0.8,
-          transition: 'opacity 700ms ease',
+          transition: 'opacity 820ms cubic-bezier(0.22,1,0.36,1)',
         }}
       />
 
@@ -156,9 +156,9 @@ export function GhostImage({ src, alt, className, style, fetchPriority = 'auto',
             position: 'absolute',
             inset: 0,
             pointerEvents: 'none',
-            background: 'linear-gradient(105deg, transparent 40%, rgba(242,242,242,0.04) 50%, transparent 60%)',
-            backgroundSize: '200% 100%',
-            animation: 'ghostShimmer 2.4s ease-in-out infinite',
+            background: 'linear-gradient(105deg, transparent 38%, rgba(242,242,242,0.035) 50%, transparent 62%)',
+            backgroundSize: '220% 100%',
+            animation: 'ghostShimmer 3.1s cubic-bezier(0.45,0,0.55,1) infinite',
           }}
         />
       )}

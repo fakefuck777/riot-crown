@@ -12,7 +12,7 @@ const GraffitiCanvas = lazy(() =>
 export function Hero() {
   const { t } = useLocale();
   const reducedMotion = usePrefersReducedMotion();
-  const sectionRef   = useRef<HTMLElement>(null);
+  const sectionRef   = useRef<HTMLDivElement>(null);
   const titleRef     = useRef<HTMLHeadingElement>(null);
   const subtitleRef  = useRef<HTMLParagraphElement>(null);
   const eyebrowRef   = useRef<HTMLParagraphElement>(null);
@@ -28,12 +28,12 @@ export function Hero() {
   useEffect(() => {
     let cancel: (() => void) | undefined;
     if (typeof window.requestIdleCallback === 'function') {
-      const id = window.requestIdleCallback(() => setDeferCanvas(true), { timeout: 900 });
+      const id = window.requestIdleCallback(() => setDeferCanvas(true), { timeout: 420 });
       cancel = () => {
         if (typeof window.cancelIdleCallback === 'function') window.cancelIdleCallback(id);
       };
     } else {
-      const id = window.setTimeout(() => setDeferCanvas(true), 320);
+      const id = window.setTimeout(() => setDeferCanvas(true), 140);
       cancel = () => clearTimeout(id);
     }
     return () => {
@@ -45,7 +45,7 @@ export function Hero() {
     const nx = e.clientX / window.innerWidth;
     const ny = 1 - e.clientY / window.innerHeight;
     mouseRef.current = [nx, ny];
-    tiltTarget.current = { x: (ny - 0.5) * -6, y: (nx - 0.5) * 6 };
+    tiltTarget.current = { x: (ny - 0.5) * -4.2, y: (nx - 0.5) * 4.2 };
   }, []);
 
   useEffect(() => {
@@ -70,9 +70,9 @@ export function Hero() {
       return;
     }
     window.addEventListener('mousemove', onMouseMove);
-    const setRotX = gsap.quickTo(section, 'rotationX', { duration: 1.8, ease: 'power3.out' });
-    const setRotY = gsap.quickTo(section, 'rotationY', { duration: 1.8, ease: 'power3.out' });
-    gsap.set(section, { transformPerspective: 1400, transformOrigin: 'center center' });
+    const setRotX = gsap.quickTo(section, 'rotationX', { duration: 2.15, ease: 'power2.out' });
+    const setRotY = gsap.quickTo(section, 'rotationY', { duration: 2.15, ease: 'power2.out' });
+    gsap.set(section, { transformPerspective: 2000, transformOrigin: 'center center' });
     let rafId: number;
     const tick = () => {
       setRotX(tiltTarget.current.x);
@@ -146,23 +146,37 @@ export function Hero() {
   return (
     <section
       id="hero"
-      ref={sectionRef}
-      className="relative w-full min-h-screen min-h-dvh bg-void"
-      style={{ willChange: 'transform', overflow: 'hidden' }}
+      className="relative isolate w-full min-h-screen min-h-dvh bg-void"
+      style={{ overflow: 'hidden' }}
     >
-      {/* WebGL — deferred slightly so first paint stays responsive (LCP / TTI). */}
-      {deferCanvas ? (
-        <Suspense fallback={null}>
-          <GraffitiCanvas
-            scrollVelRef={scrollVelRef}
-            mouseRef={mouseRef}
-            className="absolute inset-0 w-full h-full"
-          />
-        </Suspense>
-      ) : null}
+      {/* WebGL — own layer, never 3D-tilted (tilting the whole section made the fluid read “smaller” under perspective). */}
+      <div
+        className="pointer-events-none absolute inset-0 z-0 min-h-dvh w-full"
+        aria-hidden
+      >
+        {deferCanvas ? (
+          <Suspense fallback={null}>
+            <GraffitiCanvas
+              scrollVelRef={scrollVelRef}
+              mouseRef={mouseRef}
+              className="absolute inset-0 h-full min-h-dvh w-full"
+            />
+          </Suspense>
+        ) : null}
+      </div>
 
-      {/* Multi-layer veil — wide bright core so top-of-hero (eyebrow/title) keeps full fluid read */}
-      <div className="absolute inset-0 pointer-events-none" style={{
+      {/* Foreground: veils + copy — subtle parallax tilt only here */}
+      <div
+        ref={sectionRef}
+        className="pointer-events-none absolute inset-0 z-[1] min-h-dvh w-full"
+        style={{
+          willChange: 'transform',
+          transformStyle: 'preserve-3d',
+          backfaceVisibility: 'hidden',
+        }}
+      >
+        {/* Multi-layer veil — wide bright core so top-of-hero (eyebrow/title) keeps full fluid read */}
+        <div className="absolute inset-0 pointer-events-none" style={{
         background: `
           radial-gradient(ellipse 92% 72% at 50% 36%,
             rgba(5,5,5,0.0) 0%,
@@ -170,26 +184,26 @@ export function Hero() {
             rgba(5,5,5,0.88) 100%
           )
         `,
-      }} />
-      {/* Bottom fade — content below hero */}
-      <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{
-        height: '30%',
-        background: 'linear-gradient(to bottom, transparent, #050505)',
-      }} />
+        }} />
+        {/* Bottom fade — content below hero */}
+        <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{
+          height: '30%',
+          background: 'linear-gradient(to bottom, transparent, #050505)',
+        }} />
 
-      {/* Left edge accent line */}
-      <div className="absolute left-8 md:left-16 top-1/4 bottom-1/4 pointer-events-none" style={{
-        width: '1px',
-        background: 'linear-gradient(to bottom, transparent, rgba(201,168,76,0.3) 30%, rgba(201,168,76,0.3) 70%, transparent)',
-      }} />
-      {/* Right edge accent line */}
-      <div className="absolute right-8 md:right-16 top-1/4 bottom-1/4 pointer-events-none" style={{
-        width: '1px',
-        background: 'linear-gradient(to bottom, transparent, rgba(242,242,242,0.08) 30%, rgba(242,242,242,0.08) 70%, transparent)',
-      }} />
+        {/* Left edge accent line */}
+        <div className="absolute left-8 md:left-16 top-1/4 bottom-1/4 pointer-events-none" style={{
+          width: '1px',
+          background: 'linear-gradient(to bottom, transparent, rgba(201,168,76,0.3) 30%, rgba(201,168,76,0.3) 70%, transparent)',
+        }} />
+        {/* Right edge accent line */}
+        <div className="absolute right-8 md:right-16 top-1/4 bottom-1/4 pointer-events-none" style={{
+          width: '1px',
+          background: 'linear-gradient(to bottom, transparent, rgba(242,242,242,0.08) 30%, rgba(242,242,242,0.08) 70%, transparent)',
+        }} />
 
-      {/* Main content — full-width column; title scales to viewport (editorial left anchor) */}
-      <div className="absolute inset-0 flex w-full max-w-full flex-col justify-center px-8 md:px-16 lg:px-24">
+        {/* Main content — full-width column; title scales to viewport (editorial left anchor) */}
+        <div className="pointer-events-auto absolute inset-0 flex w-full max-w-full flex-col justify-center px-8 md:px-16 lg:px-24">
 
         {/* Eyebrow */}
         <p
@@ -313,52 +327,53 @@ export function Hero() {
             {t.hero.ctaTrust}
           </p>
         </div>
-      </div>
+        </div>
 
-      {/* Scroll indicator — bottom center */}
-      <div
-        ref={scrollRef}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3"
-        style={{ opacity: 0 }}
-      >
-        <span style={{
+        {/* Scroll indicator — bottom center */}
+        <div
+          ref={scrollRef}
+          className="absolute bottom-10 left-1/2 flex -translate-x-1/2 flex-col items-center gap-3"
+          style={{ opacity: 0 }}
+        >
+          <span style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.5rem',
+            letterSpacing: '0.3em',
+            color: 'rgba(242,242,242,0.25)',
+            textTransform: 'uppercase',
+          }}>
+            {t.hero.scroll}
+          </span>
+          <div style={{
+            width: '1px',
+            height: '48px',
+            background: 'linear-gradient(to bottom, rgba(201,168,76,0.5), transparent)',
+            animation: reducedMotion ? 'none' : 'pulse 2.4s ease-in-out infinite',
+          }} />
+        </div>
+
+        {/* Corner coordinates — editorial detail */}
+        <div className="pointer-events-none absolute bottom-10 left-8 md:left-16" style={{
           fontFamily: 'var(--font-mono)',
           fontSize: '0.5rem',
-          letterSpacing: '0.3em',
-          color: 'rgba(242,242,242,0.25)',
-          textTransform: 'uppercase',
+          letterSpacing: '0.1em',
+          color: 'rgba(242,242,242,0.15)',
+          lineHeight: 1.8,
         }}>
-          {t.hero.scroll}
-        </span>
-        <div style={{
-          width: '1px',
-          height: '48px',
-          background: 'linear-gradient(to bottom, rgba(201,168,76,0.5), transparent)',
-          animation: reducedMotion ? 'none' : 'pulse 2.4s ease-in-out infinite',
-        }} />
-      </div>
+          <div>{t.hero.coords}</div>
+          <div>{t.hero.district}</div>
+        </div>
 
-      {/* Corner coordinates — editorial detail */}
-      <div className="absolute bottom-10 left-8 md:left-16 pointer-events-none" style={{
-        fontFamily: 'var(--font-mono)',
-        fontSize: '0.5rem',
-        letterSpacing: '0.1em',
-        color: 'rgba(242,242,242,0.15)',
-        lineHeight: 1.8,
-      }}>
-        <div>{t.hero.coords}</div>
-        <div>{t.hero.district}</div>
-      </div>
-
-      <div className="absolute bottom-10 right-8 md:right-16 pointer-events-none text-right" style={{
-        fontFamily: 'var(--font-mono)',
-        fontSize: '0.5rem',
-        letterSpacing: '0.1em',
-        color: 'rgba(242,242,242,0.15)',
-        lineHeight: 1.8,
-      }}>
-        <div>{t.hero.rights}</div>
-        <div>{t.hero.allRights}</div>
+        <div className="pointer-events-none absolute bottom-10 right-8 text-right md:right-16" style={{
+          fontFamily: 'var(--font-mono)',
+          fontSize: '0.5rem',
+          letterSpacing: '0.1em',
+          color: 'rgba(242,242,242,0.15)',
+          lineHeight: 1.8,
+        }}>
+          <div>{t.hero.rights}</div>
+          <div>{t.hero.allRights}</div>
+        </div>
       </div>
     </section>
   );
