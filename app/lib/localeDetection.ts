@@ -30,22 +30,6 @@ const COUNTRY_TO_LOCALE: Record<string, Locale> = {
   ZA: 'EN',
 };
 
-function getCountryCode(request: Request): string | null {
-  const tryKeys = [
-    'cf-ipcountry',
-    'CF-IPCountry',
-    'x-vercel-ip-country',
-    'X-Vercel-IP-Country',
-    'x-geo-country',
-    'X-Geo-Country',
-  ];
-  for (const key of tryKeys) {
-    const v = request.headers.get(key);
-    if (v && /^[A-Za-z]{2}$/.test(v.trim())) return v.trim().toUpperCase();
-  }
-  return null;
-}
-
 /** Map BCP 47 / Accept-Language tag to supported locale, or null. */
 export function localeFromLanguageTag(tagRaw: string): Locale | null {
   const tag = tagRaw.trim().toLowerCase();
@@ -100,8 +84,11 @@ export interface ResolvedLocale {
 }
 
 /**
- * Resolve UI locale: explicit `/{localeSlug}/…` in the URL wins; else saved cookie; else `Accept-Language`;
- * else CDN / edge country; else EN.
+ * Resolve UI locale:
+ * 1. Explicit `/{localeSlug}/…` in the URL wins (user or share link).
+ * 2. Else saved `riot_locale` cookie (user previously chose in LanguageSwitcher).
+ * 3. Else **EN** — first visit is always English; we do not auto-pick from Accept-Language or edge country
+ *    (users change language in the UI or open /ja/, /zh/, etc.).
  */
 export function resolveLocaleForRequest(request: Request): ResolvedLocale {
   const url = new URL(request.url);
@@ -118,12 +105,6 @@ export function resolveLocaleForRequest(request: Request): ResolvedLocale {
   }
 
   if (fromCookie) return { locale: fromCookie, shouldPersist: false };
-
-  const fromAL = localeFromAcceptLanguage(request.headers.get('Accept-Language'));
-  if (fromAL) return { locale: fromAL, shouldPersist: true };
-
-  const fromCountry = localeFromCountry(getCountryCode(request));
-  if (fromCountry) return { locale: fromCountry, shouldPersist: true };
 
   return { locale: 'EN', shouldPersist: true };
 }

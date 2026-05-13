@@ -94,7 +94,6 @@ const CATALOG_PRODUCTS_QUERY = `#graphql
           nodes {
             id
             title
-            availableForSale
             selectedOptions {
               name
               value
@@ -130,7 +129,6 @@ const COLLECTION_PRODUCTS_QUERY = `#graphql
             nodes {
               id
               title
-              availableForSale
               selectedOptions {
                 name
                 value
@@ -165,7 +163,6 @@ const PRODUCT_BY_HANDLE_QUERY = `#graphql
         nodes {
           id
           title
-          availableForSale
           selectedOptions {
             name
             value
@@ -218,17 +215,13 @@ function variantSizes(
   return [...set];
 }
 
-function defaultMerchandiseId(
-  variants: Array<{ id: string; availableForSale: boolean }>,
-): string | undefined {
-  const avail = variants.find(v => v.availableForSale);
-  return (avail ?? variants[0])?.id;
+function defaultMerchandiseId(variants: Array<{ id: string }>): string | undefined {
+  return variants[0]?.id;
 }
 
 type SfVariant = {
   id: string;
   title: string;
-  availableForSale: boolean;
   selectedOptions: Array<{ name: string; value: string }>;
 };
 
@@ -413,6 +406,23 @@ export async function fetchShopifyProductByHandle(
       logStorefrontFailure('fetchShopifyProductByHandle', { handle: h }, errors);
     }
     const node = (data as { product?: SfProductNode | null } | null)?.product;
+    try {
+      const raw = (data as { product?: unknown } | null)?.product;
+      console.log(
+        '[Shopify Storefront product(handle) API]',
+        JSON.stringify(
+          {
+            requestedHandle: h,
+            graphQLErrors: serializeStorefrontErrors(errors ?? []),
+            productNode: raw == null ? null : JSON.parse(JSON.stringify(raw)),
+          },
+          null,
+          2,
+        ),
+      );
+    } catch (logErr) {
+      console.error('[Shopify Storefront product(handle) API] console.log serialize failed', logErr);
+    }
     if (!node && !errors?.length) {
       console.warn(
         `[fetchShopifyProductByHandle] product(handle="${h}") is null — use the product SEO handle from Shopify admin, not the numeric admin id.`,

@@ -66,16 +66,16 @@ describe('resolveLocaleForRequest', () => {
     expect(r.shouldPersist).toBe(false);
   });
 
-  it('uses Accept-Language when no cookie', () => {
+  it('defaults to EN on first visit (ignores Accept-Language)', () => {
     const req = new Request('https://x.test/', {
       headers: { 'Accept-Language': 'fr-CH, de;q=0.2' },
     });
     const r = resolveLocaleForRequest(req);
-    expect(r.locale).toBe('FR');
+    expect(r.locale).toBe('EN');
     expect(r.shouldPersist).toBe(true);
   });
 
-  it('falls back to country when language unsupported', () => {
+  it('defaults to EN on first visit (ignores country when no cookie)', () => {
     const req = new Request('https://x.test/', {
       headers: {
         'Accept-Language': 'de-DE',
@@ -83,7 +83,7 @@ describe('resolveLocaleForRequest', () => {
       },
     });
     const r = resolveLocaleForRequest(req);
-    expect(r.locale).toBe('KR');
+    expect(r.locale).toBe('EN');
     expect(r.shouldPersist).toBe(true);
   });
 
