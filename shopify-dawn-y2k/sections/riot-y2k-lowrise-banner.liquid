@@ -1,0 +1,90 @@
+{% comment %}
+  “Low-rise” wide visual — image anchored low (early-2000s campaign crop feel).
+{% endcomment %}
+{{ 'riot-y2k-luxury.css' | asset_url | stylesheet_tag }}
+
+<section class="riot-y2k-lowrise section" style="padding-top:{{ section.settings.pt }}px;padding-bottom:{{ section.settings.pb }}px;background:var(--riot-void,#050508);">
+  <div class="page-width">
+    <div class="riot-y2k-lowrise__grid">
+      <div class="riot-y2k-lowrise__visual">
+        {% if section.settings.image != blank %}
+          <img
+            src="{{ section.settings.image | image_url: width: 2000 }}"
+            alt="{{ section.settings.image.alt | escape }}"
+            loading="lazy"
+            width="{{ section.settings.image.width }}"
+            height="{{ section.settings.image.height }}"
+            class="riot-y2k-lowrise__img"
+          >
+        {% else %}
+          <div class="riot-y2k-lowrise__ph" aria-hidden="true"></div>
+        {% endif %}
+      </div>
+      <div class="riot-y2k-lowrise__copy">
+        {% if section.settings.eyebrow != blank %}
+          <p class="riot-y2k-product-section__eyebrow" style="margin-bottom:0.75rem;">{{ section.settings.eyebrow | escape }}</p>
+        {% endif %}
+        {% if section.settings.title != blank %}
+          <h2 class="riot-y2k-product-section__title" style="text-align:left;">{{ section.settings.title | escape }}</h2>
+        {% endif %}
+        {% if section.settings.body != blank %}
+          <div class="riot-y2k-pcall__body rte" style="margin-top:1rem;">{{ section.settings.body }}</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "RIOT Y2K Low-rise banner",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image (wide / model low in frame)"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "CHROME OCCULT · 2000s"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "LOW SLUNG ENERGY"
+    },
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "Body",
+      "default": "<p>Not demure — <strong>iconic</strong>. A campaign crop for the era that never logged off.</p>"
+    },
+    {
+      "type": "range",
+      "id": "pt",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "pb",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 48
+    }
+  ],
+  "presets": [{ "name": "RIOT Y2K Low-rise banner" }]
+}
+{% endschema %}

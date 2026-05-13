@@ -1,0 +1,26 @@
+{% comment %} Full-width repeating Y2K symbols — place under hero or above footer. {% endcomment %}
+{{ 'riot-y2k-luxury.css' | asset_url | stylesheet_tag }}
+
+<div class="riot-y2k-symbar" aria-hidden="true">
+  <div class="riot-y2k-symbar__track">
+    <span>{{ section.settings.symbols | escape }}</span>
+    <span>{{ section.settings.symbols | escape }}</span>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "RIOT Y2K Symbol bar",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "symbols",
+      "label": "Symbol string (repeat visually)",
+      "default": "🦋 ✦ ♡ ✟ ▪ ★ ◼ ⛓ ✧"
+    }
+  ],
+  "presets": [{ "name": "RIOT Y2K Symbol bar" }]
+}
+{% endschema %}

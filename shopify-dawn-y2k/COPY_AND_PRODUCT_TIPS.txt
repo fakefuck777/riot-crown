@@ -1,0 +1,82 @@
+RIOT CROWN — Dark Y2K Luxury 文案與產品頁建議（複製即用）
+=====================================================
+
+【語氣軸】儀式感 40% + Y2K bling 40% + Millennial 精緻 20%
+關鍵詞：iconic, nostalgia, chrome, void, ritual, limited, era, bling, zero apologies
+
+────────────────────────────────
+一、首頁 / 集合頁短標（英文範本）
+────────────────────────────────
+Eyebrow:
+  VOID ATELIER · THE ERA REMEMBERS
+  DROP CULT · ICONIC ENERGY ONLY
+
+H2:
+  BLING FOR THE RITUAL
+  CHROME OCCULT · 2000s SOUL
+
+副標:
+  The night remembers what the day forgot — stay iconic. Limited pieces, crystal-grade presence, pure early-2000s nostalgia with a darker pulse.
+
+CTA 主按鈕: SHOP THE VOID
+CTA 副: NEW DROPS · BLING EDIT
+
+────────────────────────────────
+二、產品標題旁一行（短、騷、Y2K）
+────────────────────────────────
+  Not basic. Iconic.
+  Chrome-weight attitude.
+  Built for the night you won’t forget.
+  Nostalgia, but make it couture.
+
+────────────────────────────────
+三、產品描述模板（可貼 HTML / Rich text）
+────────────────────────────────
+<p><strong>VOID CRAFT · LIMITED ICON</strong></p>
+<p>Chrome-finish energy meets early-2000s bling. Designed to read clean on the feed and hit harder in real life — crystal clarity, ritual darkness, zero apologies.</p>
+<ul>
+  <li><strong>Finish:</strong> high-polish / statement silhouette</li>
+  <li><strong>Vibe:</strong> Dark Y2K Luxury — Cyber Occult Bling</li>
+  <li><strong>Wear it:</strong> stacked, solo, or full chaos — iconic either way</li>
+</ul>
+<p><em>Limited drop. When it’s gone, the era doesn’t rewind.</em></p>
+
+────────────────────────────────
+四、產品頁版面建議（Dawn）
+────────────────────────────────
+1) Theme editor → Products → Default product → Add section → 「RIOT Y2K Product callout」放在主圖下方或價格上方。
+2) 保留 Dawn 原生 Product information；Callout 專放「態度＋材質＋場景」。
+3) 圖片：至少 1 張近拍高光（chrome）、1 張 lifestyle 暗背景。
+4) Metafields（建議）：material / finish / drop_name / era_tag（例：Y2K-VOID-01），在描述裡用 {% if product.metafields.custom... %} 進階再說。
+
+────────────────────────────────
+五、其他 Section 建議（首頁順序範例）
+────────────────────────────────
+1. RIOT Y2K Hero
+2. RIOT Y2K Symbol bar（全寬符號跑馬）
+3. RIOT Y2K Countdown（大促／上新倒數）
+4. RIOT Y2K Collection（商品網格）
+5. RIOT Y2K Trust strip（信任＋態度徽章）
+6. Dawn 原生 Image banner（campaign 靜態視覺）
+7. Collapsible content（材質／運費／儀式感 FAQ，語氣可一半嚴肅一半 Y2K）
+
+────────────────────────────────
+六、額外 Y2K / Dark Luxury 元素推薦
+────────────────────────────────
+- Sticker 風小貼紙 PNG 疊在 Image with text 區塊角落（低腰視覺可用「較寬橫幅＋貼底對齊」模擬）。
+- 「Parental Advisory」戲仿標（Parody）小字 footer — 注意法務與品牌語氣。
+- Logo 雙層：細線 chrome + 內層粉紫 glow（用 PNG 或 SVG）。
+- 音效按鈕（optional）：hover 極短「shimmer」音效需使用者手勢解鎖，避免自動播放政策問題。
+
+────────────────────────────────
+七、字體（已在 riot-y2k-fonts.liquid）
+────────────────────────────────
+- 標題氣質：Syne（未來、幾何、偏 Y2K 展場）
+- 內文精緻：DM Sans（Millennial 乾淨易讀）
+若要更「純千禧」可改試：Outfit / Plus Jakarta Sans（需自行改 fonts.google URL）。
+
+────────────────────────────────
+八、暗色模式
+────────────────────────────────
+整體以黑底為主；`riot-y2k-force-dark` 已對 `color-scheme: dark` 做輔助。
+若 Dawn 切到 light scheme，建議首頁仍用深色 Section 堆疊，避免粉紫被洗白。

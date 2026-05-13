@@ -39,9 +39,9 @@ export function ScarcityEngine() {
     <div
       id="scarcity"
       style={{
-        background: 'linear-gradient(135deg, rgba(8,8,8,0.98) 0%, rgba(12,10,8,0.98) 100%)',
+        background: 'linear-gradient(145deg, rgba(8,8,12,0.98) 0%, rgba(14,8,18,0.98) 45%, rgba(8,10,14,0.98) 100%)',
         padding: '48px 0',
-        borderTop: '0.5px solid rgba(201,168,76,0.15)',
+        borderTop: '0.5px solid rgba(182,102,255,0.12)',
         borderBottom: '0.5px solid rgba(201,168,76,0.08)',
       }}
     >
@@ -55,7 +55,7 @@ export function ScarcityEngine() {
               fontFamily: 'var(--font-mono)',
               fontSize: '0.55rem',
               letterSpacing: '0.3em',
-              color: 'rgba(201,168,76,0.6)',
+              color: 'rgba(255,18,147,0.65)',
               textTransform: 'uppercase',
               marginBottom: '1.5rem',
             }}>
@@ -81,8 +81,12 @@ export function ScarcityEngine() {
               lineHeight: 0.9,
               letterSpacing: '-0.01em',
               textTransform: 'uppercase',
-              color: '#C9A84C',
+              background: 'linear-gradient(100deg, #ff1293 0%, #c9a84c 45%, #6ecbff 95%)',
+              WebkitBackgroundClip: 'text',
+              backgroundClip: 'text',
+              color: 'transparent',
               marginBottom: '2.5rem',
+              filter: 'drop-shadow(0 0 20px rgba(255,18,147,0.2))',
             }}>
               {t.scarcity.headline2}
             </h2>

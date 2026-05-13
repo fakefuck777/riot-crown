@@ -1,12 +1,16 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
+import { useLocation, useNavigate } from '@remix-run/react';
 import { useLocale } from '~/lib/LocaleContext';
 import { LOCALES, type Locale } from '~/lib/i18n';
 import { usePrefersReducedMotion } from '~/hooks/usePrefersReducedMotion';
+import { stripLeadingLocaleFromPathname, withLocalePath } from '~/lib/localePath';
 
 export function LanguageSwitcher() {
   const { locale, setLocale } = useLocale();
+  const location = useLocation();
+  const navigate = useNavigate();
   const reducedMotion = usePrefersReducedMotion();
   const displayRef   = useRef<HTMLSpanElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -59,18 +63,29 @@ export function LanguageSwitcher() {
     closeDropdown();
     if (next === locale) return;
 
-    if (reducedMotion) {
+    const { restPath } = stripLeadingLocaleFromPathname(location.pathname);
+    const nextPath = `${withLocalePath(next, restPath)}${location.search}${location.hash}`;
+
+    const applyNavigate = () => {
       setLocale(next);
+      navigate(nextPath);
+    };
+
+    if (reducedMotion) {
+      applyNavigate();
       return;
     }
 
     const el = displayRef.current;
-    if (!el) { setLocale(next); return; }
+    if (!el) {
+      applyNavigate();
+      return;
+    }
 
     // Matrix scroll animation
     gsap.timeline()
       .to(el, { y: -14, opacity: 0, duration: 0.18, ease: 'power2.in' })
-      .call(() => setLocale(next))
+      .call(applyNavigate)
       .set(el, { y: 14, opacity: 0 })
       .to(el, { y: 0, opacity: 1, duration: 0.22, ease: 'power3.out' });
   };
@@ -110,7 +125,7 @@ export function LanguageSwitcher() {
           background: 'rgba(5,5,5,0.98)',
           backdropFilter: 'blur(24px)',
           WebkitBackdropFilter: 'blur(24px)',
-          border: '0.5px solid rgba(242,242,242,0.1)',
+          border: '0.5px solid rgba(255,18,147,0.22)',
           padding: '6px 0',
           minWidth: '64px',
         }}

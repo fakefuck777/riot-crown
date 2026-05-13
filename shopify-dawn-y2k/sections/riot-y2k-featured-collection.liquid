@@ -43,7 +43,11 @@
       >
         {% for product in selected.products limit: limit %}
           <li>
-            <div class="riot-card-y2k" data-riot-chrome-card>
+            <div
+              class="riot-card-y2k{% if section.settings.holo_border %} riot-card-y2k--holo{% endif %}"
+              data-riot-chrome-card
+            >
+              <div class="riot-card-y2k__corners" aria-hidden="true"></div>
               {% render 'card-product',
                 card_product: product,
                 media_aspect_ratio: ratio,
@@ -59,30 +63,7 @@
   </div>
 </section>
 
-<script>
-  (function () {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    document.querySelectorAll('[data-riot-chrome-grid]').forEach(function (grid) {
-      grid.querySelectorAll('[data-riot-chrome-card]').forEach(function (card) {
-        card.addEventListener(
-          'pointermove',
-          function (e) {
-            var r = card.getBoundingClientRect();
-            var x = ((e.clientX - r.left) / Math.max(r.width, 1)) * 100;
-            var y = ((e.clientY - r.top) / Math.max(r.height, 1)) * 100;
-            card.style.setProperty('--mx', x + '%');
-            card.style.setProperty('--my', y + '%');
-          },
-          { passive: true }
-        );
-        card.addEventListener('pointerleave', function () {
-          card.style.setProperty('--mx', '50%');
-          card.style.setProperty('--my', '42%');
-        });
-      });
-    });
-  })();
-</script>
+<script src="{{ 'riot-y2k-runtime.js' | asset_url }}" defer></script>
 
 {% schema %}
 {
@@ -171,6 +152,12 @@
       "id": "subheading",
       "label": "Subheading",
       "default": "Chrome, crystal, nostalgia — pieces that hit different after dark."
+    },
+    {
+      "type": "checkbox",
+      "id": "holo_border",
+      "label": "Holographic border on cards",
+      "default": true
     },
     {
       "type": "range",

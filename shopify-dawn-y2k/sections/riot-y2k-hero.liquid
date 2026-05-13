@@ -1,31 +1,50 @@
 {% comment %}
-  RIOT Y2K Hero — Dark Luxury + Chrome + ritual copy
-  Add section: theme editor → Add section → (after upload) "RIOT Y2K Hero"
-  Requires asset: riot-y2k-luxury.css in theme Assets
+  RIOT Y2K Hero — Dark Y2K Luxury / Cyber Occult Bling / Void Ritual 2000s
+  Assets: riot-y2k-luxury.css  |  Theme editor → Add section → RIOT Y2K Hero
 {% endcomment %}
 
 {{ 'riot-y2k-luxury.css' | asset_url | stylesheet_tag }}
+{% render 'riot-y2k-fonts' %}
 
-<section class="riot-y2k-hero" id="riot-y2k-hero-{{ section.id }}">
+<section class="riot-y2k-hero riot-y2k-force-dark" id="riot-y2k-hero-{{ section.id }}">
   <div class="riot-y2k-hero__mesh" aria-hidden="true"></div>
+  {% if section.settings.show_chrome_ring %}
+    <div class="riot-y2k-hero__chrome-ring" aria-hidden="true"></div>
+  {% endif %}
   <div class="riot-y2k-hero__scan" aria-hidden="true"></div>
 
-  <div class="riot-sparkle-field" data-riot-sparkles aria-hidden="true"></div>
+  <div
+    class="riot-sparkle-field"
+    data-riot-sparkles
+    data-sparkle-count="{{ section.settings.sparkle_count }}"
+    aria-hidden="true"
+  ></div>
 
   <div class="riot-y2k-hero__vignette" aria-hidden="true"></div>
 
-  <div class="riot-y2k-hero__inner">
+  <div class="riot-y2k-hero__inner riot-millennial-shell">
     {% if section.settings.show_glyphs %}
       <div class="riot-y2k-glyphs" aria-hidden="true">
+        <span title="butterfly">🦋</span>
         <span>✦</span>
-        <span>🦋</span>
-        <span>♡</span>
+        <span title="heart">♡</span>
         <span>✧</span>
-        <span>⛓</span>
-        <span>✟</span>
+        <span title="lock">🔒</span>
         <span>▪</span>
+        <span title="pixel">◼</span>
+        <span>✟</span>
+        <span>★</span>
       </div>
-      <div style="height: 1.5rem"></div>
+      <div style="height: 1rem"></div>
+    {% endif %}
+
+    {% if section.settings.show_marquee %}
+      <div class="riot-y2k-marquee" aria-hidden="true">
+        <div class="riot-y2k-marquee__track">
+          <span>{{ section.settings.marquee_text | escape }}</span>
+          <span>{{ section.settings.marquee_text | escape }}</span>
+        </div>
+      </div>
     {% endif %}
 
     {% if section.settings.eyebrow != blank %}
@@ -59,24 +78,7 @@
   </div>
 </section>
 
-<script>
-  (function () {
-    var root = document.getElementById('riot-y2k-hero-{{ section.id }}');
-    if (!root) return;
-    var field = root.querySelector('[data-riot-sparkles]');
-    if (!field || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-    var n = 42;
-    for (var i = 0; i < n; i++) {
-      var s = document.createElement('span');
-      s.style.left = Math.random() * 100 + '%';
-      s.style.top = Math.random() * 100 + '%';
-      s.style.animationDelay = Math.random() * 4 + 's';
-      s.style.animationDuration = 2.5 + Math.random() * 2.5 + 's';
-      field.appendChild(s);
-    }
-  })();
-</script>
+<script src="{{ 'riot-y2k-runtime.js' | asset_url }}" defer></script>
 
 {% schema %}
 {
@@ -87,14 +89,41 @@
     {
       "type": "checkbox",
       "id": "show_glyphs",
-      "label": "Show Y2K glyphs row",
+      "label": "Y2K symbol row (butterfly / star / etc.)",
       "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_marquee",
+      "label": "Bling marquee strip",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "marquee_text",
+      "label": "Marquee text",
+      "default": "✦ BLING ✦ ICONIC ✦ NOSTALGIA ✦ VOID RITUAL ✦ CHROME ✦ 2000s ✦"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_chrome_ring",
+      "label": "Chrome orbital ring (background)",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "sparkle_count",
+      "min": 24,
+      "max": 120,
+      "step": 4,
+      "default": 72,
+      "label": "Sparkle particle count"
     },
     {
       "type": "text",
       "id": "eyebrow",
       "label": "Eyebrow",
-      "default": "VOID ATELIER · EST. 2000s ENERGY"
+      "default": "VOID ATELIER · THE ERA REMEMBERS"
     },
     {
       "type": "text",
@@ -107,7 +136,7 @@
       "id": "title_style",
       "label": "Title style",
       "options": [
-        { "value": "chrome", "label": "Chrome metal" },
+        { "value": "chrome", "label": "Chrome metal (millennial-clean shine)" },
         { "value": "gradient", "label": "Y2K holo gradient" }
       ],
       "default": "chrome"
@@ -116,7 +145,7 @@
       "type": "textarea",
       "id": "subheading",
       "label": "Subheading",
-      "default": "The night remembers what the day forgot — but your look stays iconic. Dark ritual meets early-2000s bling: chrome, crystal, pure nostalgia."
+      "default": "The night remembers what the day forgot — stay iconic. Dark ritual meets early-2000s bling: chrome, crystal, pure nostalgia. Limited drops. Zero apologies."
     },
     {
       "type": "text",
@@ -141,10 +170,6 @@
       "label": "Secondary link"
     }
   ],
-  "presets": [
-    {
-      "name": "RIOT Y2K Hero"
-    }
-  ]
+  "presets": [{ "name": "RIOT Y2K Hero" }]
 }
 {% endschema %}

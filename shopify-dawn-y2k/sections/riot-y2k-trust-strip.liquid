@@ -1,0 +1,57 @@
+{% comment %} RIOT Y2K — Trust / bling strip (static blocks). {% endcomment %}
+{{ 'riot-y2k-luxury.css' | asset_url | stylesheet_tag }}
+
+<section class="riot-y2k-trust">
+  <div class="riot-millennial-shell">
+    <div class="riot-y2k-trust__grid">
+      {% for block in section.blocks %}
+        {% case block.type %}
+          {% when 'badge' %}
+            <div class="riot-y2k-trust__item" {{ block.shopify_attributes }}>
+              <div class="riot-y2k-trust__icon">{{ block.settings.icon | escape }}</div>
+              <div class="riot-y2k-trust__text">{{ block.settings.text | escape }}</div>
+            </div>
+        {% endcase %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "RIOT Y2K Trust strip",
+  "tag": "section",
+  "class": "section",
+  "blocks": [
+    {
+      "type": "badge",
+      "name": "Badge",
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Icon (emoji or short text)",
+          "default": "✦"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Line",
+          "default": "CHROME FINISH"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "RIOT Y2K Trust strip",
+      "blocks": [
+        { "type": "badge", "settings": { "icon": "✦", "text": "AUTHENTIC VOID" } },
+        { "type": "badge", "settings": { "icon": "⛓", "text": "SECURE CHECKOUT" } },
+        { "type": "badge", "settings": { "icon": "★", "text": "ICONIC DROPS" } },
+        { "type": "badge", "settings": { "icon": "🦋", "text": "Y2K NOSTALGIA" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

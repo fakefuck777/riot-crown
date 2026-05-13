@@ -5,6 +5,7 @@ import { gsap } from 'gsap';
 import { LanguageSwitcher } from '~/components/LanguageSwitcher';
 import { useLocale } from '~/lib/LocaleContext';
 import { usePrefersReducedMotion } from '~/hooks/usePrefersReducedMotion';
+import { withLocalePath } from '~/lib/localePath';
 
 const HOME_SCROLL_IDS = new Set(['hero', 'manifesto', 'collection', 'scarcity']);
 
@@ -30,7 +31,7 @@ const NAV = {
 } as const;
 
 export function GhostNav({ onCartOpen, cartCount = 0 }: { onCartOpen: () => void; cartCount?: number }) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const navigate = useNavigate();
   const reducedMotion = usePrefersReducedMotion();
   const navRef        = useRef<HTMLElement>(null);
@@ -218,10 +219,10 @@ export function GhostNav({ onCartOpen, cartCount = 0 }: { onCartOpen: () => void
       return;
     }
     if (HOME_SCROLL_IDS.has(id)) {
-      navigate({ pathname: '/', hash: id });
+      navigate({ pathname: withLocalePath(locale, '/'), hash: id });
       setAssistOpen(false);
     }
-  }, [closeMobileMenu, navigate]);
+  }, [closeMobileMenu, navigate, locale]);
 
   useEffect(() => {
     if (!mobileOpen) return;

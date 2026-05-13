@@ -1,7 +1,7 @@
-import { defineConfig } from 'vite';
-import { hydrogen } from '@shopify/hydrogen/vite';
-import { oxygen } from '@shopify/mini-oxygen/vite';
-import { vitePlugin as remix } from '@remix-run/dev';
+import {defineConfig} from 'vite';
+import {hydrogen} from '@shopify/hydrogen/vite';
+import {oxygen} from '@shopify/mini-oxygen/vite';
+import {vitePlugin as remix} from '@remix-run/dev';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 /**
@@ -9,12 +9,12 @@ import tsconfigPaths from 'vite-tsconfig-paths';
  * Otherwise Oxygen `worker.mjs` may import `assets/server-build*.js` that the Hydrogen
  * build step no longer keeps on disk.
  */
-export default defineConfig(({ isSsrBuild }) => ({
+export default defineConfig(({isSsrBuild}) => ({
   base: '/',
   plugins: [
     hydrogen(),
     oxygen(),
-    remix({ presets: [hydrogen.preset()] }),
+    remix({presets: [hydrogen.preset()]}),
     tsconfigPaths(),
   ],
   build: {
@@ -28,19 +28,14 @@ export default defineConfig(({ isSsrBuild }) => ({
     }),
   },
   ssr: {
-    noExternal: [
-      'three',
-      '@react-three/fiber',
-      '@react-three/drei',
-      'gsap',
-    ],
+    noExternal: ['three', '@react-three/fiber', '@react-three/drei', 'gsap'],
     // Use browser-compatible conditions for SSR — MiniOxygen is a Web Worker,
     // not a Node process. This routes react-dom to its browser SSR build.
     resolve: {
       conditions: ['worker', 'browser', 'module', 'import', 'default'],
     },
     optimizeDeps: {
-      include: ['gsap'],
+      include: ['react-dom/server.browser', 'gsap'],
     },
   },
   optimizeDeps: {

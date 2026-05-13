@@ -2,13 +2,20 @@ import type { MetaFunction } from '@shopify/remix-oxygen';
 import { Form, Link, useSearchParams } from '@remix-run/react';
 import { useMemo } from 'react';
 import { PRODUCTS } from '~/lib/products';
+import { useLocale } from '~/lib/LocaleContext';
+import { withLocalePath } from '~/lib/localePath';
+
+import { SITE_DESCRIPTION, SITE_KEYWORDS, SITE_NAME } from '~/lib/siteMeta';
 
 export const meta: MetaFunction = () => [
-  { title: 'Search | RIOT CROWN' },
-  { name: 'robots', content: 'noindex' },
+  { title: `Search | ${SITE_NAME}` },
+  { name: 'description', content: `Search the ${SITE_NAME} catalog. ${SITE_DESCRIPTION.slice(0, 120)}` },
+  { name: 'keywords', content: SITE_KEYWORDS },
+  { name: 'robots', content: 'noindex, follow' },
 ];
 
 export default function SearchRoute() {
+  const { locale } = useLocale();
   const [params] = useSearchParams();
   const q = (params.get('q') ?? '').trim().toLowerCase();
 
@@ -26,7 +33,7 @@ export default function SearchRoute() {
     <main className="min-h-screen bg-void" style={{ paddingTop: '120px', paddingBottom: '80px' }}>
       <div className="px-8 md:px-16 lg:px-24" style={{ maxWidth: '960px', margin: '0 auto' }}>
         <Link
-          to="/"
+          to={withLocalePath(locale, '/')}
           className="text-label text-chrome tracking-ultra-wide"
           style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', textDecoration: 'none', color: 'rgba(201,168,76,0.5)' }}
         >
@@ -76,7 +83,7 @@ export default function SearchRoute() {
             {results.map(p => (
               <li key={p.id}>
                 <Link
-                  to={`/products/${p.id}`}
+                  to={withLocalePath(locale, `/products/${p.id}`)}
                   prefetch="intent"
                   className="block border border-chrome/10 p-4 hover:border-gold/30 transition-colors no-underline"
                   style={{ color: 'inherit' }}

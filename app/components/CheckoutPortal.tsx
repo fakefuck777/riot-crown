@@ -103,15 +103,19 @@ export function CheckoutPortal({ isOpen, onClose, total }: CheckoutPortalProps) 
       role="dialog"
       aria-modal="true"
       aria-labelledby="checkout-step-title"
+      aria-describedby="checkout-site-dek"
     >
+      <p id="checkout-site-dek" className="sr-only">
+        {t.checkout.protocol}
+      </p>
       {/* Progress seam */}
       <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'rgba(242,242,242,0.06)' }}>
         <div style={{
           height: '1px',
-          background: 'linear-gradient(90deg, #C9A84C, #F2F2F2)',
+          background: 'linear-gradient(90deg, #ff1293, #c9a84c, #6ecbff, #f2f2f2)',
           width: `${((stepIndex + 1) / STEPS.length) * 100}%`,
           transition: 'width 0.6s cubic-bezier(0.16,1,0.3,1)',
-          boxShadow: '0 0 8px rgba(201,168,76,0.6)',
+          boxShadow: '0 0 12px rgba(255,18,147,0.35)',
         }} />
       </div>
 
@@ -135,7 +139,8 @@ export function CheckoutPortal({ isOpen, onClose, total }: CheckoutPortalProps) 
         </div>
         <button
           onClick={onClose}
-          aria-label="Abort checkout"
+          type="button"
+          aria-label={t.checkout.abort}
           className="text-label text-chrome hover:text-titanium transition-colors"
           style={{ background: 'none', border: 'none', cursor: 'pointer', letterSpacing: '0.2em' }}
         >

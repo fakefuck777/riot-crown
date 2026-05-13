@@ -155,7 +155,8 @@ export function CartDrawer({ isOpen, items, onClose, onCheckout }: CartDrawerPro
             background: 'rgba(8,8,8,0.95)',
             backdropFilter: 'blur(40px) saturate(0.3)',
             WebkitBackdropFilter: 'blur(40px) saturate(0.3)',
-            borderLeft: '0.5px solid rgba(242,242,242,0.08)',
+            borderLeft: '0.5px solid rgba(255,18,147,0.15)',
+            boxShadow: 'inset 1px 0 0 rgba(110,203,255,0.08)',
             transform: 'translateX(100%)',
           }}
         >
@@ -163,7 +164,7 @@ export function CartDrawer({ isOpen, items, onClose, onCheckout }: CartDrawerPro
           <div className="flex items-center justify-between px-8 py-7"
             style={{ borderBottom: '0.5px solid rgba(242,242,242,0.06)' }}>
             <div>
-              <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.5rem', letterSpacing: '0.3em', color: 'rgba(201,168,76,0.4)', textTransform: 'uppercase', marginBottom: '0.3rem' }}>
+              <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.5rem', letterSpacing: '0.3em', color: 'rgba(255,18,147,0.5)', textTransform: 'uppercase', marginBottom: '0.3rem' }}>
                 {t.cart.eyebrow}
               </p>
               <h2 id="cart-drawer-title" style={{ fontFamily: '"Monument Extended","Helvetica Neue",sans-serif', fontWeight: 800, fontSize: '1rem', letterSpacing: '0.15em', color: '#F2F2F2', textTransform: 'uppercase' }}>

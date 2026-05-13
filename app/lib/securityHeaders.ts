@@ -1,10 +1,12 @@
+import { buildContentSecurityPolicy } from '~/lib/csp';
+
 /**
  * Baseline security headers for HTML responses (Hydrogen / MiniOxygen).
  * Does not replace WAF, CSP nonces for inline scripts, or dependency audits.
  */
 export function applySecurityHeaders(
   headers: Headers,
-  opts: { enableHsts?: boolean } = {},
+  opts: { enableHsts?: boolean; enableCsp?: boolean } = {},
 ): void {
   headers.set('X-Content-Type-Options', 'nosniff');
   headers.set('X-Frame-Options', 'SAMEORIGIN');
@@ -14,6 +16,11 @@ export function applySecurityHeaders(
     'Permissions-Policy',
     'camera=(), microphone=(), geolocation=()',
   );
+  headers.set('X-Permitted-Cross-Domain-Policies', 'none');
+  const enableCsp = opts.enableCsp !== false;
+  if (enableCsp) {
+    headers.set('Content-Security-Policy', buildContentSecurityPolicy());
+  }
   if (opts.enableHsts) {
     headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   }

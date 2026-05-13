@@ -1,5 +1,6 @@
 import type { Locale } from '~/lib/i18n';
 import { readLocaleCookieIfPresent } from '~/lib/localeCookie';
+import { localeFromUrlSlug } from '~/lib/localePath';
 
 /** ISO 3166-1 alpha-2 → UI locale when browser language is ambiguous. */
 const COUNTRY_TO_LOCALE: Record<string, Locale> = {
@@ -99,11 +100,23 @@ export interface ResolvedLocale {
 }
 
 /**
- * Resolve UI locale: saved cookie wins; else `Accept-Language`; else CDN / edge country; else EN.
+ * Resolve UI locale: explicit `/{localeSlug}/…` in the URL wins; else saved cookie; else `Accept-Language`;
+ * else CDN / edge country; else EN.
  */
 export function resolveLocaleForRequest(request: Request): ResolvedLocale {
+  const url = new URL(request.url);
+  const firstSeg = url.pathname.split('/').filter(Boolean)[0];
+  const fromPath = localeFromUrlSlug(firstSeg?.toLowerCase());
   const cookieHeader = request.headers.get('Cookie');
   const fromCookie = readLocaleCookieIfPresent(cookieHeader);
+
+  if (fromPath) {
+    return {
+      locale:       fromPath,
+      shouldPersist: fromCookie !== fromPath,
+    };
+  }
+
   if (fromCookie) return { locale: fromCookie, shouldPersist: false };
 
   const fromAL = localeFromAcceptLanguage(request.headers.get('Accept-Language'));

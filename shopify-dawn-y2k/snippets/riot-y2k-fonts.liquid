@@ -1,0 +1,25 @@
+{% comment %}
+  Optional Y2K + millennial pairing: Syne (futuristic display) + DM Sans (clean body).
+  Add once in theme.liquid <head> OR each RIOT section calls {% render 'riot-y2k-fonts' %}
+{% endcomment %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link
+  href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Syne:wght@500;600;700;800&display=swap"
+  rel="stylesheet"
+>
+<style>
+  .riot-y2k-hero,
+  .riot-y2k-product-section,
+  .riot-y2k-countdown,
+  .riot-y2k-trust,
+  .riot-y2k-pcall {
+    font-family: 'DM Sans', system-ui, sans-serif;
+  }
+  .riot-y2k-hero__title,
+  .riot-y2k-product-section__title,
+  .riot-y2k-countdown__label,
+  .riot-y2k-pcall__title {
+    font-family: 'Syne', 'DM Sans', system-ui, sans-serif;
+  }
+</style>

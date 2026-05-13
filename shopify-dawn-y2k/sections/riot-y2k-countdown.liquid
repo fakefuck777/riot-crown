@@ -1,0 +1,125 @@
+{% comment %} RIOT Y2K — Countdown strip. End time: ISO 8601 in theme time zone, e.g. 2026-12-31T23:59:59 {% endcomment %}
+{{ 'riot-y2k-luxury.css' | asset_url | stylesheet_tag }}
+
+<section
+  class="riot-y2k-countdown"
+  id="riot-count-{{ section.id }}"
+  data-end="{{ section.settings.end_iso | escape }}"
+  {% if section.settings.hidden_when_done %}data-hide-done="1"{% endif %}
+>
+  {% if section.settings.label != blank %}
+    <p class="riot-y2k-countdown__label">{{ section.settings.label | escape }}</p>
+  {% endif %}
+  <div class="riot-y2k-countdown__grid" data-riot-cd-grid>
+    <div class="riot-y2k-countdown__unit">
+      <div class="riot-y2k-countdown__num" data-d>00</div>
+      <div class="riot-y2k-countdown__cap">{{ section.settings.caption_days | default: 'DAYS' }}</div>
+    </div>
+    <div class="riot-y2k-countdown__unit">
+      <div class="riot-y2k-countdown__num" data-h>00</div>
+      <div class="riot-y2k-countdown__cap">{{ section.settings.caption_hours | default: 'HRS' }}</div>
+    </div>
+    <div class="riot-y2k-countdown__unit">
+      <div class="riot-y2k-countdown__num" data-m>00</div>
+      <div class="riot-y2k-countdown__cap">{{ section.settings.caption_min | default: 'MIN' }}</div>
+    </div>
+    <div class="riot-y2k-countdown__unit">
+      <div class="riot-y2k-countdown__num" data-s>00</div>
+      <div class="riot-y2k-countdown__cap">{{ section.settings.caption_sec | default: 'SEC' }}</div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function () {
+    var root = document.getElementById('riot-count-{{ section.id }}');
+    if (!root) return;
+    var end = Date.parse(root.getAttribute('data-end') || '');
+    if (isNaN(end)) {
+      root.style.display = 'none';
+      return;
+    }
+    var dEl = root.querySelector('[data-d]'),
+      hEl = root.querySelector('[data-h]'),
+      mEl = root.querySelector('[data-m]'),
+      sEl = root.querySelector('[data-s]');
+    function pad(n) {
+      return n < 10 ? '0' + n : String(n);
+    }
+    function tick() {
+      var now = Date.now();
+      var ms = Math.max(0, end - now);
+      if (ms === 0 && root.getAttribute('data-hide-done') === '1') {
+        root.style.display = 'none';
+        return;
+      }
+      var s = Math.floor(ms / 1000);
+      var days = Math.floor(s / 86400);
+      s -= days * 86400;
+      var h = Math.floor(s / 3600);
+      s -= h * 3600;
+      var m = Math.floor(s / 60);
+      s = s % 60;
+      if (dEl) dEl.textContent = pad(days);
+      if (hEl) hEl.textContent = pad(h);
+      if (mEl) mEl.textContent = pad(m);
+      if (sEl) sEl.textContent = pad(s);
+    }
+    tick();
+    setInterval(tick, 1000);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "RIOT Y2K Countdown",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Eyebrow label",
+      "default": "DROP WINDOW · ICONIC ENERGY LOADING"
+    },
+    {
+      "type": "text",
+      "id": "end_iso",
+      "label": "End date/time (ISO 8601)",
+      "default": "2026-12-31T23:59:59",
+      "info": "Use your store timezone. Example: 2026-06-01T12:00:00"
+    },
+    {
+      "type": "checkbox",
+      "id": "hidden_when_done",
+      "label": "Hide section when countdown ends",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "caption_days",
+      "label": "Days caption",
+      "default": "DAYS"
+    },
+    {
+      "type": "text",
+      "id": "caption_hours",
+      "label": "Hours caption",
+      "default": "HRS"
+    },
+    {
+      "type": "text",
+      "id": "caption_min",
+      "label": "Minutes caption",
+      "default": "MIN"
+    },
+    {
+      "type": "text",
+      "id": "caption_sec",
+      "label": "Seconds caption",
+      "default": "SEC"
+    }
+  ],
+  "presets": [{ "name": "RIOT Y2K Countdown" }]
+}
+{% endschema %}

@@ -7,7 +7,7 @@ export function Footer() {
   return (
     <footer style={{
       background: 'var(--void-pit)',
-      borderTop: '0.5px solid rgba(201,168,76,0.08)',
+      borderTop: '0.5px solid rgba(182,102,255,0.12)',
       padding: '80px 0 48px',
     }}>
       <div className="px-8 md:px-16 lg:px-24">
@@ -24,14 +24,18 @@ export function Footer() {
           {/* Brand column */}
           <div>
             <h2 style={{
-              fontFamily: '"Monument Extended", "Helvetica Neue", "Arial Black", sans-serif',
+              fontFamily: 'var(--font-y2k-display), "Monument Extended", "Helvetica Neue", "Arial Black", sans-serif',
               fontWeight: 900,
               fontSize: 'clamp(1.8rem, 3vw, 2.8rem)',
               letterSpacing: '-0.01em',
               textTransform: 'uppercase',
-              color: '#F2F2F2',
+              background: 'linear-gradient(100deg, #f2f2f2 0%, #c9a84c 38%, #ff1293 72%, #6ecbff 100%)',
+              WebkitBackgroundClip: 'text',
+              backgroundClip: 'text',
+              color: 'transparent',
               lineHeight: 0.9,
               marginBottom: '1.5rem',
+              filter: 'drop-shadow(0 0 24px rgba(255,18,147,0.15))',
             }}>
               RIOT<br />CROWN
             </h2>
@@ -59,12 +63,18 @@ export function Footer() {
                     fontFamily: 'var(--font-mono)',
                     fontSize: '0.52rem',
                     letterSpacing: '0.15em',
-                    color: 'rgba(201,168,76,0.35)',
+                    color: 'rgba(182,102,255,0.45)',
                     cursor: 'default',
-                    transition: 'color 0.2s',
+                    transition: 'color 0.2s, text-shadow 0.2s',
                   }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(201,168,76,0.8)'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(201,168,76,0.35)'; }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLElement).style.color = 'rgba(255,18,147,0.85)';
+                    (e.currentTarget as HTMLElement).style.textShadow = '0 0 12px rgba(110,203,255,0.5)';
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement).style.color = 'rgba(182,102,255,0.45)';
+                    (e.currentTarget as HTMLElement).style.textShadow = 'none';
+                  }}
                 >
                   {s.label}
                 </span>
@@ -79,7 +89,7 @@ export function Footer() {
                 fontFamily: 'var(--font-mono)',
                 fontSize: '0.5rem',
                 letterSpacing: '0.3em',
-                color: 'rgba(201,168,76,0.5)',
+                color: 'rgba(255,18,147,0.55)',
                 textTransform: 'uppercase',
                 marginBottom: '1.5rem',
               }}>
@@ -120,7 +130,7 @@ export function Footer() {
             fontFamily: 'var(--font-mono)',
             fontSize: '0.48rem',
             letterSpacing: '0.12em',
-            color: 'rgba(242,242,242,0.12)',
+            color: 'rgba(200,206,220,0.18)',
             textTransform: 'uppercase',
           }}>
             {t.footer.copyright}
@@ -129,7 +139,7 @@ export function Footer() {
             fontFamily: 'var(--font-mono)',
             fontSize: '0.48rem',
             letterSpacing: '0.12em',
-            color: 'rgba(201,168,76,0.15)',
+            color: 'rgba(110,203,255,0.28)',
             textTransform: 'uppercase',
           }}>
             {t.footer.edition}

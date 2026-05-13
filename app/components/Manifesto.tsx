@@ -66,7 +66,7 @@ export function Manifesto() {
       ref={sectionRef}
       className="section-manifesto-aura"
       style={{
-        borderTop: '0.5px solid rgba(201,168,76,0.12)',
+        borderTop: '0.5px solid rgba(182,102,255,0.14)',
         padding: '64px 0 52px',
         overflow: 'hidden',
       }}
@@ -76,7 +76,7 @@ export function Manifesto() {
           fontFamily: 'var(--font-mono)',
           fontSize: '0.55rem',
           letterSpacing: '0.35em',
-          color: 'rgba(201,168,76,0.5)',
+          color: 'rgba(255,18,147,0.55)',
           textTransform: 'uppercase',
           marginBottom: '1.5rem',
         }}>
@@ -89,7 +89,9 @@ export function Manifesto() {
               key={i}
               ref={el => { linesRef.current[i] = el; }}
               style={{
-                fontFamily: '"Monument Extended", "Helvetica Neue", "Arial Black", sans-serif',
+                fontFamily: line.accent
+                  ? 'var(--font-y2k-display), "Monument Extended", "Helvetica Neue", "Arial Black", sans-serif'
+                  : '"Monument Extended", "Helvetica Neue", "Arial Black", sans-serif',
                 fontWeight: 900,
                 fontSize: i === 0
                   ? 'clamp(1.55rem, 3.6vw, 3rem)'
@@ -97,11 +99,20 @@ export function Manifesto() {
                 lineHeight: 1.12,
                 letterSpacing: i === 0 ? '-0.02em' : '-0.015em',
                 textTransform: 'uppercase',
-                color: line.accent ? '#C9A84C' : '#F2F2F2',
+                ...(line.accent
+                  ? {
+                      background: 'linear-gradient(105deg, #ff1293 0%, #c9a84c 42%, #6ecbff 88%)',
+                      WebkitBackgroundClip: 'text',
+                      backgroundClip: 'text',
+                      color: 'transparent',
+                      textShadow: 'none',
+                      filter: 'drop-shadow(0 0 28px rgba(255,18,147,0.25))',
+                    }
+                  : {
+                      color: '#F2F2F2',
+                      textShadow: '0 0 48px rgba(242,242,242,0.05)',
+                    }),
                 opacity: 0,
-                textShadow: line.accent
-                  ? '0 0 40px rgba(201,168,76,0.18)'
-                  : '0 0 48px rgba(242,242,242,0.05)',
               }}
             >
               {line.text}
@@ -145,20 +156,20 @@ export function Manifesto() {
               fontSize: '0.52rem',
               letterSpacing: '0.28em',
               textTransform: 'uppercase',
-              color: 'rgba(201,168,76,0.55)',
+              color: 'rgba(110,203,255,0.65)',
               textDecoration: 'none',
-              borderBottom: '0.5px solid rgba(201,168,76,0.25)',
+              borderBottom: '0.5px solid rgba(255,18,147,0.35)',
               paddingBottom: '0.2rem',
               display: 'inline-block',
               transition: 'color 0.2s ease, border-color 0.2s ease',
             }}
             onMouseEnter={(ev) => {
-              ev.currentTarget.style.color = 'rgba(201,168,76,0.95)';
-              ev.currentTarget.style.borderBottomColor = 'rgba(201,168,76,0.55)';
+              ev.currentTarget.style.color = 'rgba(255,18,147,0.95)';
+              ev.currentTarget.style.borderBottomColor = 'rgba(110,203,255,0.65)';
             }}
             onMouseLeave={(ev) => {
-              ev.currentTarget.style.color = 'rgba(201,168,76,0.55)';
-              ev.currentTarget.style.borderBottomColor = 'rgba(201,168,76,0.25)';
+              ev.currentTarget.style.color = 'rgba(110,203,255,0.65)';
+              ev.currentTarget.style.borderBottomColor = 'rgba(255,18,147,0.35)';
             }}
           >
             {t.manifesto.toCollection}

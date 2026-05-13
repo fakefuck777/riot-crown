@@ -4,12 +4,12 @@ import { gsap } from 'gsap';
 import { useLocale } from '~/lib/LocaleContext';
 
 const QUOTES = [
-  { text: '穿上它的那一刻，我不再需要解释自己。',       origin: '匿名买家 — 多城',    lang: 'ZH' },
-  { text: 'This is not jewelry. This is a declaration.', origin: 'Anonymous — London', lang: 'EN' },
-  { text: 'Je ne l\'enlève plus. C\'est devenu ma peau.', origin: 'Anonyme — Paris',   lang: 'FR' },
-  { text: '手に取った瞬間、これが最後の一点だと確信した。', origin: '匿名 — 大阪',      lang: 'JP' },
-  { text: 'Not a purchase. An initiation.',              origin: 'Anonymous — New York', lang: 'EN' },
-  { text: '이건 액세서리가 아니다. 선언이다.',           origin: '익명 — 서울',        lang: 'KR' },
+  { text: '不是首飾，是訊號。亮，但不討好。', origin: '匿名買家 — 多城', lang: 'ZH' },
+  { text: 'Not demure — iconic. Chrome on my pulse, zero apologies.', origin: 'Anonymous — London', lang: 'EN' },
+  { text: 'Pas sage — iconique. Du chrome au poignet, zéro excuse.', origin: 'Anonyme — Paris', lang: 'FR' },
+  { text: '控えめじゃない——iconic。脈にクローム、言い訳なし。', origin: '匿名 — 大阪', lang: 'JP' },
+  { text: 'Early-2000s energy in a velvet box. Still hits at 3am.', origin: 'Anonymous — New York', lang: 'EN' },
+  { text: '이건 악세서리가 아니다 — 시그널이다.', origin: '익명 — 서울', lang: 'KR' },
 ];
 
 export function Testimonials() {
@@ -59,7 +59,7 @@ export function Testimonials() {
           fontFamily: 'var(--font-mono)',
           fontSize: '0.52rem',
           letterSpacing: '0.35em',
-          color: 'rgba(201,168,76,0.45)',
+          color: 'rgba(182,102,255,0.5)',
           textTransform: 'uppercase',
           marginBottom: '4rem',
         }}>
@@ -89,7 +89,10 @@ export function Testimonials() {
                 fontFamily: '"Monument Extended", "Helvetica Neue", sans-serif',
                 fontSize: '3rem',
                 lineHeight: 0.6,
-                color: 'rgba(201,168,76,0.12)',
+                background: 'linear-gradient(135deg, rgba(255,18,147,0.35), rgba(201,168,76,0.25))',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                color: 'transparent',
                 marginBottom: '1.2rem',
                 userSelect: 'none',
               }}>
@@ -115,7 +118,7 @@ export function Testimonials() {
               <div style={{
                 width: '24px',
                 height: '1px',
-                background: 'rgba(201,168,76,0.3)',
+                background: 'linear-gradient(90deg, #ff1293, #6ecbff)',
                 marginBottom: '0.8rem',
               }} />
 

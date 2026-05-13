@@ -14,3 +14,11 @@ test('相容路由 /cart 會導回首頁區塊', async ({ page }) => {
   expect(res?.status()).toBeLessThan(400);
   await expect(page).toHaveURL('/');
 });
+
+test('商品 OG SVG 可取得', async ({ request }) => {
+  const res = await request.get('/og/product/01.svg');
+  expect(res.ok()).toBeTruthy();
+  expect(res.headers()['content-type']).toMatch(/image\/svg\+xml/);
+  const text = await res.text();
+  expect(text).toContain('RIOT CROWN');
+});

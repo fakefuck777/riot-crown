@@ -29,7 +29,19 @@ import { ViewportModeSync } from '~/components/ViewportModeSync';
 import { CartProvider, useCart } from '~/lib/CartContext';
 import { LOCALE_BCP47, LOCALES } from '~/lib/i18n';
 import { sumCartLineTotals, formatYenTotal } from '~/lib/price';
-import { SITE_DESCRIPTION } from '~/lib/siteMeta';
+import {
+  OG_IMAGE_PATH,
+  SITE_DEFAULT_TITLE,
+  SITE_DESCRIPTION,
+  SITE_KEYWORDS,
+  SITE_NAME,
+  absoluteOgImage,
+} from '~/lib/siteMeta';
+import {
+  stripLeadingLocaleFromPathname,
+  withLocalePath,
+} from '~/lib/localePath';
+import { buildRootJsonLd } from '~/lib/schemaOrg';
 import globalStyles from '~/styles/global.css?url';
 
 function SyncDocumentLang() {
@@ -41,12 +53,17 @@ function SyncDocumentLang() {
 }
 
 export const links: LinksFunction = () => [
+  { rel: 'manifest', href: '/manifest.webmanifest' },
   { rel: 'stylesheet', href: globalStyles },
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
   { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
   {
     rel: 'stylesheet',
     href: 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400&family=Oswald:wght@500;600;700&display=swap',
+  },
+  {
+    rel: 'stylesheet',
+    href: 'https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Syne:wght@500;600;700;800&display=swap',
   },
 ];
 
@@ -70,35 +87,52 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
   );
 }
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
+export const meta: MetaFunction<typeof loader> = ({ data, location }) => {
   const siteUrl = data?.siteUrl ?? '';
-  const ogImage = siteUrl ? `${siteUrl}/og-brand.svg` : '/og-brand.svg';
+  const base = siteUrl.replace(/\/$/, '');
+  const pathname = (location?.pathname ?? '/').split('?')[0] ?? '/';
+  const { restPath } = stripLeadingLocaleFromPathname(pathname);
+  const isHomeShell = restPath === '/';
+
+  const ogImage = siteUrl ? absoluteOgImage(siteUrl) : OG_IMAGE_PATH;
   const hreflang =
-    siteUrl.length > 0
+    isHomeShell && base.length > 0
       ? [
           ...LOCALES.map(loc => ({
             tagName: 'link' as const,
             rel: 'alternate',
             hrefLang: LOCALE_BCP47[loc],
-            href: siteUrl,
+            href: `${base}${withLocalePath(loc, '/')}`,
           })),
-          { tagName: 'link' as const, rel: 'alternate', hrefLang: 'x-default', href: siteUrl },
-          { tagName: 'link' as const, rel: 'canonical', href: siteUrl },
+          { tagName: 'link' as const, rel: 'alternate', hrefLang: 'x-default', href: `${base}/` },
+          { tagName: 'link' as const, rel: 'canonical', href: `${base}${pathname}` },
         ]
       : [];
 
   return [
-    { title: 'RIOT CROWN | Void Atelier' },
+    { title: SITE_DEFAULT_TITLE },
     { name: 'description', content: SITE_DESCRIPTION },
+    { name: 'keywords', content: SITE_KEYWORDS },
+    { name: 'author', content: SITE_NAME },
+    { name: 'robots', content: 'index, follow' },
+    {
+      name: 'googlebot',
+      content: 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1',
+    },
+    { name: 'color-scheme', content: 'dark' },
     { property: 'og:type', content: 'website' },
-    ...(siteUrl ? [{ property: 'og:url', content: siteUrl }] : []),
-    { property: 'og:title', content: 'RIOT CROWN | Void Atelier' },
+    ...(isHomeShell && base ? [{ property: 'og:url', content: `${base}${pathname}` }] : []),
+    { property: 'og:site_name', content: SITE_NAME },
+    { property: 'og:title', content: SITE_DEFAULT_TITLE },
     { property: 'og:description', content: SITE_DESCRIPTION },
     { property: 'og:image', content: ogImage },
+    { property: 'og:image:alt', content: `${SITE_NAME} — brand mark` },
+    { property: 'og:locale', content: 'en_US' },
     { name: 'twitter:card', content: 'summary_large_image' },
-    { name: 'twitter:title', content: 'RIOT CROWN | Void Atelier' },
+    { name: 'twitter:title', content: SITE_DEFAULT_TITLE },
     { name: 'twitter:description', content: SITE_DESCRIPTION },
-    { name: 'theme-color', content: '#050505' },
+    { name: 'twitter:image', content: ogImage },
+    { name: 'theme-color', content: '#050508' },
     { name: 'format-detection', content: 'telephone=no' },
     ...hreflang,
   ];
@@ -135,23 +169,16 @@ function Layout({
   children,
   initialLocale = 'EN',
   siteUrl = '',
+  shopDomain = '',
 }: {
   children:       React.ReactNode;
   initialLocale?: Locale;
   siteUrl?:       string;
+  shopDomain?:    string;
 }) {
   const orgJsonLd =
-    siteUrl.length > 0
-      ? JSON.stringify({
-          '@context':    'https://schema.org',
-          '@type':       'Organization',
-          name:          'RIOT CROWN',
-          url:           siteUrl,
-          logo:          `${siteUrl}/og-brand.svg`,
-          description:   SITE_DESCRIPTION,
-          areaServed: { '@type': 'Place', name: 'Worldwide' },
-        })
-      : '';
+    siteUrl.length > 0 ? JSON.stringify(buildRootJsonLd(siteUrl.replace(/\/$/, ''))) : '';
+  const shop = shopDomain.trim();
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -162,6 +189,12 @@ function Layout({
           name="viewport"
           content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content"
         />
+        {shop ? (
+          <>
+            <link rel="dns-prefetch" href={`https://${shop}`} />
+            <link rel="preconnect" href={`https://${shop}`} crossOrigin="anonymous" />
+          </>
+        ) : null}
         <Meta />
         {orgJsonLd ? (
           <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: orgJsonLd }} />
@@ -185,9 +218,9 @@ function Layout({
 }
 
 export default function App() {
-  const { initialLocale, siteUrl } = useLoaderData<typeof loader>();
+  const { initialLocale, siteUrl, shopDomain } = useLoaderData<typeof loader>();
   return (
-    <Layout initialLocale={initialLocale} siteUrl={siteUrl}>
+    <Layout initialLocale={initialLocale} siteUrl={siteUrl} shopDomain={shopDomain}>
       <main id="main-content" tabIndex={-1} className="relative outline-none mobile-main">
         <Outlet />
       </main>
@@ -211,9 +244,15 @@ export function ErrorBoundary() {
         <div className="min-h-screen flex flex-col items-center justify-center px-16">
           <p className="text-label text-chrome mb-8 tracking-ultra-wide">SYSTEM FAULT</p>
           <h1 className="text-brutal text-titanium mb-12">ERROR</h1>
-          <p className="text-data text-chrome max-w-md text-center mb-12">{message}</p>
+          <p
+            className="text-data text-chrome max-w-md text-center mb-12"
+            role="alert"
+            aria-live="assertive"
+          >
+            {message}
+          </p>
           <Link
-            to="/"
+            to={withLocalePath(initialLocale, '/')}
             className="text-label text-gold tracking-ultra-wide border border-gold/35 px-8 py-4 uppercase no-underline transition-colors hover:bg-gold/10"
             style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem' }}
           >

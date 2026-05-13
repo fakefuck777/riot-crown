@@ -17,7 +17,7 @@ export function TrustBar() {
           fontFamily: 'var(--font-mono)',
           fontSize: '0.55rem',
           letterSpacing: '0.35em',
-          color: 'rgba(201,168,76,0.45)',
+          color: 'rgba(255,18,147,0.5)',
           textTransform: 'uppercase',
           marginBottom: '4rem',
         }}>
@@ -44,10 +44,14 @@ export function TrustBar() {
               <div style={{
                 fontFamily: 'var(--font-mono)',
                 fontSize: '1.1rem',
-                color: '#C9A84C',
-                opacity: 0.6,
+                background: 'linear-gradient(135deg, #c9a84c, #ff1293, #6ecbff)',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                color: 'transparent',
+                opacity: 0.85,
                 marginBottom: '1.5rem',
                 letterSpacing: '0.1em',
+                filter: 'drop-shadow(0 0 8px rgba(255,18,147,0.25))',
               }}>
                 {p.icon}
               </div>
@@ -82,7 +86,7 @@ export function TrustBar() {
                 right: '2rem',
                 height: '1px',
                 background: i === 0
-                  ? 'linear-gradient(90deg, #C9A84C, transparent)'
+                  ? 'linear-gradient(90deg, #ff1293, #c9a84c, #6ecbff, transparent)'
                   : 'rgba(242,242,242,0.04)',
               }} />
             </div>
@@ -114,7 +118,7 @@ export function TrustBar() {
                 fontFamily: 'var(--font-mono)',
                 fontSize: '0.48rem',
                 letterSpacing: '0.15em',
-                color: 'rgba(201,168,76,0.25)',
+                color: 'rgba(110,203,255,0.35)',
                 textTransform: 'uppercase',
               }}>
                 {city}

@@ -1,0 +1,9 @@
+{% comment %}
+  One-shot head bundle for Dawn — paste in layout/theme.liquid inside <head>:
+    {% render 'riot-y2k-head' %}
+  Then remove duplicate {{ 'riot-y2k-luxury.css' }} from individual RIOT sections if you prefer a single load.
+{% endcomment %}
+{{ 'riot-y2k-luxury.css' | asset_url | stylesheet_tag }}
+{% render 'riot-y2k-fonts' %}
+{% render 'riot-y2k-theme-vars' %}
+<script src="{{ 'riot-y2k-runtime.js' | asset_url }}" defer></script>

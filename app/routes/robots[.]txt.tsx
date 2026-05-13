@@ -5,6 +5,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const body = [
     'User-agent: *',
     'Allow: /',
+    'Disallow: /api/',
     '',
     `Sitemap: ${origin}/sitemap.xml`,
     '',

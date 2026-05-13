@@ -121,7 +121,7 @@ export function ProductCard({
   return (
     <div
       ref={cardRef}
-      className="relative overflow-hidden group w-full h-full"
+      className="group relative w-full overflow-hidden border border-white/5 shadow-none ring-1 ring-white/5 transition-shadow duration-500 hover:border-fuchsia-500/25 hover:shadow-[0_0_32px_rgba(255,18,147,0.12)] h-full"
       style={{
         willChange: 'transform',
         cursor: 'pointer',
@@ -133,6 +133,14 @@ export function ProductCard({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
+      <div
+        className="pointer-events-none absolute left-3 top-3 z-20 h-3 w-3 border-l border-t border-[rgba(201,168,76,0.55)] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute bottom-3 right-3 z-20 h-3 w-3 border-r border-b border-[rgba(201,168,76,0.55)] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+        aria-hidden
+      />
       {/* Image */}
       <div
         ref={imageRef}

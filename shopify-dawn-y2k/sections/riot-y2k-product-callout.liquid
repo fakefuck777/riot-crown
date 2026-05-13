@@ -1,0 +1,47 @@
+{% comment %}
+  Add to **product.json** template (Theme editor → Products → Default product → Add section).
+  Rich ritual + Y2K copy block above description.
+{% endcomment %}
+{{ 'riot-y2k-luxury.css' | asset_url | stylesheet_tag }}
+{% render 'riot-y2k-fonts' %}
+
+<div class="riot-y2k-pcall page-width" {{ section.shopify_attributes }}>
+  {% if section.settings.eyebrow != blank %}
+    <p class="riot-y2k-pcall__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+  {% endif %}
+  {% if section.settings.title != blank %}
+    <h3 class="riot-y2k-pcall__title">{{ section.settings.title | escape }}</h3>
+  {% endif %}
+  {% if section.settings.body != blank %}
+    <div class="riot-y2k-pcall__body rte">{{ section.settings.body }}</div>
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "RIOT Y2K Product callout",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "VOID CRAFT · LIMITED ICON"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "BUILT FOR THE NIGHT YOU WON’T FORGET"
+    },
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "Body",
+      "default": "<p>Chrome-weight finish, crystal-grade presence. Not basic nostalgia — <strong>bling with intent</strong>. Wear it like the era owes you something.</p>"
+    }
+  ],
+  "presets": [{ "name": "RIOT Y2K Product callout" }]
+}
+{% endschema %}

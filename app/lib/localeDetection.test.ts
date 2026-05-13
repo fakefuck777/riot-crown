@@ -5,6 +5,7 @@ describe('localeFromLanguageTag', () => {
   it('maps Chinese variants to ZH', () => {
     expect(localeFromLanguageTag('zh-TW')).toBe('ZH');
     expect(localeFromLanguageTag('zh-Hans')).toBe('ZH');
+    expect(localeFromLanguageTag('zh-Hant')).toBe('ZH');
   });
   it('maps core languages', () => {
     expect(localeFromLanguageTag('ja')).toBe('JP');
@@ -32,7 +33,27 @@ describe('localeFromCountry', () => {
 });
 
 describe('resolveLocaleForRequest', () => {
-  it('prefers cookie over headers', () => {
+  it('prefers URL slug over cookie', () => {
+    const req = new Request('https://x.test/ja/products/01', {
+      headers: {
+        Cookie: 'riot_locale=EN',
+      },
+    });
+    const r = resolveLocaleForRequest(req);
+    expect(r.locale).toBe('JP');
+    expect(r.shouldPersist).toBe(true);
+  });
+
+  it('does not persist when URL matches cookie', () => {
+    const req = new Request('https://x.test/ja/', {
+      headers: { Cookie: 'riot_locale=JP' },
+    });
+    const r = resolveLocaleForRequest(req);
+    expect(r.locale).toBe('JP');
+    expect(r.shouldPersist).toBe(false);
+  });
+
+  it('prefers cookie over headers when URL has no locale', () => {
     const req = new Request('https://x.test/', {
       headers: {
         Cookie:      'riot_locale=KR',

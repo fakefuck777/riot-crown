@@ -1,0 +1,61 @@
+Dark Y2K Luxury × Dawn — 對照你要求的 1～7 步（複製順序）
+============================================================
+
+【總原則】
+- 主視覺與樣式集中在：`assets/riot-y2k-luxury.css`
+- 互動（粒子 + 卡片 chrome 反光）：`assets/riot-y2k-runtime.js`
+- 字型：`snippets/riot-y2k-fonts.liquid`
+- 可選主題色：`snippets/riot-y2k-theme-vars.liquid` + `config/settings_schema_riot_y2k.fragment.json` 併入 Dawn
+
+────────────────────────────────────────────────────────────
+1) 全域 CSS（變數、金屬光、Y2K 漸層、閃爍、hover）
+   → 上傳完整檔：`assets/riot-y2k-luxury.css`
+   → 在 `layout/theme.liquid` 的 `<head>` 擇一：
+      A. 推薦一次載入：`{% render 'riot-y2k-head' %}`
+         （內含 CSS + 字型 + theme-vars + runtime；見 `snippets/riot-y2k-head.liquid`）
+      B. 或手動：`{{ 'riot-y2k-luxury.css' | asset_url | stylesheet_tag }}`
+         + `{% render 'riot-y2k-fonts' %}` + `{% render 'riot-y2k-theme-vars' %}`
+
+────────────────────────────────────────────────────────────
+2) 英雄 Banner（金屬粒子 / 反光 / Y2K）
+   → Section：`sections/riot-y2k-hero.liquid`
+   → 主題編輯器：Add section → RIOT Y2K Hero
+   → 粒子數由區塊設定「Sparkle particle count」；腳本讀取 `data-sparkle-count`（`riot-y2k-runtime.js`）
+
+────────────────────────────────────────────────────────────
+3) 產品卡片與網格（hover、金屬框、Y2K 裝飾）
+   → Section：`sections/riot-y2k-featured-collection.liquid`
+   → 需 Dawn 預設 `snippets/card-product.liquid`；參數不符時依該檔註解調整 `{% render %}`。
+   → Chrome 游標反光由 `[data-riot-chrome-grid]` / `[data-riot-chrome-card]` + runtime 綁定。
+
+────────────────────────────────────────────────────────────
+4) 顏色變數與字型（暗色為主；可接系統淺色）
+   → 字型：`snippets/riot-y2k-fonts.liquid`
+   → 變數覆寫：`snippets/riot-y2k-theme-vars.liquid`（併入 settings_schema 後才會有編輯器欄位）
+   → CSS 內 `:root` 已有 void / chrome / holo token；`.riot-y2k-force-dark` + `prefers-color-scheme` 見主 CSS 底部。
+
+────────────────────────────────────────────────────────────
+5) 首頁其他 Section 建議
+   → `riot-y2k-countdown.liquid` — 倒數 / 儀式感 drop
+   → `riot-y2k-trust-strip.liquid` — 信任徽章條
+   → `riot-y2k-symbol-marquee.liquid` — Y2K 符號跑馬
+   → `riot-y2k-lowrise-banner.liquid` — 低腰感寬圖 + 文案（object-position: bottom）
+   → `riot-y2k-product-callout.liquid` — 產品頁加塊
+
+────────────────────────────────────────────────────────────
+6) 產品頁優化與文案模板
+   → 區塊：同上 `riot-y2k-product-callout.liquid`
+   → 長文案與語氣範例：`COPY_AND_PRODUCT_TIPS.txt`
+
+────────────────────────────────────────────────────────────
+7) 額外 Y2K / Dark Luxury 元素
+   → Hero：glyph 列、marquee、chrome ring、mesh、scan、sparkle field
+   → 卡片：`riot-card-y2k`、可選 `riot-card-y2k--holo`
+   → 詳細安裝：`INSTALL.txt`
+
+────────────────────────────────────────────────────────────
+【runtime.js 載入說明】
+- `riot-y2k-hero.liquid` 與 `riot-y2k-featured-collection.liquid` 底部各有一段
+  `<script src="{{ 'riot-y2k-runtime.js' | asset_url }}" defer></script>`
+  確保未改 theme.liquid 時仍能運作。
+- 若已在 `<head>` 使用 `{% render 'riot-y2k-head' %}`（已含 runtime），可刪除上述 Section 內的 script 行以避免重複（功能仍安全，僅多一次快取命中）。

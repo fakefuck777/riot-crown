@@ -31,6 +31,7 @@ export default async function handleRequest(
   responseHeaders.set('Content-Type', 'text/html');
   applySecurityHeaders(responseHeaders, {
     enableHsts: process.env.NODE_ENV === 'production',
+    enableCsp: process.env.NODE_ENV === 'production',
   });
 
   return new Response(body, {

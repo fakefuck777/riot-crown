@@ -146,6 +146,7 @@ export function Hero() {
   return (
     <section
       id="hero"
+      data-riot-hero="split-webgl-v2"
       className="relative isolate w-full min-h-screen min-h-dvh bg-void"
       style={{ overflow: 'hidden' }}
     >
@@ -202,8 +203,30 @@ export function Hero() {
           background: 'linear-gradient(to bottom, transparent, rgba(242,242,242,0.08) 30%, rgba(242,242,242,0.08) 70%, transparent)',
         }} />
 
+        {!reducedMotion ? <div className="y2k-hero-chrome-orbit" aria-hidden /> : null}
+
         {/* Main content — full-width column; title scales to viewport (editorial left anchor) */}
         <div className="pointer-events-auto absolute inset-0 flex w-full max-w-full flex-col justify-center px-8 md:px-16 lg:px-24">
+
+        <div className="y2k-hero-glyph-row" aria-hidden>
+          <span title="butterfly">🦋</span>
+          <span>✦</span>
+          <span title="heart">♡</span>
+          <span>✧</span>
+          <span title="lock">🔒</span>
+          <span>▪</span>
+          <span title="pixel">◼</span>
+          <span>✟</span>
+          <span>★</span>
+        </div>
+        {!reducedMotion ? (
+          <div className="y2k-hero-marquee" aria-hidden>
+            <div className="y2k-hero-marquee__track">
+              <span>{t.hero.marquee}</span>
+              <span>{t.hero.marquee}</span>
+            </div>
+          </div>
+        ) : null}
 
         {/* Eyebrow */}
         <p
@@ -263,8 +286,9 @@ export function Hero() {
 
         {/* Subtitle + metadata row */}
         <div ref={subtitleRef} style={{ opacity: 0 }}>
-          <p style={{
-            fontFamily: 'var(--font-mono)',
+          <p
+            className="y2k-hero-body-copy"
+            style={{
             fontSize: '0.65rem',
             letterSpacing: '0.2em',
             textTransform: 'uppercase',
@@ -273,7 +297,8 @@ export function Hero() {
             maxWidth: 'min(38rem, 92vw)',
             lineHeight: 1.75,
             whiteSpace: 'pre-wrap',
-          }}>
+          }}
+          >
             {t.hero.subtitle}
           </p>
           {/* Metadata strip */}

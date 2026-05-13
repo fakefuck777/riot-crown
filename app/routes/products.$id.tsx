@@ -1,4 +1,4 @@
-import { useParams, useNavigate, Link } from '@remix-run/react';
+import { useParams, useNavigate, Link, useLoaderData } from '@remix-run/react';
 import { json, type LoaderFunctionArgs, type MetaFunction } from '@shopify/remix-oxygen';
 import { useRef, useEffect, useLayoutEffect, useCallback, useState } from 'react';
 import { gsap } from 'gsap';
@@ -8,40 +8,95 @@ import { useAudio } from '~/hooks/useAudio';
 import { useLocale } from '~/lib/LocaleContext';
 import { usePrefersReducedMotion } from '~/hooks/usePrefersReducedMotion';
 import { getProduct, PRODUCTS, getDescription, getDetails } from '~/lib/products';
+import { LOCALE_BCP47, LOCALES, type Locale } from '~/lib/i18n';
+import {
+  PRODUCT_NOT_FOUND_TITLE,
+  SITE_KEYWORDS,
+  SITE_NAME,
+  productOgImageUrl,
+} from '~/lib/siteMeta';
+import { withLocalePath } from '~/lib/localePath';
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  return json({ siteUrl: new URL(request.url).origin });
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  const url = new URL(request.url);
+  const siteUrl = url.origin.replace(/\/$/, '');
+  const pathname = url.pathname;
+  const pid = params.id ?? '';
+  const product = getProduct(pid);
+  const { buildProductJsonLd } = await import('~/lib/schemaOrg');
+  return json({
+    siteUrl,
+    pathname,
+    productJsonLd: product ? JSON.stringify(buildProductJsonLd(siteUrl, product, pathname)) : null,
+  });
 }
 
-export const meta: MetaFunction<typeof loader> = ({ data, params }) => {
-  const p = getProduct(params.id ?? '');
-  const siteUrl = data?.siteUrl ?? '';
+export const meta: MetaFunction<typeof loader> = ({ data, params, location }) => {
+  const pid = params.id ?? '';
+  const p = getProduct(pid);
+  const siteUrl = (data?.siteUrl ?? '').replace(/\/$/, '');
+  const pagePath = (location?.pathname ?? `/products/${pid}`).split('?')[0] ?? `/products/${pid}`;
+  const hreflang =
+    siteUrl.length > 0
+      ? [
+          ...LOCALES.map((loc: Locale) => ({
+            tagName: 'link' as const,
+            rel: 'alternate',
+            hrefLang: LOCALE_BCP47[loc],
+            href: `${siteUrl}${withLocalePath(loc, `/products/${pid}`)}`,
+          })),
+          {
+            tagName: 'link' as const,
+            rel: 'alternate',
+            hrefLang: 'x-default',
+            href: `${siteUrl}${withLocalePath('EN', `/products/${pid}`)}`,
+          },
+        ]
+      : [];
+
   if (!p) {
     return [
-      { title: 'Artifact Not Found | RIOT CROWN' },
-      { name: 'robots', content: 'noindex' },
+      { title: PRODUCT_NOT_FOUND_TITLE },
+      { name: 'description', content: 'The requested piece is not in the RIOT CROWN catalog.' },
+      { name: 'robots', content: 'noindex, follow' },
     ];
   }
   const desc = (p.descriptions.EN ?? p.descriptions.ZH ?? p.name).slice(0, 160);
-  const canonical = siteUrl ? `${siteUrl}/products/${params.id}` : '';
-  const ogImage = siteUrl ? `${siteUrl}/og-brand.svg` : '/og-brand.svg';
+  const canonical = siteUrl ? `${siteUrl}${pagePath}` : '';
+  const ogImage = siteUrl ? productOgImageUrl(siteUrl, pid) : '/og-brand.svg';
+  const pageTitle = `${p.name} | ${SITE_NAME}`;
+  const keywords = `${p.name}, ${p.material}, ${SITE_KEYWORDS}`.slice(0, 400);
+
   return [
-    { title: `${p.name} | RIOT CROWN` },
+    { title: pageTitle },
     { name: 'description', content: desc },
+    { name: 'keywords', content: keywords },
+    { name: 'robots', content: 'index, follow' },
+    {
+      name: 'googlebot',
+      content: 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1',
+    },
     ...(canonical ? [{ tagName: 'link' as const, rel: 'canonical', href: canonical }] : []),
     { property: 'og:type', content: 'product' },
     ...(canonical ? [{ property: 'og:url', content: canonical }] : []),
+    { property: 'og:site_name', content: SITE_NAME },
     { property: 'og:title', content: p.name },
     { property: 'og:description', content: desc },
     { property: 'og:image', content: ogImage },
+    { property: 'og:image:type', content: 'image/svg+xml' },
+    { property: 'og:image:width', content: '1200' },
+    { property: 'og:image:height', content: '630' },
+    { property: 'og:image:alt', content: p.name },
     { name: 'twitter:card', content: 'summary_large_image' },
     { name: 'twitter:title', content: p.name },
     { name: 'twitter:description', content: desc },
     { name: 'twitter:image', content: ogImage },
+    ...hreflang,
   ];
 };
 
 export default function ProductDetail() {
+  const { productJsonLd } = useLoaderData<typeof loader>();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { addToCart } = useCart();
@@ -154,8 +209,9 @@ export default function ProductDetail() {
     // Button feedback — flash gold then back
     if (btnRef.current) {
       gsap.timeline()
-        .to(btnRef.current, { background: '#C9A84C', color: '#050505', duration: 0.12 })
-        .to(btnRef.current, { background: '#F2F2F2', color: '#050505', duration: 0.3, delay: 0.15 });
+        .to(btnRef.current, { background: '#ff1293', color: '#f2f2f2', duration: 0.1 })
+        .to(btnRef.current, { background: '#6ecbff', color: '#050505', duration: 0.12 })
+        .to(btnRef.current, { background: '#F2F2F2', color: '#050505', duration: 0.28, delay: 0.08 });
     }
     gsap.delayedCall(1.6, () => { addedRef.current = false; });
   }, [product, playClick, addToCart, selectedSize]);
@@ -168,7 +224,7 @@ export default function ProductDetail() {
           {t.product.notFound}
         </p>
         <button
-          onClick={() => navigate('/')}
+          onClick={() => navigate(withLocalePath(locale, '/'))}
           style={{ marginTop: '2rem', fontFamily: 'var(--font-mono)', fontSize: '0.6rem', letterSpacing: '0.2em', color: 'rgba(242,242,242,0.4)', background: 'none', border: 'none', cursor: 'pointer' }}
         >
           {t.product.backVoid}
@@ -181,6 +237,12 @@ export default function ProductDetail() {
 
   return (
     <div ref={pageRef} className="bg-void min-h-dvh-safe" style={{ paddingTop: 'max(5rem, calc(52px + env(safe-area-inset-top, 0px) + 0.75rem))' }}>
+      {productJsonLd ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: productJsonLd }}
+        />
+      ) : null}
 
       {/* Back button */}
       <div className="px-8 md:px-16 lg:px-24 pt-10 pb-6">
@@ -438,7 +500,7 @@ export default function ProductDetail() {
               transition: 'background 0.2s, color 0.2s',
               marginBottom: '1rem',
             }}
-            onMouseEnter={e => { if (!addedRef.current) gsap.to(e.currentTarget, { background: '#C9A84C', duration: 0.25 }); }}
+            onMouseEnter={e => { if (!addedRef.current) gsap.to(e.currentTarget, { background: '#dbe4f0', duration: 0.25 }); }}
             onMouseLeave={e => { if (!addedRef.current) gsap.to(e.currentTarget, { background: '#F2F2F2', duration: 0.25 }); }}
           >
             {t.product.acquire}
@@ -513,7 +575,7 @@ export default function ProductDetail() {
           {related.map(p => (
             <Link
               key={p.id}
-              to={`/products/${p.id}`}
+              to={withLocalePath(locale, `/products/${p.id}`)}
               prefetch="intent"
               style={{ background: '#050505', cursor: 'pointer', position: 'relative', overflow: 'hidden', textDecoration: 'none', color: 'inherit' }}
             >

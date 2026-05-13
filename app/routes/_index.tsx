@@ -1,7 +1,8 @@
 import type { MetaFunction } from '@shopify/remix-oxygen';
+import { json, type LoaderFunctionArgs } from '@shopify/remix-oxygen';
+import { useLoaderData } from '@remix-run/react';
 import { useEffect } from 'react';
-import { useRouteLoaderData } from '@remix-run/react';
-import { SITE_DESCRIPTION } from '~/lib/siteMeta';
+import { SITE_DESCRIPTION, SITE_HOME_TITLE, SITE_KEYWORDS } from '~/lib/siteMeta';
 import { Hero } from '~/components/Hero';
 import { Manifesto } from '~/components/Manifesto';
 import { ProductGrid } from '~/components/ProductGrid';
@@ -10,52 +11,23 @@ import { TrustBar } from '~/components/TrustBar';
 import { Testimonials } from '~/components/Testimonials';
 import { Footer } from '~/components/Footer';
 
-export const meta: MetaFunction = () => [
-  { title: 'RIOT CROWN — Void Atelier' },
-  {
-    name: 'description',
-    content: SITE_DESCRIPTION,
-  },
-];
-
-function HomeJsonLd({ siteUrl }: { siteUrl: string }) {
-  const payload = {
-    '@context': 'https://schema.org',
-    '@graph': [
-      {
-        '@type': 'Organization',
-        name: 'RIOT CROWN',
-        url: siteUrl,
-        logo: `${siteUrl}/og-brand.svg`,
-        description: SITE_DESCRIPTION,
-      },
-      {
-        '@type': 'WebSite',
-        name: 'RIOT CROWN',
-        url: siteUrl,
-        description: SITE_DESCRIPTION,
-        publisher: { '@type': 'Organization', name: 'RIOT CROWN', url: siteUrl },
-        potentialAction: {
-          '@type': 'SearchAction',
-          target: {
-            '@type': 'EntryPoint',
-            urlTemplate: `${siteUrl}/search?q={search_term_string}`,
-          },
-          'query-input': 'required name=search_term_string',
-        },
-      },
-    ],
-  };
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(payload) }}
-    />
-  );
+export async function loader({ request }: LoaderFunctionArgs) {
+  const siteUrl = new URL(request.url).origin.replace(/\/$/, '');
+  const { buildCatalogItemListJsonLd } = await import('~/lib/schemaOrg');
+  return json({
+    catalogJsonLd: JSON.stringify(buildCatalogItemListJsonLd(siteUrl)),
+  });
 }
 
+export const meta: MetaFunction = () => [
+  { title: SITE_HOME_TITLE },
+  { name: 'description', content: SITE_DESCRIPTION },
+  { name: 'keywords', content: SITE_KEYWORDS },
+  { name: 'robots', content: 'index, follow' },
+];
+
 export default function Index() {
-  const root = useRouteLoaderData('root') as { siteUrl?: string } | undefined;
+  const { catalogJsonLd } = useLoaderData<typeof loader>();
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -69,7 +41,7 @@ export default function Index() {
 
   return (
     <main>
-      {root?.siteUrl ? <HomeJsonLd siteUrl={root.siteUrl} /> : null}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: catalogJsonLd }} />
       <Hero />
       <Manifesto />
       <ProductGrid />

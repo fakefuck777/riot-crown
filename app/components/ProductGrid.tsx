@@ -5,6 +5,7 @@ import { ProductCard } from '~/components/ProductCard';
 import { useAudio } from '~/hooks/useAudio';
 import { useLocale } from '~/lib/LocaleContext';
 import { PRODUCTS } from '~/lib/products';
+import { withLocalePath } from '~/lib/localePath';
 import type { ProductData } from '~/lib/products';
 
 interface ProductGridProps {
@@ -12,7 +13,7 @@ interface ProductGridProps {
 }
 
 export function ProductGrid({ products = PRODUCTS }: ProductGridProps) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const { startDrone } = useAudio();
   const navigate = useNavigate();
 
@@ -26,16 +27,17 @@ export function ProductGrid({ products = PRODUCTS }: ProductGridProps) {
     <section id="collection" className="w-full bg-void-plate px-8 py-24 md:px-16 lg:px-24">
       <div className="flex items-end justify-between mb-16">
         <div>
-          <p className="text-label text-chrome tracking-ultra-wide opacity-40 mb-4">
+          <p className="text-label tracking-ultra-wide mb-4 text-y2k-pink opacity-55">
             {t.grid.eyebrow}
           </p>
           <h2
             className="text-titanium uppercase leading-none"
             style={{
-              fontFamily: '"Monument Extended", "Helvetica Neue", sans-serif',
+              fontFamily: 'var(--font-y2k-display), "Monument Extended", "Helvetica Neue", sans-serif',
               fontWeight: 800,
               fontSize: 'clamp(2rem, 5vw, 4.5rem)',
               letterSpacing: '0.06em',
+              textShadow: '0 0 40px rgba(255,18,147,0.08)',
             }}
           >
             {t.grid.title}
@@ -55,7 +57,7 @@ export function ProductGrid({ products = PRODUCTS }: ProductGridProps) {
         </p>
       </div>
 
-      <div className="divider-gold mb-16" />
+      <div className="divider-y2k-chrome mb-16" />
 
       <div
         className="product-collection-grid"
@@ -72,7 +74,7 @@ export function ProductGrid({ products = PRODUCTS }: ProductGridProps) {
             <ProductCard
               product={product}
               fetchPriority={index === 0 ? 'high' : 'low'}
-              onClick={() => navigate(`/products/${product.id}`)}
+              onClick={() => navigate(withLocalePath(locale, `/products/${product.id}`))}
             />
           </GridCell>
         ))}

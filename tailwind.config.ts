@@ -15,6 +15,10 @@ export default {
         titanium:'#F2F2F2',  // Stark Titanium
         gold:    '#C9A84C',  // 18K Raw Gold
         liquid:  '#D4D4D4',  // Liquid Chrome
+        'y2k-pink':   '#ff1293',
+        'y2k-purple': '#b366ff',
+        'y2k-blue':   '#6ecbff',
+        'y2k-acid':   '#c8ff00',
       },
       fontFamily: {
         display: ['var(--font-display)', 'sans-serif'],
