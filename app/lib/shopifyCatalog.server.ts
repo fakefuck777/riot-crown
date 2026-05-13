@@ -1,3 +1,8 @@
+/**
+ * Shopify Storefront catalog for Hydrogen/Oxygen.
+ * - GraphQL: no Product.totalInventory / tracksInventory (avoids extra scopes that break whole query).
+ * - Errors: logStorefrontFailure → JSON with extensions/stack/cause (Oxygen logs).
+ */
 import { CacheShort } from '@shopify/hydrogen';
 import type { Storefront } from '@shopify/hydrogen';
 import { makeSVG } from '~/lib/makeSVG';
@@ -59,7 +64,7 @@ function logStorefrontFailure(
   console.error(`[${label}]`, JSON.stringify(payload, null, 2));
 }
 
-/** Oxygen / server must set exactly `PUBLIC_STOREFRONT_API_TOKEN` (not …APITOKEN). Wired in `server.ts` → `createStorefrontClient`. */
+/** Oxygen: use `PUBLIC_STOREFRONT_API_TOKEN` (not …APITOKEN) — wired in `server.ts` → createStorefrontClient. */
 
 const SIZE_CYCLE: ProductData['size'][] = [
   'large', 'tall', 'wide', 'standard', 'tall', 'standard',
@@ -273,7 +278,6 @@ function mapNode(node: SfProductNode, index: number): ProductData {
     node.featuredImage?.url ??
     makeSVG(String(index + 1).padStart(2, '0'), 600, 800, '#C9A84C', label);
 
-  /** Omit totalInventory in query — requires extra Storefront scopes and can fail the whole request. */
   const stock: number | undefined = undefined;
 
   const sizes = variantSizes(variants);
