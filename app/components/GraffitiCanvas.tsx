@@ -92,40 +92,38 @@ const fragmentShader = /* glsl */`
     return spec;
   }
 
-  // Soft highlight roll-off + slight saturation lift (in-glass “luxury” grade)
+  // Tone map: keep highlights controlled but leave chroma strong (neon must read on first glance)
   vec3 tonemapLuxury(vec3 c) {
     c = max(c, vec3(1e-4));
-    c = pow(c, vec3(0.97));
+    c = pow(c, vec3(0.99));
     vec3 num = c * (c * vec3(2.02) + vec3(0.06));
     vec3 den = c * (c * vec3(2.43) + vec3(0.59)) + vec3(0.14);
     vec3 x = num / den;
     float l = dot(x, vec3(0.299, 0.587, 0.114));
-    x = mix(vec3(l), x, 1.035);
+    x = mix(vec3(l), x, 1.11);
     return clamp(x, 0.0, 1.0);
   }
 
   void main() {
     vec2 uv = vUv;
 
-    // Mouse influence — slightly softer for calmer parallax read
-    vec2 mouseOffset = (uMouse - 0.5) * 0.11;
+    vec2 mouseOffset = (uMouse - 0.5) * 0.12;
     float mouseFalloff = mix(0.38, 1.0, 1.0 - uv.y);
     uv += mouseOffset * mouseFalloff;
 
-    // Aspect-corrected coords for noise only (drips stay screen-locked)
     float asp = uResolution.x / max(uResolution.y, 1.0);
     vec2 nq = vec2(uv.x * asp, uv.y);
 
-    float scrollBoost = 1.0 + uScrollVel * 3.4;
+    float scrollBoost = 1.0 + uScrollVel * 3.6;
 
-    vec3 color = vec3(0.018, 0.018, 0.022);
+    vec3 color = vec3(0.014, 0.014, 0.026);
 
     float paintMass = fbm(nq * vec2(1.12, 0.96) + vec2(uTime * 0.035, 0.0), 5);
-    paintMass = smoothstep(0.035, 0.5, paintMass + uScrollVel * 0.28);
+    paintMass = smoothstep(0.028, 0.54, paintMass + uScrollVel * 0.32);
 
-    vec3 neonPink   = vec3(1.0,  0.08, 0.56);
-    vec3 neonHot    = vec3(0.98, 0.02, 0.36);
-    vec3 chromeTint = vec3(0.82, 0.84, 0.92);
+    vec3 neonPink   = vec3(1.0,  0.02, 0.62);
+    vec3 neonHot    = vec3(1.0,  0.0,  0.42);
+    vec3 chromeTint = vec3(0.78, 0.82, 1.0);
 
     float colorNoise = fbm(nq * 2.45 + uTime * 0.055, 3) * 0.5 + 0.5;
     vec3  paintColor = mix(neonHot, neonPink, colorNoise);
@@ -141,30 +139,33 @@ const fragmentShader = /* glsl */`
     dripMask += drip(uv, 0.91, 0.17 * scrollBoost, 0.016);
     dripMask = clamp(dripMask, 0.0, 1.0);
 
-    float totalPaint = clamp(paintMass * 0.72 + dripMask * 0.88, 0.0, 1.0);
+    float totalPaint = clamp(paintMass * 0.8 + dripMask * 0.96, 0.0, 1.0);
 
     vec2  lightDir   = normalize(uMouse - uv + vec2(0.28, 0.58));
     float spec       = specular(nq * 3.8, lightDir, 44.0);
     float specChrome = specular(nq * 7.6, lightDir, 108.0);
-    float microGlint = specular(nq * 14.0 + uTime * 0.02, lightDir, 220.0) * 0.35;
+    float microGlint = specular(nq * 14.0 + uTime * 0.02, lightDir, 220.0) * 0.42;
 
-    vec3 litPaint = paintColor
-                  + chromeTint * spec * 0.55
-                  + vec3(0.98, 0.99, 1.0) * specChrome * 0.38
-                  + vec3(1.0, 0.95, 0.98) * microGlint;
+    vec3 litPaint = paintColor * 1.06
+                  + chromeTint * spec * 0.62
+                  + vec3(0.98, 0.99, 1.0) * specChrome * 0.44
+                  + vec3(1.0, 0.92, 0.98) * microGlint;
 
-    float glow = totalPaint * (1.0 - totalPaint) * 2.35;
-    vec3  glowColor = neonPink * glow * (1.0 + uScrollVel * 1.75);
+    float glow = totalPaint * (1.0 - totalPaint) * 2.95;
+    vec3  glowColor = neonPink * glow * (1.0 + uScrollVel * 2.0);
 
     color = mix(color, litPaint, totalPaint);
     color += glowColor;
 
-    float vignette = 1.0 - smoothstep(0.42, 1.42,
+    float vignette = 1.0 - smoothstep(0.4, 1.38,
                        length((vUv - 0.5) * vec2(1.0, 1.04)));
     color *= vignette;
 
     float d = fract(sin(dot(gl_FragCoord.xy * 0.31 + uTime * 37.0, vec2(12.9898, 78.233))) * 43758.5453123);
     color += (d - 0.5) * 0.0038;
+
+    vec3 chroma = color - dot(color, vec3(0.299, 0.587, 0.114));
+    color += chroma * 0.085;
 
     color = tonemapLuxury(color);
 
