@@ -13,7 +13,8 @@ import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js';
 import { getHeroGpuTier } from '~/lib/heroGpuProfile';
 import { supportsHeroHalfFloatTargets } from '~/lib/heroPostCapability';
 
-const MAX_DPR = 3;
+/** 与 Canvas 对齐：降低 composer 像素负荷，减轻卡顿。 */
+const MAX_DPR = 2;
 
 const chromaticShader = {
   name: 'HeroChromaticAberration',
@@ -43,7 +44,7 @@ export interface HeroCinematicPostProps {
 }
 
 /**
- * Cinematic stack: bloom → film grain → subtle chromatic → SMAA (tiered) → output.
+ * Cinematic stack: bloom → [film] → chromatic → [SMAA on high only] → output.
  * `useFrame(..., 1)` owns the final frame (R3F disables default `gl.render`).
  */
 export function HeroCinematicPost({ scrollVelRef }: HeroCinematicPostProps) {
@@ -75,19 +76,22 @@ export function HeroCinematicPost({ scrollVelRef }: HeroCinematicPostProps) {
     const bloomStrength = tier === 'high' ? 0.28 : tier === 'mid' ? 0.22 : 0.17;
     const bloomThreshold = 0.3;
     const bloom = new UnrealBloomPass(new THREE.Vector2(bw, bh), bloomStrength, 0.42, bloomThreshold);
-    const film = new FilmPass(tier === 'high' ? 0.048 : tier === 'mid' ? 0.042 : 0.03, false);
+    const film =
+      tier === 'low'
+        ? null
+        : new FilmPass(tier === 'high' ? 0.04 : 0.034, false);
 
     const chromatic = new ShaderPass(chromaticShader);
     chromatic.uniforms.amount.value =
-      tier === 'high' ? 0.0022 : tier === 'mid' ? 0.0015 : 0.00085;
+      tier === 'high' ? 0.0018 : tier === 'mid' ? 0.0012 : 0.0007;
 
     const composer = new EffectComposer(gl);
     composer.addPass(new RenderPass(scene, camera));
     composer.addPass(bloom);
-    composer.addPass(film);
+    if (film) composer.addPass(film);
     composer.addPass(chromatic);
 
-    if (tier !== 'low') {
+    if (tier === 'high') {
       const smaa = new SMAAPass(w, h);
       composer.addPass(smaa);
       smaaRef.current = smaa;

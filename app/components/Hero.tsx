@@ -1,5 +1,5 @@
 'use client';
-import { useRef, useEffect, useLayoutEffect, useCallback, lazy, Suspense, useState } from 'react';
+import { useRef, useEffect, useLayoutEffect, lazy, Suspense } from 'react';
 import { gsap } from 'gsap';
 import { useLocale } from '~/lib/LocaleContext';
 import { usePrefersReducedMotion } from '~/hooks/usePrefersReducedMotion';
@@ -22,22 +22,7 @@ export function Hero() {
   const ctaBlockRef  = useRef<HTMLDivElement>(null);
   const scrollVelRef = useRef<number>(0);
   const mouseRef     = useRef<[number, number]>([0.5, 0.5]);
-  const tiltTarget   = useRef({ x: 0, y: 0 });
   const ctaMagneticRef = useMagnetic<HTMLDivElement>(1.05);
-  const [deferCanvas, setDeferCanvas] = useState(false);
-
-  /** 下一帧再挂 WebGL，避免与首屏排版抢主线程；比 idle 420ms 更早出现画面。 */
-  useEffect(() => {
-    const id = window.requestAnimationFrame(() => setDeferCanvas(true));
-    return () => window.cancelAnimationFrame(id);
-  }, []);
-
-  const onMouseMove = useCallback((e: MouseEvent) => {
-    const nx = e.clientX / window.innerWidth;
-    const ny = 1 - e.clientY / window.innerHeight;
-    mouseRef.current = [nx, ny];
-    tiltTarget.current = { x: (ny - 0.5) * -4.2, y: (nx - 0.5) * 4.2 };
-  }, []);
 
   useEffect(() => {
     if (reducedMotion) return;
@@ -53,6 +38,7 @@ export function Hero() {
     return () => window.removeEventListener('wheel', onWheel);
   }, [reducedMotion]);
 
+  /** 视差倾斜：仅在 pointer 移动时驱动 quickTo，避免与 WebGL 争抢「每帧空转」的 rAF。 */
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
@@ -60,19 +46,22 @@ export function Hero() {
       gsap.set(section, { rotationX: 0, rotationY: 0 });
       return;
     }
-    window.addEventListener('mousemove', onMouseMove);
-    const setRotX = gsap.quickTo(section, 'rotationX', { duration: 2.15, ease: 'power2.out' });
-    const setRotY = gsap.quickTo(section, 'rotationY', { duration: 2.15, ease: 'power2.out' });
+    const setRotX = gsap.quickTo(section, 'rotationX', { duration: 2.35, ease: 'power2.out' });
+    const setRotY = gsap.quickTo(section, 'rotationY', { duration: 2.35, ease: 'power2.out' });
     gsap.set(section, { transformPerspective: 2000, transformOrigin: 'center center' });
-    let rafId: number;
-    const tick = () => {
-      setRotX(tiltTarget.current.x);
-      setRotY(tiltTarget.current.y);
-      rafId = requestAnimationFrame(tick);
+
+    const onMove = (e: MouseEvent) => {
+      const nx = e.clientX / window.innerWidth;
+      const ny = 1 - e.clientY / window.innerHeight;
+      mouseRef.current = [nx, ny];
+      const tx = (ny - 0.5) * -3.4;
+      const ty = (nx - 0.5) * 3.4;
+      setRotX(tx);
+      setRotY(ty);
     };
-    rafId = requestAnimationFrame(tick);
-    return () => { window.removeEventListener('mousemove', onMouseMove); cancelAnimationFrame(rafId); };
-  }, [onMouseMove, reducedMotion]);
+    window.addEventListener('mousemove', onMove, { passive: true });
+    return () => window.removeEventListener('mousemove', onMove);
+  }, [reducedMotion]);
 
   // Entrance — staggered; layout effect avoids first paint stuck at opacity:0; context cleans StrictMode remounts.
   useLayoutEffect(() => {
@@ -172,35 +161,15 @@ export function Hero() {
         className="pointer-events-none absolute inset-0 z-0 min-h-dvh w-full"
         aria-hidden
       >
-        {deferCanvas ? (
-          <Suspense
-            fallback={
-              <div
-                className="absolute inset-0 h-full min-h-dvh w-full bg-[#050505]"
-                style={{
-                  background:
-                    'radial-gradient(ellipse 80% 55% at 50% 40%, rgba(255,18,147,0.12), transparent 62%), #050505',
-                }}
-                aria-hidden
-              />
-            }
-          >
-            <GraffitiCanvas
-              scrollVelRef={scrollVelRef}
-              mouseRef={mouseRef}
-              className="absolute inset-0 h-full min-h-dvh w-full"
-            />
-          </Suspense>
-        ) : (
-          <div
-            className="absolute inset-0 h-full min-h-dvh w-full bg-[#050505]"
-            style={{
-              background:
-                'radial-gradient(ellipse 80% 55% at 50% 40%, rgba(255,18,147,0.08), transparent 62%), #050505',
-            }}
-            aria-hidden
+        <Suspense
+          fallback={<div className="absolute inset-0 h-full min-h-dvh w-full bg-void" aria-hidden />}
+        >
+          <GraffitiCanvas
+            scrollVelRef={scrollVelRef}
+            mouseRef={mouseRef}
+            className="absolute inset-0 h-full min-h-dvh w-full"
           />
-        )}
+        </Suspense>
       </div>
 
       {/* Foreground: veils + copy — subtle parallax tilt only here */}
@@ -213,32 +182,21 @@ export function Hero() {
           backfaceVisibility: 'hidden',
         }}
       >
-        {/* Multi-layer veil — wide bright core so top-of-hero (eyebrow/title) keeps full fluid read */}
-        <div className="absolute inset-0 pointer-events-none" style={{
-        background: `
-          radial-gradient(ellipse 92% 72% at 50% 36%,
-            rgba(5,5,5,0.14) 0%,
-            rgba(5,5,5,0.42) 48%,
-            rgba(5,5,5,0.92) 100%
-          )
-        `,
-        }} />
-        {/* Bottom fade — content below hero */}
-        <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{
-          height: '30%',
-          background: 'linear-gradient(to bottom, transparent, #050505)',
-        }} />
-
-        {/* Left edge accent line */}
-        <div className="absolute left-8 md:left-16 top-1/4 bottom-1/4 pointer-events-none" style={{
-          width: '1px',
-          background: 'linear-gradient(to bottom, transparent, rgba(201,168,76,0.3) 30%, rgba(201,168,76,0.3) 70%, transparent)',
-        }} />
-        {/* Right edge accent line */}
-        <div className="absolute right-8 md:right-16 top-1/4 bottom-1/4 pointer-events-none" style={{
-          width: '1px',
-          background: 'linear-gradient(to bottom, transparent, rgba(242,242,242,0.08) 30%, rgba(242,242,242,0.08) 70%, transparent)',
-        }} />
+        {/* 单层暗角：压住中心过曝，减少与流体霓虹的「抢色」 */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              'radial-gradient(ellipse 88% 70% at 50% 38%, rgba(5,5,5,0.22) 0%, rgba(5,5,5,0.55) 52%, rgba(5,5,5,0.94) 100%)',
+          }}
+        />
+        <div
+          className="absolute bottom-0 left-0 right-0 pointer-events-none"
+          style={{
+            height: '28%',
+            background: 'linear-gradient(to bottom, transparent, var(--void))',
+          }}
+        />
 
         {!reducedMotion ? <div className="y2k-hero-chrome-orbit" aria-hidden /> : null}
 

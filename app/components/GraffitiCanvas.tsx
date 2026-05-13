@@ -269,8 +269,8 @@ interface GraffitiCanvasProps {
   className?:   string;
 }
 
-/** Max physical-pixel ratio for the hero fluid — 3× covers Retina / most flagship OLEDs with diminishing returns beyond. */
-const MAX_HERO_DPR = 3;
+/** 2× 在清晰度与帧率之间更稳；3× 对全屏后处理过重易卡顿。 */
+const MAX_HERO_DPR = 2;
 
 function heroCanvasDpr(): [number, number] {
   if (typeof window === 'undefined') return [1, 2];
@@ -307,7 +307,7 @@ export function GraffitiCanvas({ scrollVelRef, mouseRef, className }: GraffitiCa
       }}
       camera={{ position: [0, 0, 1], near: 0.1, far: 10 }}
       dpr={dpr}
-      resize={{ scroll: true, debounce: { scroll: 50, resize: 0 } }}
+      resize={{ scroll: false, debounce: { scroll: 0, resize: 120 } }}
       frameloop={tabVisible ? 'always' : 'never'}
       onCreated={({ gl }) => {
         gl.setClearColor('#050505', 1);
