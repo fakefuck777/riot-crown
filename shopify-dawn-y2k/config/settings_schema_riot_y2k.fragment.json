@@ -1,0 +1,59 @@
+[
+  {
+    "name": "RIOT Y2K",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Dark Y2K Luxury — colors"
+      },
+      {
+        "type": "color",
+        "id": "riot_color_void",
+        "label": "Void background",
+        "default": "#050508"
+      },
+      {
+        "type": "color",
+        "id": "riot_color_void_2",
+        "label": "Void lift (cards / panels)",
+        "default": "#0a0a10"
+      },
+      {
+        "type": "color",
+        "id": "riot_color_chrome",
+        "label": "Chrome / silver text",
+        "default": "#e8eaef"
+      },
+      {
+        "type": "color",
+        "id": "riot_color_gold",
+        "label": "Ritual gold",
+        "default": "#c9a84c"
+      },
+      {
+        "type": "color",
+        "id": "riot_color_pink",
+        "label": "Neon pink",
+        "default": "#ff1293"
+      },
+      {
+        "type": "color",
+        "id": "riot_color_purple",
+        "label": "Electric purple",
+        "default": "#b366ff"
+      },
+      {
+        "type": "color",
+        "id": "riot_color_blue",
+        "label": "Ice blue",
+        "default": "#6ecbff"
+      },
+      {
+        "type": "color",
+        "id": "riot_color_acid",
+        "label": "Acid green",
+        "default": "#c8ff00"
+      }
+    ]
+  }
+]

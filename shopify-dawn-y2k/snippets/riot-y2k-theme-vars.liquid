@@ -1,0 +1,32 @@
+{% comment %}
+  Maps Theme settings → CSS variables (optional). Merge settings_schema_riot_y2k.fragment.json first.
+  In layout/theme.liquid after riot-y2k-luxury.css:
+    {% render 'riot-y2k-theme-vars' %}
+{% endcomment %}
+<style id="riot-y2k-theme-vars">
+  :root {
+    --riot-void: {{ settings.riot_color_void | default: '#050508' }};
+    --riot-void-2: {{ settings.riot_color_void_2 | default: '#0a0a10' }};
+    --riot-chrome: {{ settings.riot_color_chrome | default: '#e8eaef' }};
+    --riot-gold-ritual: {{ settings.riot_color_gold | default: '#c9a84c' }};
+    --riot-pink-neon: {{ settings.riot_color_pink | default: '#ff1293' }};
+    --riot-purple-electric: {{ settings.riot_color_purple | default: '#b366ff' }};
+    --riot-blue-ice: {{ settings.riot_color_blue | default: '#6ecbff' }};
+    --riot-acid: {{ settings.riot_color_acid | default: '#c8ff00' }};
+    --riot-y2k-gradient: linear-gradient(
+      125deg,
+      {{ settings.riot_color_pink | default: '#ff1293' }} 0%,
+      {{ settings.riot_color_purple | default: '#b366ff' }} 28%,
+      {{ settings.riot_color_blue | default: '#6ecbff' }} 55%,
+      {{ settings.riot_color_acid | default: '#c8ff00' }} 82%,
+      {{ settings.riot_color_pink | default: '#ff1293' }} 100%
+    );
+    --riot-holo-border: linear-gradient(
+      135deg,
+      rgba(255, 18, 147, 0.85),
+      rgba(179, 102, 255, 0.75),
+      rgba(110, 203, 255, 0.7),
+      rgba(200, 255, 0, 0.55)
+    );
+  }
+</style>

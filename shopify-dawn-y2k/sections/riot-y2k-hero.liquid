@@ -1,0 +1,150 @@
+{% comment %}
+  RIOT Y2K Hero — Dark Luxury + Chrome + ritual copy
+  Add section: theme editor → Add section → (after upload) "RIOT Y2K Hero"
+  Requires asset: riot-y2k-luxury.css in theme Assets
+{% endcomment %}
+
+{{ 'riot-y2k-luxury.css' | asset_url | stylesheet_tag }}
+
+<section class="riot-y2k-hero" id="riot-y2k-hero-{{ section.id }}">
+  <div class="riot-y2k-hero__mesh" aria-hidden="true"></div>
+  <div class="riot-y2k-hero__scan" aria-hidden="true"></div>
+
+  <div class="riot-sparkle-field" data-riot-sparkles aria-hidden="true"></div>
+
+  <div class="riot-y2k-hero__vignette" aria-hidden="true"></div>
+
+  <div class="riot-y2k-hero__inner">
+    {% if section.settings.show_glyphs %}
+      <div class="riot-y2k-glyphs" aria-hidden="true">
+        <span>✦</span>
+        <span>🦋</span>
+        <span>♡</span>
+        <span>✧</span>
+        <span>⛓</span>
+        <span>✟</span>
+        <span>▪</span>
+      </div>
+      <div style="height: 1.5rem"></div>
+    {% endif %}
+
+    {% if section.settings.eyebrow != blank %}
+      <p class="riot-y2k-hero__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+    {% endif %}
+
+    <h1 class="riot-y2k-hero__title">
+      {% if section.settings.title_style == 'gradient' %}
+        <span class="riot-y2k-gradient-title">{{ section.settings.heading | escape }}</span>
+      {% else %}
+        <span class="riot-chrome-title">{{ section.settings.heading | escape }}</span>
+      {% endif %}
+    </h1>
+
+    {% if section.settings.subheading != blank %}
+      <p class="riot-y2k-hero__sub">{{ section.settings.subheading | newline_to_br }}</p>
+    {% endif %}
+
+    <div class="riot-y2k-hero__actions">
+      {% if section.settings.button_label != blank %}
+        <a href="{{ section.settings.button_link }}" class="riot-btn-y2k">
+          {{ section.settings.button_label | escape }}
+        </a>
+      {% endif %}
+      {% if section.settings.secondary_label != blank %}
+        <a href="{{ section.settings.secondary_link }}" class="riot-btn-ghost">
+          {{ section.settings.secondary_label | escape }}
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<script>
+  (function () {
+    var root = document.getElementById('riot-y2k-hero-{{ section.id }}');
+    if (!root) return;
+    var field = root.querySelector('[data-riot-sparkles]');
+    if (!field || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    var n = 42;
+    for (var i = 0; i < n; i++) {
+      var s = document.createElement('span');
+      s.style.left = Math.random() * 100 + '%';
+      s.style.top = Math.random() * 100 + '%';
+      s.style.animationDelay = Math.random() * 4 + 's';
+      s.style.animationDuration = 2.5 + Math.random() * 2.5 + 's';
+      field.appendChild(s);
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "RIOT Y2K Hero",
+  "tag": "section",
+  "class": "section section--riot-y2k-hero",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_glyphs",
+      "label": "Show Y2K glyphs row",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "VOID ATELIER · EST. 2000s ENERGY"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "RIOT CROWN"
+    },
+    {
+      "type": "select",
+      "id": "title_style",
+      "label": "Title style",
+      "options": [
+        { "value": "chrome", "label": "Chrome metal" },
+        { "value": "gradient", "label": "Y2K holo gradient" }
+      ],
+      "default": "chrome"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "The night remembers what the day forgot — but your look stays iconic. Dark ritual meets early-2000s bling: chrome, crystal, pure nostalgia."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Primary button",
+      "default": "SHOP THE VOID"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Primary link"
+    },
+    {
+      "type": "text",
+      "id": "secondary_label",
+      "label": "Secondary button",
+      "default": "NEW DROPS"
+    },
+    {
+      "type": "url",
+      "id": "secondary_link",
+      "label": "Secondary link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "RIOT Y2K Hero"
+    }
+  ]
+}
+{% endschema %}

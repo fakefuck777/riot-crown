@@ -1,0 +1,35 @@
+RIOT Y2K — Dawn theme install (Online Store 2.0)
+==============================================
+
+1) Upload CSS
+   - Admin → Online Store → Themes → … → Edit code
+   - Assets → Add a new asset → name: riot-y2k-luxury.css
+   - Paste contents from shopify-dawn-y2k/assets/riot-y2k-luxury.css
+
+2) Add Hero section
+   - Sections → Add a new section → name: riot-y2k-hero.liquid
+   - Paste contents from shopify-dawn-y2k/sections/riot-y2k-hero.liquid
+
+3) Add Featured collection section (products + chrome hover)
+   - Sections → Add a new section → name: riot-y2k-featured-collection.liquid
+   - Paste from shopify-dawn-y2k/sections/riot-y2k-featured-collection.liquid
+   - Theme editor → Add section → “RIOT Y2K Collection” → pick a collection
+
+4) Optional — Theme color variables (editor pickable colors)
+   - Open config/settings_schema.json
+   - Open shopify-dawn-y2k/config/settings_schema_riot_y2k.fragment.json
+   - Copy the FIRST (and only) object inside the outer [...] — i.e. the object that starts with "name": "RIOT Y2K"
+   - Paste that object as a new element in the ROOT array of settings_schema.json (add a comma after the previous last element). Valid JSON is required.
+   - Snippets → Add riot-y2k-theme-vars.liquid (paste from repo)
+   - layout/theme.liquid → inside <head>, AFTER riot-y2k-luxury.css line, add:
+     {% render 'riot-y2k-theme-vars' %}
+
+5) Global load (minimum)
+   - layout/theme.liquid → inside <head> before </head>:
+     {{ 'riot-y2k-luxury.css' | asset_url | stylesheet_tag }}
+
+6) If card-product render errors
+   - Your Dawn version may use different render arguments for snippets/card-product.liquid
+   - Open snippets/card-product.liquid and match the {% render %} argument names shown in comments at the top of that file
+
+Note: Headless Hydrogen (riotcrown.shop) does not use these Liquid files — only the Online Store theme channel.

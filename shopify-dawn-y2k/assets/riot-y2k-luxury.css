@@ -1,0 +1,540 @@
+/**
+ * RIOT CROWN — Dark Y2K Luxury / Cyber Occult Bling
+ * Paste into Dawn: Assets → Add asset → riot-y2k-luxury.css
+ * Then in layout/theme.liquid before </head>:
+ *   {{ 'riot-y2k-luxury.css' | asset_url | stylesheet_tag }}
+ */
+
+:root {
+  --riot-void: #050508;
+  --riot-void-2: #0a0a10;
+  --riot-chrome: #e8eaef;
+  --riot-chrome-mid: #9aa3b2;
+  --riot-chrome-dark: #5c6570;
+  --riot-gold-ritual: #c9a84c;
+  --riot-pink-neon: #ff1293;
+  --riot-purple-electric: #b366ff;
+  --riot-blue-ice: #6ecbff;
+  --riot-acid: #c8ff00;
+  --riot-magenta-deep: #7d0a4a;
+  --riot-y2k-gradient: linear-gradient(
+    125deg,
+    #ff1293 0%,
+    #b366ff 28%,
+    #6ecbff 55%,
+    #c8ff00 82%,
+    #ff1293 100%
+  );
+  --riot-chrome-sheen: linear-gradient(
+    105deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.45) 45%,
+    rgba(255, 255, 255, 0.08) 52%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  --riot-holo-border: linear-gradient(
+    135deg,
+    rgba(255, 18, 147, 0.85),
+    rgba(179, 102, 255, 0.75),
+    rgba(110, 203, 255, 0.7),
+    rgba(200, 255, 0, 0.55)
+  );
+}
+
+/* ─── Base tone: keep Dawn readable but darker shell ───────────────── */
+body.gradient--riot-y2k,
+.riot-y2k-page {
+  background: var(--riot-void);
+  color: rgba(242, 242, 242, 0.92);
+}
+
+/* ─── Chrome / metallic display titles ─────────────────────────────── */
+.riot-chrome-title {
+  position: relative;
+  display: inline-block;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #d4d8e0 22%,
+    #8b93a0 48%,
+    #f5f7fa 55%,
+    #9aa3b2 78%,
+    #e8eaef 100%
+  );
+  background-size: 100% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 24px rgba(255, 255, 255, 0.12))
+    drop-shadow(0 2px 0 rgba(0, 0, 0, 0.85));
+  animation: riot-chrome-shine 8s ease-in-out infinite;
+}
+
+@keyframes riot-chrome-shine {
+  0%,
+  100% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 0% 100%;
+  }
+}
+
+/* Y2K acid outline title variant */
+.riot-y2k-gradient-title {
+  background: var(--riot-y2k-gradient);
+  background-size: 220% 220%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: riot-holo-shift 14s ease infinite;
+  filter: drop-shadow(0 0 28px rgba(255, 18, 147, 0.25));
+}
+
+@keyframes riot-holo-shift {
+  0% {
+    background-position: 0% 40%;
+  }
+  50% {
+    background-position: 100% 60%;
+  }
+  100% {
+    background-position: 0% 40%;
+  }
+}
+
+/* ─── Holographic / chrome frame (cards, buttons) ─────────────────── */
+.riot-y2k-frame {
+  position: relative;
+  border-radius: 2px;
+  background: linear-gradient(var(--riot-void-2), var(--riot-void-2)) padding-box,
+    var(--riot-holo-border) border-box;
+  border: 1px solid transparent;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+    0 24px 60px rgba(0, 0, 0, 0.55), 0 0 40px rgba(255, 18, 147, 0.08);
+}
+
+.riot-y2k-frame--pulse::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: var(--riot-holo-border);
+  opacity: 0.25;
+  z-index: -1;
+  filter: blur(18px);
+  animation: riot-frame-glow 4s ease-in-out infinite;
+}
+
+@keyframes riot-frame-glow {
+  0%,
+  100% {
+    opacity: 0.18;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.38;
+    transform: scale(1.01);
+  }
+}
+
+/* ─── Metallic button ───────────────────────────────────────────────── */
+.riot-btn-y2k {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.75rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #0a0a10;
+  background: linear-gradient(180deg, #f2f4f8 0%, #b8c0cc 45%, #8f98a8 50%, #dce0e8 100%);
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35) inset, 0 12px 32px rgba(0, 0, 0, 0.45);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
+}
+
+.riot-btn-y2k::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.55) 45%,
+    rgba(255, 255, 255, 0.15) 50%,
+    transparent 58%
+  );
+  transform: translateX(-120%);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.riot-btn-y2k:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 1px rgba(255, 18, 147, 0.35), 0 0 48px rgba(255, 18, 147, 0.2),
+    0 18px 40px rgba(0, 0, 0, 0.5);
+}
+
+.riot-btn-y2k:hover::after {
+  transform: translateX(120%);
+}
+
+/* Ghost outline button (ritual + Y2K) */
+.riot-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 1.75rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(242, 242, 242, 0.88);
+  background: rgba(5, 5, 8, 0.35);
+  border: 1px solid rgba(201, 168, 76, 0.45);
+  border-radius: 2px;
+  backdrop-filter: blur(10px);
+  transition: border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.riot-btn-ghost:hover {
+  border-color: rgba(255, 18, 147, 0.65);
+  color: #fff;
+  box-shadow: 0 0 32px rgba(255, 18, 147, 0.15);
+}
+
+/* ─── Sparkle / particle field (pure CSS, hero bg layer) ───────────── */
+.riot-sparkle-field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.riot-sparkle-field span {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.9), 0 0 14px rgba(110, 203, 255, 0.45);
+  opacity: 0;
+  animation: riot-sparkle 3.2s ease-in-out infinite;
+}
+
+@keyframes riot-sparkle {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.4) translateY(0);
+  }
+  15% {
+    opacity: 1;
+  }
+  55% {
+    opacity: 0.85;
+    transform: scale(1.1) translateY(-14px);
+  }
+  85% {
+    opacity: 0;
+    transform: scale(0.6) translateY(-28px);
+  }
+}
+
+/* ─── Y2K icon row (butterfly, star, etc. as inline SVG or emoji) ───── */
+.riot-y2k-glyphs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  letter-spacing: 0.2em;
+  opacity: 0.75;
+  filter: drop-shadow(0 0 12px rgba(255, 18, 147, 0.35));
+}
+
+.riot-y2k-glyphs span {
+  display: inline-flex;
+  animation: riot-glyph-float 5s ease-in-out infinite;
+}
+
+.riot-y2k-glyphs span:nth-child(2n) {
+  animation-delay: 0.6s;
+}
+.riot-y2k-glyphs span:nth-child(3n) {
+  animation-delay: 1.1s;
+}
+
+@keyframes riot-glyph-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+/* ─── Hero section layout ───────────────────────────────────────────── */
+.riot-y2k-hero {
+  position: relative;
+  min-height: 88vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1.5rem 5rem;
+  background: radial-gradient(ellipse 120% 80% at 50% -10%, rgba(179, 102, 255, 0.12), transparent 55%),
+    radial-gradient(ellipse 90% 60% at 80% 100%, rgba(255, 18, 147, 0.1), transparent 50%),
+    radial-gradient(ellipse 70% 50% at 10% 80%, rgba(110, 203, 255, 0.08), transparent 45%),
+    var(--riot-void);
+  overflow: hidden;
+}
+
+.riot-y2k-hero__mesh {
+  position: absolute;
+  inset: -20%;
+  background: conic-gradient(
+    from 200deg at 50% 50%,
+    rgba(255, 18, 147, 0.08),
+    rgba(110, 203, 255, 0.06),
+    rgba(200, 255, 0, 0.05),
+    rgba(179, 102, 255, 0.07),
+    rgba(255, 18, 147, 0.08)
+  );
+  opacity: 0.55;
+  animation: riot-mesh-spin 48s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes riot-mesh-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.riot-y2k-hero__scan {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.03) 0px,
+    rgba(255, 255, 255, 0.03) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: overlay;
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+.riot-y2k-hero__vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 70% 55% at 50% 45%, transparent 0%, rgba(5, 5, 8, 0.88) 100%);
+  pointer-events: none;
+}
+
+.riot-y2k-hero__inner {
+  position: relative;
+  z-index: 2;
+  max-width: 56rem;
+  text-align: center;
+}
+
+.riot-y2k-hero__eyebrow {
+  font-size: 0.62rem;
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: rgba(201, 168, 76, 0.75);
+  margin-bottom: 1.5rem;
+}
+
+.riot-y2k-hero__title {
+  font-size: clamp(2.2rem, 6vw, 4.2rem);
+  line-height: 0.95;
+  margin: 0 0 1.25rem;
+}
+
+.riot-y2k-hero__sub {
+  font-size: clamp(0.82rem, 1.8vw, 1rem);
+  line-height: 1.65;
+  color: rgba(200, 206, 220, 0.72);
+  max-width: 36rem;
+  margin: 0 auto 2.25rem;
+}
+
+.riot-y2k-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+/* ─── Product card hover chrome (use on card wrapper) ───────────────── */
+.riot-card-y2k {
+  position: relative;
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.45s ease;
+}
+
+.riot-card-y2k::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  background: radial-gradient(
+    120% 80% at var(--mx, 50%) var(--my, 40%),
+    rgba(255, 255, 255, 0.18) 0%,
+    rgba(255, 18, 147, 0.12) 28%,
+    transparent 60%
+  );
+  mix-blend-mode: screen;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+
+.riot-card-y2k:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), 0 0 48px rgba(255, 18, 147, 0.12);
+}
+
+.riot-card-y2k:hover::before {
+  opacity: 1;
+}
+
+/* ─── Product grid (Y2K collection section) ─────────────────────────── */
+.riot-y2k-product-section {
+  background: var(--riot-void);
+  padding-top: var(--riot-sec-pt, 3rem);
+  padding-bottom: var(--riot-sec-pb, 4rem);
+}
+
+.riot-y2k-product-section__head {
+  text-align: center;
+  max-width: 42rem;
+  margin: 0 auto 2.5rem;
+  padding: 0 1.25rem;
+}
+
+.riot-y2k-product-section__eyebrow {
+  font-size: 0.58rem;
+  letter-spacing: 0.36em;
+  text-transform: uppercase;
+  color: rgba(201, 168, 76, 0.7);
+  margin-bottom: 0.75rem;
+}
+
+.riot-y2k-product-section__title {
+  font-size: clamp(1.5rem, 3.5vw, 2.35rem);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0 0 0.75rem;
+  background: linear-gradient(90deg, var(--riot-chrome) 0%, rgba(255, 18, 147, 0.95) 45%, var(--riot-blue-ice) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.riot-y2k-product-section__sub {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: rgba(200, 206, 220, 0.65);
+}
+
+.riot-y2k-product-grid {
+  list-style: none;
+  padding: 0 1.25rem;
+  margin: 0 auto;
+  max-width: var(--page-width, 120rem);
+  display: grid;
+  gap: 1.25rem 1rem;
+  grid-template-columns: repeat(var(--riot-cols-mobile, 2), minmax(0, 1fr));
+}
+
+@media screen and (min-width: 750px) {
+  .riot-y2k-product-grid {
+    grid-template-columns: repeat(var(--riot-cols-tablet, 3), minmax(0, 1fr));
+    gap: 1.5rem 1.25rem;
+  }
+}
+
+@media screen and (min-width: 990px) {
+  .riot-y2k-product-grid {
+    grid-template-columns: repeat(var(--riot-cols-desktop, 4), minmax(0, 1fr));
+    gap: 2rem 1.5rem;
+  }
+}
+
+.riot-y2k-product-grid > li {
+  list-style: none;
+}
+
+.riot-y2k-product-grid .riot-card-y2k {
+  height: 100%;
+  border-radius: 4px;
+}
+
+.riot-y2k-product-grid .riot-card-y2k > .card-wrapper,
+.riot-y2k-product-grid .riot-card-y2k > *:first-child {
+  height: 100%;
+}
+
+/* Dawn card inner polish */
+.riot-y2k-product-grid .card,
+.riot-y2k-product-grid .card--standard,
+.riot-y2k-product-grid .card--media {
+  background: rgba(10, 10, 16, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 0 1px rgba(255, 18, 147, 0.04);
+  transition: border-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.riot-y2k-product-grid .riot-card-y2k:hover .card,
+.riot-y2k-product-grid .riot-card-y2k:hover .card--standard,
+.riot-y2k-product-grid .riot-card-y2k:hover .card--media {
+  border-color: rgba(255, 18, 147, 0.28);
+  box-shadow: 0 0 36px rgba(255, 18, 147, 0.08), 0 0 0 1px rgba(110, 203, 255, 0.12);
+}
+
+.riot-y2k-product-grid .card__inner .media img {
+  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), filter 0.45s ease;
+}
+
+.riot-y2k-product-grid .riot-card-y2k:hover .card__inner .media img {
+  transform: scale(1.04);
+  filter: saturate(1.08) contrast(1.04) brightness(1.02);
+}
+
+/* Utility: reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .riot-chrome-title,
+  .riot-y2k-gradient-title,
+  .riot-y2k-frame--pulse::before,
+  .riot-y2k-hero__mesh,
+  .riot-y2k-glyphs span,
+  .riot-sparkle-field span {
+    animation: none !important;
+  }
+  .riot-btn-y2k::after {
+    transform: none;
+  }
+  .riot-y2k-product-grid .riot-card-y2k:hover .card__inner .media img {
+    transform: none;
+    filter: none;
+  }
+}
