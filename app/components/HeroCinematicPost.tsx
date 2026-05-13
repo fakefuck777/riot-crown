@@ -16,6 +16,27 @@ import { supportsHeroHalfFloatTargets } from '~/lib/heroPostCapability';
 /** 与 Canvas 对齐：降低 composer 像素负荷，减轻卡顿。 */
 const MAX_DPR = 2;
 
+/** 避免 width×DPR 超过 maxTextureSize 导致 Framebuffer incomplete（移动端常见）。 */
+function clampCssSizeForComposer(
+  gl: THREE.WebGLRenderer,
+  cssW: number,
+  cssH: number,
+  pr: number,
+): { w: number; h: number } {
+  const maxTex = Math.min(gl.capabilities.maxTextureSize || 4096, 4096);
+  let w = Math.max(8, Math.floor(cssW));
+  let h = Math.max(8, Math.floor(cssH));
+  const bufW = w * pr;
+  const bufH = h * pr;
+  const maxDim = Math.max(bufW, bufH);
+  if (maxDim > maxTex) {
+    const s = maxTex / maxDim;
+    w = Math.max(8, Math.floor(w * s));
+    h = Math.max(8, Math.floor(h * s));
+  }
+  return { w, h };
+}
+
 const chromaticShader = {
   name: 'HeroChromaticAberration',
   uniforms: {
@@ -66,8 +87,10 @@ export function HeroCinematicPost({ scrollVelRef }: HeroCinematicPostProps) {
 
     const iw = typeof window !== 'undefined' ? window.innerWidth : 1280;
     const ih = typeof window !== 'undefined' ? window.innerHeight : 720;
-    const w = Math.max(8, Math.floor(size.width) || iw);
-    const h = Math.max(8, Math.floor(size.height) || ih);
+    const rawW = Math.floor(size.width) || iw;
+    const rawH = Math.floor(size.height) || ih;
+    const pr0 = Math.min(MAX_DPR, gl.getPixelRatio());
+    const { w, h } = clampCssSizeForComposer(gl, rawW, rawH, pr0);
 
     const bloomScale = tier === 'high' ? 1 : tier === 'mid' ? 0.52 : 0.36;
     const bw = Math.max(32, Math.floor(w * bloomScale));
@@ -123,11 +146,12 @@ export function HeroCinematicPost({ scrollVelRef }: HeroCinematicPostProps) {
 
   useEffect(() => {
     const c = composerRef.current;
-    if (!c || size.width < 1 || size.height < 1) return;
+    if (!c || size.width < 2 || size.height < 2) return;
     const pr = Math.min(MAX_DPR, gl.getPixelRatio());
+    const { w, h } = clampCssSizeForComposer(gl, size.width, size.height, pr);
     c.setPixelRatio(pr);
-    c.setSize(size.width, size.height);
-    smaaRef.current?.setSize(size.width, size.height);
+    c.setSize(w, h);
+    smaaRef.current?.setSize(w, h);
   }, [gl, size.width, size.height]);
 
   useFrame((_state, delta) => {
@@ -135,6 +159,11 @@ export function HeroCinematicPost({ scrollVelRef }: HeroCinematicPostProps) {
     const bloom = bloomRef.current;
 
     if (!composer) {
+      gl.render(scene, camera);
+      return;
+    }
+
+    if (size.width < 2 || size.height < 2) {
       gl.render(scene, camera);
       return;
     }
