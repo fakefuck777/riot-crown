@@ -1,0 +1,30 @@
+{% comment %}
+  Minimal product card — fallback when Dawn `card-product` render params differ.
+  Used by riot-y2k-featured-collection when "Use Dawn card-product" is off.
+{% endcomment %}
+{%- liquid
+  assign featured_media = product.featured_media
+  assign price = product.price | money
+-%}
+<div class="riot-y2k-minimal-card">
+  <a href="{{ product.url }}" class="riot-y2k-minimal-card__link">
+    <div class="riot-y2k-minimal-card__media">
+      {% if featured_media %}
+        <img
+          src="{{ featured_media | image_url: width: 800 }}"
+          alt="{{ featured_media.alt | default: product.title | escape }}"
+          loading="lazy"
+          width="{{ featured_media.width }}"
+          height="{{ featured_media.height }}"
+          class="riot-y2k-minimal-card__img"
+        >
+      {% else %}
+        <div class="riot-y2k-minimal-card__ph" aria-hidden="true"></div>
+      {% endif %}
+    </div>
+    <div class="riot-y2k-minimal-card__info">
+      <h3 class="riot-y2k-minimal-card__title">{{ product.title | escape }}</h3>
+      <p class="riot-y2k-minimal-card__price">{{ price }}</p>
+    </div>
+  </a>
+</div>

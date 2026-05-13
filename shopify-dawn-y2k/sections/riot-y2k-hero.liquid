@@ -6,7 +6,8 @@
 {{ 'riot-y2k-luxury.css' | asset_url | stylesheet_tag }}
 {% render 'riot-y2k-fonts' %}
 
-<section class="riot-y2k-hero riot-y2k-force-dark" id="riot-y2k-hero-{{ section.id }}">
+<section class="riot-y2k-hero riot-y2k-force-dark riot-y2k-hero--impact riot-y2k-surface-glint" id="riot-y2k-hero-{{ section.id }}">
+  <div class="riot-y2k-hero__bolt" aria-hidden="true"></div>
   <div class="riot-y2k-hero__mesh" aria-hidden="true"></div>
   {% if section.settings.show_chrome_ring %}
     <div class="riot-y2k-hero__chrome-ring" aria-hidden="true"></div>
@@ -48,7 +49,7 @@
     {% endif %}
 
     {% if section.settings.eyebrow != blank %}
-      <p class="riot-y2k-hero__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+      <p class="riot-y2k-hero__eyebrow riot-y2k-hero__eyebrow--pulse">{{ section.settings.eyebrow | escape }}</p>
     {% endif %}
 
     <h1 class="riot-y2k-hero__title">

@@ -1,0 +1,21 @@
+══════════════════════════════════════════════════════════════════
+Dawn layout/theme.liquid — 建議手動補丁（與 GitHub 主題倉庫同步）
+══════════════════════════════════════════════════════════════════
+
+1) <head> 內：在 {{ 'base.css' | asset_url | stylesheet_tag }} 之「後」加入一行（只載入一次即可）：
+   {% render 'riot-y2k-head' %}
+   若各 Section 已各自載入 riot-y2k-luxury.css，可改為只保留 fonts + vars + runtime，避免重複 CSS。
+
+2) <body> 開頭標籤加上 class（舊版 iOS 無 :has() 時仍保證黑底）：
+   將
+     <body class="gradient ...">
+   改為（保留原有 class，僅追加）：
+     <body class="gradient ... riot-y2k-active">
+
+3) 確認存在標準 viewport（Dawn 預設通常已有）：
+   <meta name="viewport" content="width=device-width,initial-scale=1">
+
+4) 首頁 JSON：將本 repo 的 templates/index.json 複製到主題根目錄 templates/index.json
+   （若已有自訂首頁，請先備份再合併 order / sections。）
+
+══════════════════════════════════════════════════════════════════

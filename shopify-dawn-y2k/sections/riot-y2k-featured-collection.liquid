@@ -43,19 +43,23 @@
       >
         {% for product in selected.products limit: limit %}
           <li>
-            <div
-              class="riot-card-y2k{% if section.settings.holo_border %} riot-card-y2k--holo{% endif %}"
-              data-riot-chrome-card
-            >
-              <div class="riot-card-y2k__corners" aria-hidden="true"></div>
-              {% render 'card-product',
-                card_product: product,
-                media_aspect_ratio: ratio,
-                show_secondary_image: section.settings.show_secondary_image,
-                show_vendor: section.settings.show_vendor,
-                section_id: section.id
-              %}
-            </div>
+            {% if section.settings.use_dawn_card_product %}
+              <div
+                class="riot-card-y2k{% if section.settings.holo_border %} riot-card-y2k--holo{% endif %}"
+                data-riot-chrome-card
+              >
+                <div class="riot-card-y2k__corners" aria-hidden="true"></div>
+                {% render 'card-product',
+                  card_product: product,
+                  media_aspect_ratio: ratio,
+                  show_secondary_image: section.settings.show_secondary_image,
+                  show_vendor: section.settings.show_vendor,
+                  section_id: section.id
+                %}
+              </div>
+            {% else %}
+              {% render 'riot-y2k-product-card-minimal', product: product %}
+            {% endif %}
           </li>
         {% endfor %}
       </ul>
@@ -71,6 +75,13 @@
   "tag": "section",
   "class": "section",
   "settings": [
+    {
+      "type": "checkbox",
+      "id": "use_dawn_card_product",
+      "label": "Use Dawn card-product snippet",
+      "default": true,
+      "info": "若首頁產品區空白或報錯，取消勾選改用內建簡化卡片（仍為 Y2K 樣式）。"
+    },
     {
       "type": "collection",
       "id": "collection",

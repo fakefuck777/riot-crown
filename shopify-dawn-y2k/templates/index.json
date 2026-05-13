@@ -1,0 +1,124 @@
+{
+  "sections": {
+    "riot_y2k_hero": {
+      "type": "riot-y2k-hero",
+      "settings": {
+        "show_glyphs": true,
+        "show_marquee": true,
+        "marquee_text": "✦ BLING ✦ ICONIC ✦ NOSTALGIA ✦ VOID RITUAL ✦ CHROME ✦ 2000s ✦",
+        "show_chrome_ring": true,
+        "sparkle_count": 72,
+        "eyebrow": "VOID ATELIER · THE ERA REMEMBERS",
+        "heading": "RIOT CROWN",
+        "title_style": "chrome",
+        "subheading": "The night remembers what the day forgot — stay iconic. Dark ritual meets early-2000s bling: chrome, crystal, pure nostalgia. Limited drops. Zero apologies.",
+        "button_label": "SHOP THE VOID",
+        "button_link": "/collections/all",
+        "secondary_label": "NEW DROPS",
+        "secondary_link": "/collections/all"
+      }
+    },
+    "riot_y2k_symbar_1": {
+      "type": "riot-y2k-symbol-marquee",
+      "settings": {
+        "symbols": "🦋 ✦ ♡ ✟ ▪ ★ ◼ ⛓ ✧"
+      }
+    },
+    "riot_y2k_featured": {
+      "type": "riot-y2k-featured-collection",
+      "settings": {
+        "use_dawn_card_product": true,
+        "collection": "",
+        "products_to_show": 8,
+        "media_ratio": "portrait",
+        "show_secondary_image": true,
+        "show_vendor": false,
+        "columns_mobile": 2,
+        "columns_tablet": 3,
+        "columns_desktop": 4,
+        "eyebrow": "ICONIC DROPS · Y2K VOID",
+        "title": "Bling for the ritual",
+        "subheading": "Chrome, crystal, nostalgia — pieces that hit different after dark.",
+        "holo_border": true,
+        "padding_top": 36,
+        "padding_bottom": 52
+      }
+    },
+    "riot_y2k_countdown": {
+      "type": "riot-y2k-countdown",
+      "settings": {
+        "label": "DROP WINDOW · ICONIC ENERGY LOADING",
+        "end_iso": "2026-12-31T23:59:59",
+        "hidden_when_done": false,
+        "caption_days": "DAYS",
+        "caption_hours": "HRS",
+        "caption_min": "MIN",
+        "caption_sec": "SEC"
+      }
+    },
+    "riot_y2k_trust": {
+      "type": "riot-y2k-trust-strip",
+      "blocks": {
+        "badge_1": {
+          "type": "badge",
+          "settings": {
+            "icon": "✦",
+            "text": "AUTHENTIC VOID"
+          }
+        },
+        "badge_2": {
+          "type": "badge",
+          "settings": {
+            "icon": "⛓",
+            "text": "SECURE CHECKOUT"
+          }
+        },
+        "badge_3": {
+          "type": "badge",
+          "settings": {
+            "icon": "★",
+            "text": "ICONIC DROPS"
+          }
+        },
+        "badge_4": {
+          "type": "badge",
+          "settings": {
+            "icon": "🦋",
+            "text": "Y2K NOSTALGIA"
+          }
+        }
+      },
+      "block_order": [
+        "badge_1",
+        "badge_2",
+        "badge_3",
+        "badge_4"
+      ]
+    },
+    "riot_y2k_lowrise": {
+      "type": "riot-y2k-lowrise-banner",
+      "settings": {
+        "eyebrow": "CHROME OCCULT · 2000s",
+        "title": "LOW SLUNG ENERGY",
+        "body": "<p>Not demure — <strong>iconic</strong>. A campaign crop for the era that never logged off.</p>",
+        "pt": 40,
+        "pb": 48
+      }
+    },
+    "riot_y2k_symbar_2": {
+      "type": "riot-y2k-symbol-marquee",
+      "settings": {
+        "symbols": "★ ◼ ✧ ✦ ♡ ⛓ 🦋 ▪ ✟"
+      }
+    }
+  },
+  "order": [
+    "riot_y2k_hero",
+    "riot_y2k_symbar_1",
+    "riot_y2k_featured",
+    "riot_y2k_countdown",
+    "riot_y2k_trust",
+    "riot_y2k_lowrise",
+    "riot_y2k_symbar_2"
+  ]
+}

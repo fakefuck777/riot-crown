@@ -31,7 +31,12 @@ E) 可選 — 主題色編輯器
    併入後：若 <head> 用的是 `{% render 'riot-y2k-head' %}`，已內含 `riot-y2k-theme-vars`，不必重複加。
    若用手動載入（見 D），請在 <head> 再加：`{% render 'riot-y2k-theme-vars' %}`
 
-F) 主題編輯器
+F) 主題編輯器 / GitHub 首頁 JSON
+   • 本 repo 提供 templates/index.json（僅 RIOT 區塊順序）。若你的 Dawn 已有首頁，請先備份 themes/.../templates/index.json 再合併或整檔替換。
+   • 替換後請在後台「首頁」確認 Section 無報錯；collection 留空時會使用「所有商品」邏輯（見 riot-y2k-featured-collection.liquid）。
+   • 手動：依 COPY_AND_PRODUCT_TIPS.txt 順序在編輯器加入各 Section。
+
+F2) 主題編輯器（僅手動）
    首頁：依 COPY_AND_PRODUCT_TIPS.txt 建議順序加入各 Section。
    產品頁：Products → Default product → Add section → RIOT Y2K Product callout
 
@@ -39,6 +44,19 @@ G) card-product 報錯時
    打開 snippets/card-product.liquid 檔頭註解，對齊 {% render %} 參數名稱與你的 Dawn 版本。
 
 H) Hydrogen 店（riotcrown 無頭）與本包無關；本包只作用在 Online Store 的 Dawn 主題。
+
+I) 【緊急白屏/留白】請確認：
+   • 不要刪除或整份覆蓋 Dawn 的 assets/base.css（會導致版面崩壞）。
+   • riot-y2k-luxury.css 必須在 base.css「之後」載入（見 theme.liquid 註解）。
+   • layout/theme.liquid 須有標準 viewport：`<meta name="viewport" content="width=device-width,initial-scale=1">`
+   • 瀏覽器 Console 檢查：見下方「Console 檢查清單」。
+
+Console 檢查清單（貼到 Console 執行或觀察）：
+   • document.querySelector('link[href*="riot-y2k-luxury"]') 是否非 null（CSS 有載入）
+   • 紅色報錯：Failed to load resource / MIME type / 404 on .css or .js
+   • document.getElementById('MainContent') 是否存在、offsetHeight 是否 > 200
+   • getComputedStyle(document.body).backgroundColor（是否仍為白/透明）
+   • Shopify.designMode 若為 true，為主題編輯器預覽；請同時用手機實機預覽連結測試
 
 對照需求 1～7 的貼上順序：PASTE_ORDER.txt
 詳細文案：COPY_AND_PRODUCT_TIPS.txt

@@ -1,9 +1,155 @@
 /**
  * RIOT CROWN — Dark Y2K Luxury / Cyber Occult Bling
  * Paste into Dawn: Assets → Add asset → riot-y2k-luxury.css
- * Then in layout/theme.liquid before </head>:
+ *
+ * 【緊急】請在 layout/theme.liquid 的 </head> 前「晚於」Dawn 的 base.css 載入，例如：
+ *   {{ 'base.css' | asset_url | stylesheet_tag }}
+ *   {% render 'riot-y2k-head' %}
+ * 或手動：
  *   {{ 'riot-y2k-luxury.css' | asset_url | stylesheet_tag }}
+ *
+ * 勿整份覆蓋 Dawn 內建 base.css — 本檔為疊加層，避免主題核心樣式被刪光造成白屏。
  */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LAYER 0 — Dawn 相容 / 白屏與巨大留白 / 行動端（緊急修復）
+   目標：主內容可見、黑底、區塊不「漂走」、小螢幕不撐爆
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+html,
+body {
+  color-scheme: dark;
+}
+
+/* 頁面含任一 RIOT 區塊時，強制暗色殼（不依賴主題編輯器 body class） */
+@supports selector(:has(*)) {
+  body:has(.riot-y2k-hero),
+  body:has(.riot-y2k-product-section),
+  body:has(.riot-y2k-countdown),
+  body:has(.riot-y2k-trust),
+  body:has(.riot-y2k-symbar),
+  body:has(.riot-y2k-lowrise),
+  body:has(.riot-millennial-shell) {
+    background-color: var(--riot-void, #050508);
+    color: rgba(242, 242, 242, 0.92);
+  }
+}
+
+/* 不支援 :has 的瀏覽器：在 theme.liquid 的 <body> 手動加 class="... riot-y2k-active" */
+body.riot-y2k-active {
+  background-color: var(--riot-void, #050508);
+  color: rgba(242, 242, 242, 0.92);
+}
+
+/* Dawn 會在 body 加 template-index / template-product 等 — 首頁強制暗底，根治移動端白屏 */
+body.template-index,
+body.template-index.gradient,
+body.template-index[class*="gradient"] {
+  background-color: var(--riot-void, #050508) !important;
+  color: rgba(242, 242, 242, 0.92);
+}
+
+body.template-index #MainContent,
+body.template-index .content-for-layout {
+  background-color: transparent;
+}
+
+/* 避免主內容區被設成 min-height:0 或 opacity:0 的第三方樣式拖垮 */
+body.template-index #MainContent .shopify-section {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Dawn 主欄：避免 flex 子項 min-height:auto 把內容「擠沒」 */
+#MainContent,
+#main-content,
+main#MainContent {
+  flex: 1 1 auto;
+  min-height: min(100vh, 100dvh);
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.content-for-layout,
+#MainContent .shopify-section,
+.shopify-section {
+  max-width: 100%;
+}
+
+/* RIOT 區塊：層級與寬度，避免被 header 蓋住或橫向撐破 */
+.shopify-section[class*="riot-y2k"],
+.shopify-section .riot-y2k-hero,
+.shopify-section .riot-y2k-product-section,
+.shopify-section .riot-y2k-countdown,
+.shopify-section .riot-y2k-trust,
+.shopify-section .riot-y2k-symbar {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 圖片不撐破版面 */
+.riot-y2k-hero img,
+.riot-y2k-product-section img,
+.riot-y2k-lowrise img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* 金屬閃光層（全站可用，不影響可讀性） */
+@keyframes riot-spec-glint {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: translateX(-30%) skewX(-12deg);
+  }
+  50% {
+    opacity: 0.85;
+    transform: translateX(30%) skewX(-12deg);
+  }
+}
+
+.riot-y2k-surface-glint {
+  position: relative;
+  overflow: hidden;
+}
+
+.riot-y2k-surface-glint::after {
+  content: "";
+  position: absolute;
+  inset: -50% -40%;
+  z-index: 1;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.07) 42%,
+    rgba(110, 203, 255, 0.12) 50%,
+    rgba(255, 18, 147, 0.08) 58%,
+    transparent 100%
+  );
+  pointer-events: none;
+  mix-blend-mode: screen;
+  animation: riot-spec-glint 6.5s ease-in-out infinite;
+}
+
+.riot-y2k-hero.riot-y2k-surface-glint .riot-y2k-hero__inner {
+  z-index: 3;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .riot-y2k-surface-glint::after {
+    animation: none;
+    opacity: 0.25;
+    transform: none;
+  }
+}
 
 :root {
   --riot-void: #050508;
@@ -290,11 +436,11 @@ body.gradient--riot-y2k,
 /* ─── Hero section layout ───────────────────────────────────────────── */
 .riot-y2k-hero {
   position: relative;
-  min-height: 88vh;
+  min-height: min(92dvh, 900px);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 4rem 1.5rem 5rem;
+  padding: clamp(2.5rem, 8vw, 4rem) clamp(1rem, 4vw, 1.5rem) clamp(3rem, 10vw, 5rem);
   background: radial-gradient(ellipse 120% 80% at 50% -10%, rgba(179, 102, 255, 0.12), transparent 55%),
     radial-gradient(ellipse 90% 60% at 80% 100%, rgba(255, 18, 147, 0.1), transparent 50%),
     radial-gradient(ellipse 70% 50% at 10% 80%, rgba(110, 203, 255, 0.08), transparent 45%),
@@ -843,6 +989,258 @@ body.gradient--riot-y2k,
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LAYER MOBILE + RITUAL — Dark Y2K Luxury / Cyber Occult Bling（手機優先加固）
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@keyframes riot-electric-edge {
+  0%,
+  100% {
+    box-shadow: 0 0 0 1px rgba(255, 18, 147, 0.12), 0 0 28px rgba(110, 203, 255, 0.06);
+  }
+  50% {
+    box-shadow: 0 0 0 1px rgba(179, 102, 255, 0.35), 0 0 40px rgba(255, 18, 147, 0.12);
+  }
+}
+
+@keyframes riot-gold-ritual-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    filter: drop-shadow(0 0 8px rgba(201, 168, 76, 0.35));
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 18px rgba(201, 168, 76, 0.55));
+  }
+}
+
+.riot-y2k-hero--impact {
+  animation: riot-electric-edge 5s ease-in-out infinite;
+}
+
+.riot-y2k-hero__eyebrow--pulse {
+  animation: riot-gold-ritual-pulse 3.2s ease-in-out infinite;
+}
+
+@media screen and (max-width: 749px) {
+  .riot-y2k-hero {
+    min-height: min(90dvh, 820px);
+    padding-top: max(1.75rem, env(safe-area-inset-top, 0px));
+    padding-bottom: max(2.5rem, env(safe-area-inset-bottom, 0px));
+    padding-left: max(1rem, env(safe-area-inset-left, 0px));
+    padding-right: max(1rem, env(safe-area-inset-right, 0px));
+  }
+
+  .riot-y2k-hero__title {
+    font-size: clamp(2.85rem, 12vw, 4rem);
+    line-height: 0.92;
+  }
+
+  .riot-y2k-hero__eyebrow {
+    font-size: 0.55rem;
+    letter-spacing: 0.28em;
+    margin-bottom: 1.1rem;
+  }
+
+  .riot-y2k-hero__sub {
+    font-size: 0.88rem;
+    line-height: 1.7;
+    margin-bottom: 1.85rem;
+  }
+
+  .riot-y2k-hero__actions {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    max-width: 22rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .riot-btn-y2k,
+  .riot-btn-ghost {
+    width: 100%;
+    justify-content: center;
+    min-height: 48px;
+  }
+
+  .riot-y2k-hero__chrome-ring {
+    inset: 10% 4%;
+    opacity: 0.42;
+  }
+
+  .riot-millennial-shell {
+    max-width: 100%;
+    padding-left: max(0.75rem, env(safe-area-inset-left, 0px));
+    padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
+  }
+
+  .riot-y2k-product-section .page-width {
+    padding-left: max(1rem, env(safe-area-inset-left, 0px));
+    padding-right: max(1rem, env(safe-area-inset-right, 0px));
+  }
+
+  .riot-y2k-product-grid {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    gap: 0.85rem 0.65rem;
+  }
+
+  .riot-y2k-product-section__head {
+    margin-bottom: 1.75rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  .riot-y2k-product-section__title {
+    font-size: clamp(1.35rem, 6vw, 1.85rem);
+  }
+
+  .riot-y2k-product-grid .card__inner,
+  .riot-y2k-product-grid .card__content {
+    min-height: 0;
+  }
+
+  .riot-y2k-product-grid .card__inner .media {
+    min-height: 0;
+  }
+
+  .riot-card-y2k:active {
+    transform: scale(0.985);
+  }
+
+  .riot-y2k-countdown {
+    padding-left: max(1rem, env(safe-area-inset-left, 0px));
+    padding-right: max(1rem, env(safe-area-inset-right, 0px));
+  }
+
+  .riot-y2k-trust {
+    padding-left: max(1rem, env(safe-area-inset-left, 0px));
+    padding-right: max(1rem, env(safe-area-inset-right, 0px));
+  }
+
+  .riot-y2k-lowrise__img,
+  .riot-y2k-lowrise__ph {
+    height: clamp(200px, 48vw, 360px);
+  }
+
+  .riot-y2k-marquee {
+    max-width: 100%;
+  }
+}
+
+@media screen and (min-width: 750px) and (max-width: 989px) {
+  .riot-y2k-hero__title {
+    font-size: clamp(2.6rem, 7vw, 3.6rem);
+  }
+}
+
+/* ─── Minimal product card (fallback grid) ─────────────────────────── */
+.riot-y2k-minimal-card {
+  height: 100%;
+  border-radius: 6px;
+  overflow: hidden;
+  background: rgba(10, 10, 16, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 1px rgba(255, 18, 147, 0.06);
+  transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+}
+
+.riot-y2k-minimal-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 18, 147, 0.35);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 40px rgba(255, 18, 147, 0.12);
+}
+
+.riot-y2k-minimal-card__link {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  text-decoration: none;
+  color: inherit;
+}
+
+.riot-y2k-minimal-card__media {
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: rgba(5, 5, 8, 0.9);
+}
+
+.riot-y2k-minimal-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease;
+}
+
+.riot-y2k-minimal-card:hover .riot-y2k-minimal-card__img {
+  transform: scale(1.05);
+  filter: saturate(1.1) brightness(1.03);
+}
+
+.riot-y2k-minimal-card__ph {
+  width: 100%;
+  height: 100%;
+  min-height: 12rem;
+  background: linear-gradient(145deg, rgba(30, 18, 40, 1), rgba(5, 5, 8, 1));
+}
+
+.riot-y2k-minimal-card__info {
+  padding: 1rem 0.85rem 1.15rem;
+  flex: 1;
+}
+
+.riot-y2k-minimal-card__title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.35;
+  margin: 0 0 0.35rem;
+  color: rgba(242, 242, 242, 0.95);
+}
+
+.riot-y2k-minimal-card__price {
+  margin: 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  color: rgba(201, 168, 76, 0.85);
+}
+
+/* Hero — 電光脈衝層（儀式感） */
+.riot-y2k-hero__bolt {
+  position: absolute;
+  inset: -30% -20%;
+  background: conic-gradient(
+    from 220deg at 50% 30%,
+    transparent 0deg,
+    rgba(255, 18, 147, 0.14) 60deg,
+    transparent 100deg,
+    rgba(110, 203, 255, 0.1) 200deg,
+    rgba(179, 102, 255, 0.12) 280deg,
+    transparent 360deg
+  );
+  opacity: 0.65;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 0;
+  animation: riot-bolt-drift 18s ease-in-out infinite;
+}
+
+@keyframes riot-bolt-drift {
+  0%,
+  100% {
+    transform: rotate(0deg) scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: rotate(180deg) scale(1.08);
+    opacity: 0.75;
+  }
+}
+
 /* Utility: reduce motion */
 @media (prefers-reduced-motion: reduce) {
   .riot-chrome-title,
@@ -868,5 +1266,19 @@ body.gradient--riot-y2k,
   .riot-y2k-hero__chrome-ring,
   .riot-y2k-hero__chrome-ring::after {
     animation: none !important;
+  }
+  .riot-y2k-hero--impact,
+  .riot-y2k-hero__eyebrow--pulse {
+    animation: none !important;
+  }
+  .riot-card-y2k:active {
+    transform: none;
+  }
+  .riot-y2k-hero__bolt {
+    animation: none !important;
+  }
+  .riot-y2k-minimal-card:hover .riot-y2k-minimal-card__img {
+    transform: none;
+    filter: none;
   }
 }

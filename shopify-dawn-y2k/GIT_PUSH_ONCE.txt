@@ -1,0 +1,7 @@
+在倉庫根目錄（含 shopify-dawn-y2k 的 monorepo 則在該目錄或整庫根）執行：
+
+git add .
+git commit -m "feat(shopify-theme): Dawn Y2K mobile white-screen fix, hero impact, grid fallback"
+git push
+
+（若主題為獨立 GitHub repo，請只同步 shopify-dawn-y2k/ 下檔案到主題根目錄對應路徑後再 push。）
