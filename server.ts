@@ -101,4 +101,6 @@ interface HydrogenWorkerEnv {
   PUBLIC_CHECKOUT_DOMAIN?: string;
   PUBLIC_STOREFRONT_LANGUAGE?: string;
   PUBLIC_STOREFRONT_COUNTRY?: string;
+  /** Home / search / sitemap: use this collection handle; if unset or missing, uses all published products. */
+  PUBLIC_HOME_COLLECTION_HANDLE?: string;
 }

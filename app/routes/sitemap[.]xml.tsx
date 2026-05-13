@@ -1,7 +1,13 @@
 import type { LoaderFunctionArgs } from '@shopify/remix-oxygen';
-import { PRODUCTS } from '~/lib/products';
+import type { Storefront } from '@shopify/hydrogen';
 import { LOCALES } from '~/lib/i18n';
 import { withLocalePath } from '~/lib/localePath';
+import { loadStoreCatalog } from '~/lib/shopifyCatalog.server';
+
+type HydrogenRouteContext = {
+  storefront?: Storefront;
+  env?: { PUBLIC_HOME_COLLECTION_HANDLE?: string };
+};
 
 function xmlEscape(s: string): string {
   return s
@@ -11,13 +17,18 @@ function xmlEscape(s: string): string {
     .replace(/"/g, '&quot;');
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request, context }: LoaderFunctionArgs) {
   const origin = new URL(request.url).origin;
+  const ctx = context as HydrogenRouteContext;
+  const { products } = await loadStoreCatalog(
+    ctx.storefront,
+    ctx.env?.PUBLIC_HOME_COLLECTION_HANDLE,
+  );
   const paths = new Set<string>();
   for (const loc of LOCALES) {
     paths.add(withLocalePath(loc, '/'));
     paths.add(withLocalePath(loc, '/search'));
-    for (const p of PRODUCTS) {
+    for (const p of products) {
       paths.add(withLocalePath(loc, `/products/${p.id}`));
     }
   }

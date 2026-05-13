@@ -1,5 +1,6 @@
 import { useParams, useNavigate, Link, useLoaderData } from '@remix-run/react';
 import { json, type LoaderFunctionArgs, type MetaFunction } from '@shopify/remix-oxygen';
+import type { Storefront } from '@shopify/hydrogen';
 import { useRef, useEffect, useLayoutEffect, useCallback, useState } from 'react';
 import { gsap } from 'gsap';
 import { GhostImage } from '~/components/GhostImage';
@@ -7,7 +8,7 @@ import { useCart } from '~/lib/CartContext';
 import { useAudio } from '~/hooks/useAudio';
 import { useLocale } from '~/lib/LocaleContext';
 import { usePrefersReducedMotion } from '~/hooks/usePrefersReducedMotion';
-import { getProduct, PRODUCTS, getDescription, getDetails } from '~/lib/products';
+import { getProduct, getDescription, getDetails } from '~/lib/products';
 import { LOCALE_BCP47, LOCALES, type Locale } from '~/lib/i18n';
 import {
   PRODUCT_NOT_FOUND_TITLE,
@@ -16,24 +17,50 @@ import {
   productOgImageUrl,
 } from '~/lib/siteMeta';
 import { withLocalePath } from '~/lib/localePath';
+import {
+  fetchShopifyProductByHandle,
+  loadStoreCatalog,
+} from '~/lib/shopifyCatalog.server';
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+type HydrogenRouteContext = {
+  storefront?: Storefront;
+  env?: { PUBLIC_HOME_COLLECTION_HANDLE?: string };
+};
+
+export async function loader({ request, context, params }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const siteUrl = url.origin.replace(/\/$/, '');
   const pathname = url.pathname;
-  const pid = params.id ?? '';
-  const product = getProduct(pid);
+  const id = params.id ?? '';
+  const ctx = context as HydrogenRouteContext;
+  const storefront = ctx.storefront;
+
+  let product = storefront ? await fetchShopifyProductByHandle(storefront, id) : undefined;
+  if (!product) {
+    product = getProduct(id);
+  }
+
+  const { products: catalog } = await loadStoreCatalog(
+    storefront,
+    ctx.env?.PUBLIC_HOME_COLLECTION_HANDLE,
+  );
+  const related = product ? catalog.filter(p => p.id !== product.id).slice(0, 3) : [];
+
   const { buildProductJsonLd } = await import('~/lib/schemaOrg');
   return json({
     siteUrl,
     pathname,
-    productJsonLd: product ? JSON.stringify(buildProductJsonLd(siteUrl, product, pathname)) : null,
+    product: product ?? null,
+    related,
+    productJsonLd: product
+      ? JSON.stringify(buildProductJsonLd(siteUrl, product, pathname))
+      : null,
   });
 }
 
 export const meta: MetaFunction<typeof loader> = ({ data, params, location }) => {
   const pid = params.id ?? '';
-  const p = getProduct(pid);
+  const p = data?.product ?? undefined;
   const siteUrl = (data?.siteUrl ?? '').replace(/\/$/, '');
   const pagePath = (location?.pathname ?? `/products/${pid}`).split('?')[0] ?? `/products/${pid}`;
   const hreflang =
@@ -63,7 +90,12 @@ export const meta: MetaFunction<typeof loader> = ({ data, params, location }) =>
   }
   const desc = (p.descriptions.EN ?? p.descriptions.ZH ?? p.name).slice(0, 160);
   const canonical = siteUrl ? `${siteUrl}${pagePath}` : '';
-  const ogImage = siteUrl ? productOgImageUrl(siteUrl, pid) : '/og-brand.svg';
+  const ogImage =
+    p.imageUrl.startsWith('http://') || p.imageUrl.startsWith('https://')
+      ? p.imageUrl
+      : siteUrl
+        ? productOgImageUrl(siteUrl, pid)
+        : '/og-brand.svg';
   const pageTitle = `${p.name} | ${SITE_NAME}`;
   const keywords = `${p.name}, ${p.material}, ${SITE_KEYWORDS}`.slice(0, 400);
 
@@ -83,7 +115,10 @@ export const meta: MetaFunction<typeof loader> = ({ data, params, location }) =>
     { property: 'og:title', content: p.name },
     { property: 'og:description', content: desc },
     { property: 'og:image', content: ogImage },
-    { property: 'og:image:type', content: 'image/svg+xml' },
+    {
+      property: 'og:image:type',
+      content: ogImage.endsWith('.svg') ? 'image/svg+xml' : 'image/jpeg',
+    },
     { property: 'og:image:width', content: '1200' },
     { property: 'og:image:height', content: '630' },
     { property: 'og:image:alt', content: p.name },
@@ -96,7 +131,7 @@ export const meta: MetaFunction<typeof loader> = ({ data, params, location }) =>
 };
 
 export default function ProductDetail() {
-  const { productJsonLd } = useLoaderData<typeof loader>();
+  const { productJsonLd, product: loaderProduct, related } = useLoaderData<typeof loader>();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { addToCart } = useCart();
@@ -104,12 +139,9 @@ export default function ProductDetail() {
   const { t, locale } = useLocale();
   const reducedMotion = usePrefersReducedMotion();
 
-  const product = getProduct(id ?? '');
+  const product = loaderProduct ?? undefined;
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [sizeWarning, setSizeWarning] = useState(false);
-
-  // Related products — 3 others excluding current
-  const related = PRODUCTS.filter(p => p.id !== id).slice(0, 3);
 
   // Refs for entrance animation
   const pageRef    = useRef<HTMLDivElement>(null);
@@ -135,7 +167,7 @@ export default function ProductDetail() {
   // Run after DOM commit so refs exist; retry a few frames like CartDrawer + `mounted`
   // — otherwise first client navigation can leave image/info at opacity:0 (looks “broken”).
   useLayoutEffect(() => {
-    const p = getProduct(id ?? '');
+    const p = product;
     if (!p) return;
 
     const tweensOn: (HTMLElement | HTMLButtonElement)[] = [];
@@ -187,7 +219,7 @@ export default function ProductDetail() {
       cancelled = true;
       gsap.killTweensOf(tweensOn);
     };
-  }, [id, reducedMotion]);
+  }, [id, reducedMotion, product]);
 
   const handleAcquire = useCallback(() => {
     if (!product) return;
@@ -197,11 +229,16 @@ export default function ProductDetail() {
     }
     setSizeWarning(false);
     playClick();
+    const merchandiseId =
+      product.sizes?.length && selectedSize && product.variantIdsBySize
+        ? product.variantIdsBySize[selectedSize]
+        : product.merchandiseId;
     addToCart({
       id: product.id,
       name: product.name,
       price: product.price,
       material: product.material,
+      ...(merchandiseId ? { merchandiseId } : {}),
       ...(product.sizes?.length && selectedSize ? { size: selectedSize } : {}),
     });
     addedRef.current = true;

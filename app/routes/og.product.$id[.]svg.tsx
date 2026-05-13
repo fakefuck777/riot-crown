@@ -1,11 +1,14 @@
 import type { LoaderFunctionArgs } from '@shopify/remix-oxygen';
+import type { Storefront } from '@shopify/hydrogen';
+import type { ProductData } from '~/lib/products';
 import { getProduct } from '~/lib/products';
+import { fetchShopifyProductByHandle } from '~/lib/shopifyCatalog.server';
 import { escapeXml } from '~/lib/svgEscape';
 
 const W = 1200;
 const H = 630;
 
-function buildProductOgSvg(product: NonNullable<ReturnType<typeof getProduct>>): string {
+function buildProductOgSvg(product: ProductData): string {
   const name = escapeXml(product.name.length > 72 ? `${product.name.slice(0, 69)}…` : product.name);
   const price = escapeXml(product.price);
   const material = escapeXml(
@@ -35,9 +38,14 @@ function buildProductOgSvg(product: NonNullable<ReturnType<typeof getProduct>>):
 </svg>`;
 }
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params, context }: LoaderFunctionArgs) {
   const id = params.id ?? '';
-  const product = getProduct(id);
+  const storefront = (context as { storefront?: Storefront }).storefront;
+  let product: ProductData | undefined =
+    storefront ? await fetchShopifyProductByHandle(storefront, id) : undefined;
+  if (!product) {
+    product = getProduct(id);
+  }
   if (!product) {
     return new Response('Not found', { status: 404, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
   }

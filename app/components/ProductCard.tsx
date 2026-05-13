@@ -35,7 +35,13 @@ export function ProductCard({
   const handleAcquire = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     playClick();
-    addToCart({ id: product.id, name: product.name, price: product.price, material: product.material });
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      material: product.material,
+      ...(product.merchandiseId ? { merchandiseId: product.merchandiseId } : {}),
+    });
   }, [product, playClick, addToCart]);
 
   const onMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {

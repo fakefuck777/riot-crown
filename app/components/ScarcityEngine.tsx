@@ -3,14 +3,18 @@ import { useMemo, useRef, useEffect } from 'react';
 import { gsap } from 'gsap';
 import { useLocale } from '~/lib/LocaleContext';
 import { usePrefersReducedMotion } from '~/hooks/usePrefersReducedMotion';
-import { getCatalogStockStats } from '~/lib/products';
+import { computeCatalogStockStats, getCatalogStockStats } from '~/lib/products';
+import type { ProductData } from '~/lib/products';
 
-export function ScarcityEngine() {
+export function ScarcityEngine({ products }: { products?: ProductData[] }) {
   const { t } = useLocale();
   const reducedMotion = usePrefersReducedMotion();
   const heartRef = useRef<HTMLDivElement>(null);
 
-  const stats = useMemo(() => getCatalogStockStats(), []);
+  const stats = useMemo(
+    () => (products?.length ? computeCatalogStockStats(products) : getCatalogStockStats()),
+    [products],
+  );
 
   const fillPct = useMemo(() => {
     if (stats.listedSkuCount === 0) return 8;

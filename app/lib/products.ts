@@ -13,6 +13,13 @@ export interface ProductData {
   detailsList:  Record<string, string[]>;
   accent:      string;
   sizes?:      string[];
+  /** Storefront variant GID for Cart API / checkout integrations */
+  merchandiseId?: string;
+  /** Map option "Size" value → variant GID for line items */
+  variantIdsBySize?: Record<string, string>;
+  /** Raw Storefront money (schema.org / precise totals) */
+  priceAmount?: string;
+  priceCurrency?: string;
 }
 
 export function getDescription(p: ProductData, locale: string): string {
@@ -348,9 +355,9 @@ export function getProduct(id: string): ProductData | undefined {
   return PRODUCTS.find(p => p.id === id);
 }
 
-/** Aggregate stock from static catalog data (replace with Storefront API for production). */
-export function getCatalogStockStats() {
-  const stocked = PRODUCTS.filter((p): p is ProductData & { stock: number } => p.stock != null);
+/** Aggregate stock from a product list (Shopify or demo catalog). */
+export function computeCatalogStockStats(list: ProductData[]) {
+  const stocked = list.filter((p): p is ProductData & { stock: number } => p.stock != null);
   if (stocked.length === 0) {
     return { totalUnits: 0, lowSkuCount: 0, minStock: 0, listedSkuCount: 0 };
   }
@@ -358,4 +365,9 @@ export function getCatalogStockStats() {
   const lowSkuCount = stocked.filter(p => p.stock <= 5).length;
   const minStock = Math.min(...stocked.map(p => p.stock));
   return { totalUnits, lowSkuCount, minStock, listedSkuCount: stocked.length };
+}
+
+/** Aggregate stock from static demo catalog. */
+export function getCatalogStockStats() {
+  return computeCatalogStockStats(PRODUCTS);
 }

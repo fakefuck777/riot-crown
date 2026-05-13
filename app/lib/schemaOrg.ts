@@ -1,5 +1,4 @@
 import type { ProductData } from '~/lib/products';
-import { PRODUCTS } from '~/lib/products';
 import { parseDisplayPriceYen } from '~/lib/price';
 import { productOgImageUrl, SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE } from '~/lib/siteMeta';
 
@@ -57,15 +56,15 @@ export function buildRootJsonLd(siteUrl: string) {
   };
 }
 
-/** ItemList for the static catalog (home route; complements root graph). */
-export function buildCatalogItemListJsonLd(siteUrl: string) {
+/** ItemList for the catalog (home route; complements root graph). */
+export function buildCatalogItemListJsonLd(siteUrl: string, products: ProductData[]) {
   const base = siteUrl.replace(/\/$/, '');
   return {
     '@context': SCHEMA,
     '@type': 'ItemList',
     name: `${SITE_NAME} — collection`,
-    numberOfItems: PRODUCTS.length,
-    itemListElement: PRODUCTS.map((p, i) => ({
+    numberOfItems: products.length,
+    itemListElement: products.map((p, i) => ({
       '@type': 'ListItem',
       position: i + 1,
       name: p.name,
@@ -88,8 +87,15 @@ export function buildProductJsonLd(siteUrl: string, product: ProductData, reques
       : `/products/${product.id}`;
   const canonical = `${base}${path}`;
   const orgId = `${base}/#organization`;
-  const image = productOgImageUrl(base, product.id);
-  const price = parseDisplayPriceYen(product.price);
+  const primaryImage =
+    product.imageUrl.startsWith('http://') || product.imageUrl.startsWith('https://')
+      ? product.imageUrl
+      : productOgImageUrl(base, product.id);
+  const offerCurrency = product.priceCurrency ?? 'JPY';
+  const offerPrice =
+    product.priceAmount != null
+      ? product.priceAmount
+      : String(Math.round(parseDisplayPriceYen(product.price)));
   const desc = (product.descriptions.EN ?? product.descriptions.ZH ?? product.name).slice(0, 8000);
 
   return {
@@ -102,15 +108,15 @@ export function buildProductJsonLd(siteUrl: string, product: ProductData, reques
         description: desc,
         sku: product.id,
         mpn: product.id,
-        image: [image],
+        image: [primaryImage],
         brand: { '@type': 'Brand', name: SITE_NAME },
         category: 'Jewelry',
         material: product.material,
         offers: {
           '@type': 'Offer',
           url: canonical,
-          priceCurrency: 'JPY',
-          price: String(Math.round(price)),
+          priceCurrency: offerCurrency,
+          price: offerPrice,
           priceValidUntil: new Date(Date.now() + 180 * 864e5).toISOString().slice(0, 10),
           availability: availabilityUrl(product.stock),
           itemCondition: `${SCHEMA}/NewCondition`,

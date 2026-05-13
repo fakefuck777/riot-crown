@@ -16,7 +16,17 @@ test('相容路由 /cart 會導回首頁區塊', async ({ page }) => {
 });
 
 test('商品 OG SVG 可取得', async ({ request }) => {
-  const res = await request.get('/og/product/01.svg');
+  const sm = await request.get('/sitemap.xml');
+  const xml = await sm.text();
+  let slug = '01';
+  for (const m of xml.matchAll(/<loc>([^<]+)<\/loc>/g)) {
+    const tail = m[1].match(/\/products\/([^/?#]+)$/);
+    if (tail?.[1]) {
+      slug = decodeURIComponent(tail[1]);
+      break;
+    }
+  }
+  const res = await request.get(`/og/product/${slug}.svg`);
   expect(res.ok()).toBeTruthy();
   expect(res.headers()['content-type']).toMatch(/image\/svg\+xml/);
   const text = await res.text();

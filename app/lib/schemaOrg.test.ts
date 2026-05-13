@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { buildCatalogItemListJsonLd, buildProductJsonLd, buildRootJsonLd } from './schemaOrg';
-import { getProduct } from './products';
+import { getProduct, PRODUCTS } from './products';
 
 describe('schemaOrg', () => {
   const site = 'https://example.com';
@@ -15,7 +15,7 @@ describe('schemaOrg', () => {
   });
 
   it('buildCatalogItemListJsonLd lists all products', () => {
-    const j = buildCatalogItemListJsonLd(site) as {
+    const j = buildCatalogItemListJsonLd(site, PRODUCTS) as {
       numberOfItems: number;
       itemListElement: unknown[];
     };

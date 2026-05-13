@@ -2,6 +2,7 @@ import type { MetaFunction } from '@shopify/remix-oxygen';
 import { json, type LoaderFunctionArgs } from '@shopify/remix-oxygen';
 import { useLoaderData } from '@remix-run/react';
 import { useEffect } from 'react';
+import type { Storefront } from '@shopify/hydrogen';
 import { SITE_DESCRIPTION, SITE_HOME_TITLE, SITE_KEYWORDS } from '~/lib/siteMeta';
 import { Hero } from '~/components/Hero';
 import { Manifesto } from '~/components/Manifesto';
@@ -10,12 +11,25 @@ import { ScarcityEngine } from '~/components/ScarcityEngine';
 import { TrustBar } from '~/components/TrustBar';
 import { Testimonials } from '~/components/Testimonials';
 import { Footer } from '~/components/Footer';
+import { loadStoreCatalog } from '~/lib/shopifyCatalog.server';
 
-export async function loader({ request }: LoaderFunctionArgs) {
+type HydrogenRouteContext = {
+  storefront?: Storefront;
+  env?: { PUBLIC_HOME_COLLECTION_HANDLE?: string };
+};
+
+export async function loader({ request, context }: LoaderFunctionArgs) {
   const siteUrl = new URL(request.url).origin.replace(/\/$/, '');
+  const ctx = context as HydrogenRouteContext;
+  const { products: catalogProducts } = await loadStoreCatalog(
+    ctx.storefront,
+    ctx.env?.PUBLIC_HOME_COLLECTION_HANDLE,
+  );
   const { buildCatalogItemListJsonLd } = await import('~/lib/schemaOrg');
   return json({
-    catalogJsonLd: JSON.stringify(buildCatalogItemListJsonLd(siteUrl)),
+    siteUrl,
+    catalogProducts,
+    catalogJsonLd: JSON.stringify(buildCatalogItemListJsonLd(siteUrl, catalogProducts)),
   });
 }
 
@@ -27,7 +41,7 @@ export const meta: MetaFunction = () => [
 ];
 
 export default function Index() {
-  const { catalogJsonLd } = useLoaderData<typeof loader>();
+  const { catalogJsonLd, catalogProducts } = useLoaderData<typeof loader>();
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -44,8 +58,8 @@ export default function Index() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: catalogJsonLd }} />
       <Hero />
       <Manifesto />
-      <ProductGrid />
-      <ScarcityEngine />
+      <ProductGrid products={catalogProducts} />
+      <ScarcityEngine products={catalogProducts} />
       <TrustBar />
       <Testimonials />
       <Footer />

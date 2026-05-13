@@ -10,21 +10,37 @@ test.beforeEach(async ({ context }) => {
   ]);
 });
 
-test('語系前綴路由 /ja/ 與 /ja/products/01 為 200', async ({ page }) => {
+/** First product handle from sitemap (locale-prefixed URLs). */
+async function firstProductSlugFromSitemap(request: {
+  get: (url: string) => Promise<{ ok: () => boolean; text: () => Promise<string> }>;
+}): Promise<string> {
+  const res = await request.get('/sitemap.xml');
+  expect(res.ok()).toBeTruthy();
+  const xml = await res.text();
+  for (const m of xml.matchAll(/<loc>([^<]+)<\/loc>/g)) {
+    const tail = m[1].match(/\/products\/([^/?#]+)$/);
+    if (tail?.[1]) return decodeURIComponent(tail[1]);
+  }
+  throw new Error('sitemap should list at least one /products/ URL');
+}
+
+test('語系前綴路由 /ja/ 與 /ja/products/:slug 為 200', async ({ page, request }) => {
+  const slug = await firstProductSlugFromSitemap(request);
   const r1 = await page.goto('/ja/');
   expect(r1?.status()).toBe(200);
-  const r2 = await page.goto('/ja/products/01');
+  const r2 = await page.goto(`/ja/products/${slug}`);
   expect(r2?.status()).toBe(200);
 });
 
-test('搜尋頁與商品頁可開且為 200', async ({ page }) => {
+test('搜尋頁與商品頁可開且為 200', async ({ page, request }) => {
+  const slug = await firstProductSlugFromSitemap(request);
   const r1 = await page.goto('/search');
   expect(r1?.status()).toBe(200);
   await expect(page.getByRole('heading', { name: /SEARCH/i })).toBeVisible();
 
-  const r2 = await page.goto('/products/01');
+  const r2 = await page.goto(`/products/${slug}`);
   expect(r2?.status()).toBe(200);
-  await expect(page.getByRole('heading', { name: /millennium chain/i })).toBeVisible({ timeout: 15_000 });
+  await expect(page.locator('h1').first()).toBeVisible({ timeout: 15_000 });
 });
 
 test('首頁加購 → 開購物車 → 關閉（桌面）', async ({ page }) => {

@@ -7,4 +7,6 @@ export interface CartItem {
   qty:      number;
   /** When set, merges qty only with the same product id + size. */
   size?:    string;
+  /** Storefront variant GID for future Cart API checkout */
+  merchandiseId?: string;
 }

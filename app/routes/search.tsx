@@ -1,11 +1,25 @@
-import type { MetaFunction } from '@shopify/remix-oxygen';
-import { Form, Link, useSearchParams } from '@remix-run/react';
+import { json, type LoaderFunctionArgs, type MetaFunction } from '@shopify/remix-oxygen';
+import type { Storefront } from '@shopify/hydrogen';
+import { Form, Link, useLoaderData, useSearchParams } from '@remix-run/react';
 import { useMemo } from 'react';
-import { PRODUCTS } from '~/lib/products';
 import { useLocale } from '~/lib/LocaleContext';
 import { withLocalePath } from '~/lib/localePath';
+import { loadStoreCatalog } from '~/lib/shopifyCatalog.server';
 
 import { SITE_DESCRIPTION, SITE_KEYWORDS, SITE_NAME } from '~/lib/siteMeta';
+
+type HydrogenRouteContext = {
+  storefront?: Storefront;
+  env?: { PUBLIC_HOME_COLLECTION_HANDLE?: string };
+};
+
+export async function loader({ context }: LoaderFunctionArgs) {
+  const { products } = await loadStoreCatalog(
+    (context as HydrogenRouteContext).storefront,
+    (context as HydrogenRouteContext).env?.PUBLIC_HOME_COLLECTION_HANDLE,
+  );
+  return json({ catalogProducts: products });
+}
 
 export const meta: MetaFunction = () => [
   { title: `Search | ${SITE_NAME}` },
@@ -16,18 +30,19 @@ export const meta: MetaFunction = () => [
 
 export default function SearchRoute() {
   const { locale } = useLocale();
+  const { catalogProducts } = useLoaderData<typeof loader>();
   const [params] = useSearchParams();
   const q = (params.get('q') ?? '').trim().toLowerCase();
 
   const results = useMemo(() => {
     if (!q) return [];
-    return PRODUCTS.filter(
+    return catalogProducts.filter(
       p =>
         p.name.toLowerCase().includes(q) ||
         p.material.toLowerCase().includes(q) ||
         p.id.toLowerCase().includes(q),
     );
-  }, [q]);
+  }, [q, catalogProducts]);
 
   return (
     <main className="min-h-screen bg-void" style={{ paddingTop: '120px', paddingBottom: '80px' }}>
