@@ -25,9 +25,12 @@ function Pearl({ position, scale, color, metallic, roughness, emissiveIntensity,
     if (meshRef.current && !window.isUserInteracting) {
       meshRef.current.rotation.x += 0.002;
       meshRef.current.rotation.y += 0.003;
+      // 呼吸效果 — 珍珠脉动
+      const breathe = 1 + Math.sin(clock.getElapsedTime() * 1.2) * 0.08;
+      meshRef.current.scale.set(breathe, breathe, breathe);
     }
     if (lightRef.current) {
-      lightRef.current.intensity = 1.2 + Math.sin(clock.getElapsedTime() * 2.5) * 0.6;
+      lightRef.current.intensity = 1.5 + Math.sin(clock.getElapsedTime() * 2.5) * 0.8;
     }
   });
 

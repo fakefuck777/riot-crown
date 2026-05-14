@@ -98,16 +98,17 @@ export function ProductDetailEnhanced({ product, onAddToCart }: ProductDetailEnh
             {/* Add to Cart Button - Enhanced */}
             <button
               onClick={handleAddToCart}
-              className="w-full px-8 py-6 bg-gradient-to-r from-y2k-pink via-y2k-purple to-y2k-pink text-white font-black uppercase rounded text-lg transition-all duration-300 hover:scale-105 active:scale-95 relative overflow-hidden group"
+              className="w-full px-8 py-6 bg-gradient-to-r from-y2k-pink via-y2k-purple to-y2k-pink text-white font-black uppercase rounded text-lg transition-all duration-300 hover:scale-105 active:scale-95 relative overflow-hidden group animate-pulse"
               style={{
-                boxShadow: '0 0 30px rgba(255, 18, 147, 0.6), inset 0 0 20px rgba(255, 255, 255, 0.1)',
+                boxShadow: '0 0 40px rgba(255, 18, 147, 0.8), 0 0 80px rgba(255, 18, 147, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.15)',
                 textShadow: '0 2px 10px rgba(0, 0, 0, 0.3)',
+                animationDuration: '2s',
               }}
             >
               <span className="relative z-10 flex items-center justify-center gap-2">
                 💎 立即购买 💎
               </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-20 group-hover:animate-pulse" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-30 group-hover:animate-pulse" />
             </button>
 
             {/* Trust Badges */}
