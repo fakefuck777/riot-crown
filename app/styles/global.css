@@ -520,7 +520,88 @@ a[href],
   -webkit-tap-highlight-color: rgba(201, 168, 76, 0.1);
 }
 
-/* ─── MOBILE OPTIMIZATION ────────────────────────────────────── */
+/* ─── PREMIUM CINEMATIC EFFECTS ──────────────────────────────────── */
+
+@keyframes premium-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 20px rgba(255, 18, 147, 0.3),
+      0 0 40px rgba(110, 203, 255, 0.15),
+      inset 0 0 20px rgba(201, 168, 76, 0.1);
+  }
+  50% {
+    box-shadow:
+      0 0 40px rgba(255, 18, 147, 0.5),
+      0 0 80px rgba(110, 203, 255, 0.3),
+      inset 0 0 30px rgba(201, 168, 76, 0.2);
+  }
+}
+
+@keyframes premium-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.95;
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: 1;
+  }
+}
+
+@keyframes premium-shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes premium-float {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px);
+  }
+  25% {
+    transform: translateY(-10px) translateX(5px);
+  }
+  50% {
+    transform: translateY(-20px) translateX(-5px);
+  }
+  75% {
+    transform: translateY(-10px) translateX(5px);
+  }
+}
+
+@keyframes premium-rotate {
+  0% {
+    transform: rotateX(0deg) rotateY(0deg);
+  }
+  100% {
+    transform: rotateX(360deg) rotateY(360deg);
+  }
+}
+
+.premium-glow {
+  animation: premium-glow 3s ease-in-out infinite;
+}
+
+.premium-pulse {
+  animation: premium-pulse 2s ease-in-out infinite;
+}
+
+.premium-shimmer {
+  animation: premium-shimmer 3s linear infinite;
+  background-size: 1000px 100%;
+}
+
+.premium-float {
+  animation: premium-float 6s ease-in-out infinite;
+}
+
+.premium-rotate {
+  animation: premium-rotate 20s linear infinite;
+  transform-style: preserve-3d;
+}
 @media (max-width: 768px) {
   .text-brutal-chrome {
     font-size: clamp(2.5rem, 12vw, 4rem) !important;
