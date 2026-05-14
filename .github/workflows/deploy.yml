@@ -38,64 +38,22 @@ jobs:
           PUBLIC_STORE_DOMAIN: ${{ secrets.PUBLIC_STORE_DOMAIN }}
           PUBLIC_HOME_COLLECTION_HANDLE: ${{ secrets.PUBLIC_HOME_COLLECTION_HANDLE }}
 
-  deploy:
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build project
-        run: npm run build
-        env:
-          PUBLIC_STOREFRONT_API_TOKEN: ${{ secrets.PUBLIC_STOREFRONT_API_TOKEN }}
-          PUBLIC_STORE_DOMAIN: ${{ secrets.PUBLIC_STORE_DOMAIN }}
-          PUBLIC_HOME_COLLECTION_HANDLE: ${{ secrets.PUBLIC_HOME_COLLECTION_HANDLE }}
-
-      - name: Deploy to Shopify Hydrogen
-        env:
-          SHOPIFY_CLI_TOKEN: ${{ secrets.SHOPIFY_CLI_TOKEN }}
-          SHOPIFY_SHOP: ${{ secrets.SHOPIFY_SHOP }}
-        run: |
-          npm install -g @shopify/cli
-          shopify hydrogen deploy --token $SHOPIFY_CLI_TOKEN --shop $SHOPIFY_SHOP
-
-      - name: Create deployment status
-        if: success()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.repos.createDeploymentStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              deployment_id: context.payload.deployment.id,
-              state: 'success',
-              environment_url: 'https://riotcrown.shop',
-              description: 'RIOT CROWN Y2K Theme deployed successfully'
-            });
+      - name: Run tests
+        run: npm test
 
       - name: Notify Slack on success
-        if: success()
+        if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: slackapi/slack-github-action@v1
         with:
           payload: |
             {
-              "text": "✅ RIOT CROWN Y2K Theme Deployed",
+              "text": "✅ RIOT CROWN Y2K Theme Tests Passed",
               "blocks": [
                 {
                   "type": "header",
                   "text": {
                     "type": "plain_text",
-                    "text": "🚀 RIOT CROWN Y2K Theme Deployed"
+                    "text": "✅ RIOT CROWN Y2K Theme Tests Passed"
                   }
                 },
                 {
@@ -115,28 +73,13 @@ jobs:
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "*Status:*\n✅ Success"
+                      "text": "*Status:*\n✅ All Tests Passed"
                     }
                   ]
                 },
                 {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "🎨 *Features Deployed:*\n• Full-screen WebGL 3D pearl necklace scene\n• Product 3D interactive models with material switching\n• AR try-on interface\n• Scarcity engine with real-time inventory\n• Y2K dark industrial aesthetic\n• Black box packaging animation\n• Social proof notifications"
-                  }
-                },
-                {
                   "type": "actions",
                   "elements": [
-                    {
-                      "type": "button",
-                      "text": {
-                        "type": "plain_text",
-                        "text": "View Site"
-                      },
-                      "url": "https://riotcrown.shop"
-                    },
                     {
                       "type": "button",
                       "text": {
@@ -154,18 +97,18 @@ jobs:
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
       - name: Notify Slack on failure
-        if: failure()
+        if: failure() && github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: slackapi/slack-github-action@v1
         with:
           payload: |
             {
-              "text": "❌ RIOT CROWN Y2K Theme Deployment Failed",
+              "text": "❌ RIOT CROWN Y2K Theme Tests Failed",
               "blocks": [
                 {
                   "type": "header",
                   "text": {
                     "type": "plain_text",
-                    "text": "⚠️ RIOT CROWN Y2K Theme Deployment Failed"
+                    "text": "⚠️ RIOT CROWN Y2K Theme Tests Failed"
                   }
                 },
                 {
@@ -185,7 +128,7 @@ jobs:
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "*Status:*\n❌ Failed"
+                      "text": "*Status:*\n❌ Tests Failed"
                     }
                   ]
                 },
@@ -207,4 +150,3 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
-
