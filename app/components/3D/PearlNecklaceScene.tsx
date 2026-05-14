@@ -344,16 +344,22 @@ export function PearlNecklaceScene() {
 
       {/* Overlay Text */}
       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-        <h1 className="text-display-2xl font-black uppercase text-transparent bg-clip-text bg-neon-pink-purple animate-neon-flicker"
+        <h1 className="text-brutal-chrome"
           style={{
-            textShadow: '0 0 30px rgba(255, 18, 147, 0.5), 0 0 60px rgba(179, 102, 255, 0.3)',
-            letterSpacing: '0.1em',
+            textShadow: '0 4px 8px rgba(0, 0, 0, 0.9), 0 12px 24px rgba(0, 0, 0, 0.7), inset -2px -2px 4px rgba(0, 0, 0, 0.6), inset 2px 2px 4px rgba(255, 255, 255, 0.4)',
+            letterSpacing: '0.08em',
+            filter: 'brightness(1.15) contrast(1.35) drop-shadow(0 0 20px rgba(201, 168, 76, 0.2))',
           }}>
           RIOT CROWN
         </h1>
-        <p className="text-label uppercase tracking-ultra-wide text-y2k-blue mt-4 animate-pulse"
-          style={{ textShadow: '0 0 20px rgba(110, 203, 255, 0.4)' }}>
-          千禧年崩坏后，珍珠在废墟中重生
+        <p className="text-label uppercase tracking-ultra-wide text-titanium mt-6"
+          style={{
+            textShadow: '0 2px 8px rgba(0, 0, 0, 0.8)',
+            opacity: 0.85,
+            letterSpacing: '0.2em',
+            fontWeight: 500,
+          }}>
+          MILLENNIUM ATELIER · LUXURY JEWELRY
         </p>
       </div>
 

@@ -210,6 +210,41 @@ body {
     font-weight: 900;
   }
 
+  /* Metallic Chrome Effect for Hero Title */
+  .text-brutal-chrome {
+    font-size: clamp(5.5rem, 14vw, 16rem);
+    line-height: 0.85;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    font-weight: 900;
+    background: linear-gradient(
+      135deg,
+      #ffffff 0%,
+      #f2f2f2 15%,
+      #d4d4d4 30%,
+      #a8a8a8 50%,
+      #808080 70%,
+      #606060 85%,
+      #404040 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: brightness(1.1) contrast(1.3);
+    text-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.8),
+      0 8px 16px rgba(0, 0, 0, 0.6),
+      inset -1px -1px 2px rgba(0, 0, 0, 0.5),
+      inset 1px 1px 2px rgba(255, 255, 255, 0.3);
+    position: relative;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .text-brutal-chrome {
+      animation: chrome-shine 6s ease-in-out infinite;
+    }
+  }
+
   .text-label {
     font-size: 0.6rem;
     letter-spacing: 0.3em;
@@ -272,8 +307,32 @@ body {
     box-shadow: 0 0 12px rgba(255, 18, 147, 0.12);
   }
 
-  .border-surgical {
-    border: 0.5px solid rgba(242,242,242,0.07);
+  /* Enhanced gradient text for section titles */
+  .text-gradient-gold {
+    background: linear-gradient(135deg, #F2F2F2 0%, #C9A84C 50%, #A8A8A8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-y2k {
+    background: linear-gradient(135deg, #FF1293 0%, #B366FF 25%, #6ECBFF 50%, #C8FF00 75%, #C9A84C 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Glow effects */
+  .glow-gold {
+    box-shadow: 0 0 20px rgba(201, 168, 76, 0.3), inset 0 0 20px rgba(201, 168, 76, 0.1);
+  }
+
+  .glow-pink {
+    box-shadow: 0 0 20px rgba(255, 18, 147, 0.3), inset 0 0 20px rgba(255, 18, 147, 0.1);
+  }
+
+  .glow-cyan {
+    box-shadow: 0 0 20px rgba(110, 203, 255, 0.3), inset 0 0 20px rgba(110, 203, 255, 0.1);
   }
 }
 #collection {
@@ -328,6 +387,25 @@ body {
   0%   { background-position: 0% 50%; }
   50%  { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
+}
+
+@keyframes chrome-shine {
+  0%, 100% {
+    filter: brightness(1.1) contrast(1.3);
+    text-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.8),
+      0 8px 16px rgba(0, 0, 0, 0.6),
+      inset -1px -1px 2px rgba(0, 0, 0, 0.5),
+      inset 1px 1px 2px rgba(255, 255, 255, 0.3);
+  }
+  50% {
+    filter: brightness(1.25) contrast(1.4);
+    text-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.6),
+      0 12px 24px rgba(201, 168, 76, 0.3),
+      inset -1px -1px 2px rgba(0, 0, 0, 0.3),
+      inset 1px 1px 3px rgba(255, 255, 255, 0.5);
+  }
 }
 
 /* ─── Y2K IRIDESCENT UTILITY ──────────────────────────────────── */

@@ -7,6 +7,7 @@ import { SITE_DESCRIPTION, SITE_HOME_TITLE, SITE_KEYWORDS } from '~/lib/siteMeta
 import { PearlNecklaceScene } from '~/components/3D/PearlNecklaceScene';
 import { Manifesto } from '~/components/Manifesto';
 import { ScrollNarrative } from '~/components/ScrollNarrative';
+import { HeroProductCarousel } from '~/components/HeroProductCarousel';
 import { ProductGrid } from '~/components/ProductGrid';
 import { ScarcityEngine } from '~/components/ScarcityEngine';
 import { TrustBar } from '~/components/TrustBar';
@@ -61,6 +62,7 @@ export default function Index() {
     <main>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: catalogJsonLd }} />
       <PearlNecklaceScene />
+      <HeroProductCarousel products={catalogProducts} />
       <Manifesto />
       <ScrollNarrative />
       <ProductGrid products={catalogProducts} />

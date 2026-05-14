@@ -65,24 +65,37 @@ export function Manifesto() {
       ref={sectionRef}
       className="section-manifesto-aura"
       style={{
-        borderTop: '0.5px solid rgba(182,102,255,0.14)',
-        padding: '64px 0 52px',
+        borderTop: '1px solid rgba(201,168,76,0.18)',
+        borderBottom: '1px solid rgba(182,102,255,0.12)',
+        padding: '72px 0 64px',
         overflow: 'hidden',
+        position: 'relative',
       }}
     >
-      <div className="px-8 md:px-16 lg:px-24">
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'radial-gradient(circle at 15% 50%, rgba(255,18,147,0.06) 0%, transparent 35%), radial-gradient(circle at 85% 50%, rgba(110,203,255,0.06) 0%, transparent 35%)',
+          pointerEvents: 'none',
+        }}
+      />
+      <div className="px-8 md:px-16 lg:px-24 relative z-10">
         <p style={{
           fontFamily: 'var(--font-mono)',
-          fontSize: '0.55rem',
+          fontSize: '0.58rem',
           letterSpacing: '0.35em',
-          color: 'rgba(255,18,147,0.55)',
+          color: '#C9A84C',
           textTransform: 'uppercase',
-          marginBottom: '1.5rem',
+          marginBottom: '2rem',
+          opacity: 0.85,
+          fontWeight: 500,
         }}>
           {t.manifesto.eyebrow}
         </p>
 
-        <div style={{ marginBottom: '2rem', maxWidth: 'min(100%, 40rem)' }}>
+        <div style={{ marginBottom: '2.5rem', maxWidth: 'min(100%, 48rem)' }}>
           {lines.map((line, i) => (
             <div
               key={i}
@@ -93,9 +106,9 @@ export function Manifesto() {
                   : '"Monument Extended", "Helvetica Neue", "Arial Black", sans-serif',
                 fontWeight: 900,
                 fontSize: i === 0
-                  ? 'clamp(1.55rem, 3.6vw, 3rem)'
-                  : 'clamp(1.45rem, 3.2vw, 2.65rem)',
-                lineHeight: 1.12,
+                  ? 'clamp(1.75rem, 4vw, 3.35rem)'
+                  : 'clamp(1.65rem, 3.6vw, 3rem)',
+                lineHeight: 1.08,
                 letterSpacing: i === 0 ? '-0.02em' : '-0.015em',
                 textTransform: 'uppercase',
                 ...(line.accent
@@ -105,11 +118,11 @@ export function Manifesto() {
                       backgroundClip: 'text',
                       color: 'transparent',
                       textShadow: 'none',
-                      filter: 'drop-shadow(0 0 28px rgba(255,18,147,0.25))',
+                      filter: 'drop-shadow(0 0 32px rgba(255,18,147,0.3))',
                     }
                   : {
                       color: '#F2F2F2',
-                      textShadow: '0 0 48px rgba(242,242,242,0.05)',
+                      textShadow: '0 2px 8px rgba(0,0,0,0.6), 0 0 48px rgba(242,242,242,0.08)',
                     }),
                 opacity: 0,
               }}

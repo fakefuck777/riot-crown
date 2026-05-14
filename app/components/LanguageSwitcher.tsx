@@ -7,6 +7,14 @@ import { LOCALES, type Locale } from '~/lib/i18n';
 import { usePrefersReducedMotion } from '~/hooks/usePrefersReducedMotion';
 import { stripLeadingLocaleFromPathname, withLocalePath } from '~/lib/localePath';
 
+const LANGUAGE_NAMES: Record<Locale, string> = {
+  EN: 'English',
+  ZH: '中文',
+  JP: '日本語',
+  KR: '한국어',
+  FR: 'Français',
+};
+
 export function LanguageSwitcher() {
   const { locale, setLocale } = useLocale();
   const location = useLocation();
@@ -94,23 +102,42 @@ export function LanguageSwitcher() {
     <div ref={containerRef} className="relative">
       <button
         onClick={toggleDropdown}
-        aria-label={`Language: ${locale}. Click to change`}
+        aria-label={`Language: ${LANGUAGE_NAMES[locale]}. Click to change`}
         aria-expanded={dropdownOpen}
-        className="text-nav text-chrome hover:text-titanium transition-colors duration-200"
+        className="transition-all duration-300"
         style={{
           fontFamily: 'var(--font-mono)',
-          letterSpacing: '0.16em',
-          background: 'none',
-          border: 'none',
+          fontSize: '0.75rem',
+          letterSpacing: '0.14em',
+          textTransform: 'uppercase',
+          fontWeight: 500,
+          background: 'rgba(201,168,76,0.08)',
+          border: '1px solid rgba(201,168,76,0.35)',
           cursor: 'pointer',
-          padding: '6px 2px',
+          padding: '8px 12px',
           display: 'flex',
           alignItems: 'center',
-          gap: '5px',
+          gap: '6px',
+          borderRadius: '4px',
+          color: '#C9A84C',
+          boxShadow: '0 0 12px rgba(201,168,76,0.15)',
+          transition: 'all 0.3s ease',
+        }}
+        onMouseEnter={(e) => {
+          const el = e.currentTarget as HTMLElement;
+          el.style.background = 'rgba(201,168,76,0.15)';
+          el.style.boxShadow = '0 0 24px rgba(201,168,76,0.35)';
+          el.style.borderColor = 'rgba(201,168,76,0.65)';
+        }}
+        onMouseLeave={(e) => {
+          const el = e.currentTarget as HTMLElement;
+          el.style.background = 'rgba(201,168,76,0.08)';
+          el.style.boxShadow = '0 0 12px rgba(201,168,76,0.15)';
+          el.style.borderColor = 'rgba(201,168,76,0.35)';
         }}
       >
-        <span ref={displayRef} style={{ display: 'inline-block' }}>{locale}</span>
-        <span style={{ opacity: 0.4, fontSize: '0.5rem', lineHeight: 1 }}>▾</span>
+        <span ref={displayRef} style={{ display: 'inline-block' }}>{LANGUAGE_NAMES[locale]}</span>
+        <span style={{ opacity: 0.6, fontSize: '0.5rem', lineHeight: 1 }}>▾</span>
       </button>
 
       {/* Dropdown — fixed to escape nav overflow:hidden */}
@@ -125,9 +152,11 @@ export function LanguageSwitcher() {
           background: 'rgba(5,5,5,0.98)',
           backdropFilter: 'blur(24px)',
           WebkitBackdropFilter: 'blur(24px)',
-          border: '0.5px solid rgba(255,18,147,0.22)',
-          padding: '6px 0',
-          minWidth: '64px',
+          border: '1px solid rgba(201,168,76,0.35)',
+          borderRadius: '6px',
+          padding: '8px 0',
+          minWidth: '140px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.6), inset 0 1px 0 rgba(201,168,76,0.2)',
         }}
       >
         {LOCALES.filter(l => l !== locale).map((l, i) => (
@@ -160,19 +189,31 @@ function DropdownItem({
     <button
       ref={ref}
       onClick={() => onSelect(locale)}
-      className="text-nav text-chrome hover:text-gold transition-colors duration-150 w-full text-left"
+      className="transition-colors duration-150 w-full text-left"
       style={{
         fontFamily: 'var(--font-mono)',
-        letterSpacing: '0.14em',
+        fontSize: '0.72rem',
+        letterSpacing: '0.08em',
         background: 'none',
         border: 'none',
         cursor: 'pointer',
-        padding: '8px 16px',
+        padding: '10px 16px',
         opacity: 0,
         display: 'block',
+        color: 'rgba(242,242,242,0.82)',
+      }}
+      onMouseEnter={(e) => {
+        const el = e.currentTarget as HTMLElement;
+        el.style.color = '#C9A84C';
+        el.style.background = 'rgba(201,168,76,0.08)';
+      }}
+      onMouseLeave={(e) => {
+        const el = e.currentTarget as HTMLElement;
+        el.style.color = 'rgba(242,242,242,0.82)';
+        el.style.background = 'none';
       }}
     >
-      {locale}
+      {LANGUAGE_NAMES[locale]}
     </button>
   );
 }
