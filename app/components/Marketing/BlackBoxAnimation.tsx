@@ -4,13 +4,24 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { PerspectiveCamera, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 
-function BlackBox() {
+function BlackBox({ isOpen }: { isOpen: boolean }) {
   const groupRef = useRef<THREE.Group>(null);
+  const lidRef = useRef<THREE.Mesh>(null);
 
   useFrame(({ clock }) => {
     if (groupRef.current) {
-      groupRef.current.rotation.x = Math.sin(clock.getElapsedTime() * 0.5) * 0.2;
-      groupRef.current.rotation.y = clock.getElapsedTime() * 0.3;
+      if (!isOpen) {
+        groupRef.current.rotation.x = Math.sin(clock.getElapsedTime() * 0.5) * 0.2;
+        groupRef.current.rotation.y = clock.getElapsedTime() * 0.3;
+      } else {
+        groupRef.current.rotation.x = 0;
+        groupRef.current.rotation.y = 0;
+      }
+    }
+
+    if (lidRef.current && isOpen) {
+      lidRef.current.rotation.x = Math.min(clock.getElapsedTime() * 2, Math.PI * 0.6);
+      lidRef.current.position.y = 1.3 + Math.sin(clock.getElapsedTime() * 2) * 0.3;
     }
   });
 
@@ -34,12 +45,12 @@ function BlackBox() {
         <meshStandardMaterial
           color="#FF1293"
           emissive="#FF1293"
-          emissiveIntensity={0.5}
+          emissiveIntensity={isOpen ? 1 : 0.5}
         />
       </mesh>
 
       {/* Lid */}
-      <mesh position={[0, 1.3, 0]} castShadow>
+      <mesh ref={lidRef} position={[0, 1.3, 0]} castShadow>
         <boxGeometry args={[2, 0.3, 1.5]} />
         <meshStandardMaterial
           color="#1a1a1a"
@@ -48,9 +59,24 @@ function BlackBox() {
         />
       </mesh>
 
+      {/* Inner glow */}
+      {isOpen && (
+        <mesh position={[0, 0, 0]}>
+          <boxGeometry args={[1.8, 2.2, 1.3]} />
+          <meshStandardMaterial
+            color="#FF1293"
+            emissive="#FF1293"
+            emissiveIntensity={0.3}
+            transparent={true}
+            opacity={0.1}
+          />
+        </mesh>
+      )}
+
       {/* Lighting */}
-      <pointLight position={[2, 2, 2]} intensity={1.2} color="#FF1293" />
-      <pointLight position={[-2, -2, 2]} intensity={0.8} color="#6ECBFF" />
+      <pointLight position={[2, 2, 2]} intensity={isOpen ? 2 : 1.2} color="#FF1293" />
+      <pointLight position={[-2, -2, 2]} intensity={isOpen ? 1.5 : 0.8} color="#6ECBFF" />
+      {isOpen && <pointLight position={[0, 0, 1]} intensity={1.5} color="#FF1293" />}
     </group>
   );
 }
