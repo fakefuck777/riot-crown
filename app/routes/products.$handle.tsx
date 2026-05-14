@@ -21,10 +21,11 @@ import {
   fetchShopifyProductByHandle,
   loadStoreCatalog,
 } from '~/lib/shopifyCatalog.server';
+import { storefrontTokenPrefix4FromEnv, type StorefrontTokenEnv } from '~/lib/storefrontEnvDebug';
 
 type HydrogenRouteContext = {
   storefront?: Storefront;
-  env?: { PUBLIC_HOME_COLLECTION_HANDLE?: string };
+  env?: StorefrontTokenEnv & { PUBLIC_HOME_COLLECTION_HANDLE?: string };
 };
 
 export async function loader({ request, context, params }: LoaderFunctionArgs) {
@@ -34,9 +35,13 @@ export async function loader({ request, context, params }: LoaderFunctionArgs) {
   const handle = params.handle ?? '';
   const ctx = context as HydrogenRouteContext;
   const storefront = ctx.storefront;
+  const debugTokenPrefix4 = storefrontTokenPrefix4FromEnv(ctx.env);
 
   let product = storefront
-    ? await fetchShopifyProductByHandle(storefront, handle, request.url)
+    ? await fetchShopifyProductByHandle(storefront, handle, {
+        requestUrl: request.url,
+        debugTokenPrefix4,
+      })
     : undefined;
   if (!product) {
     product = getProduct(handle);
@@ -47,6 +52,7 @@ export async function loader({ request, context, params }: LoaderFunctionArgs) {
   const { products: catalog } = await loadStoreCatalog(storefront, {
     collectionHandle: ctx.env?.PUBLIC_HOME_COLLECTION_HANDLE,
     requestUrl: request.url,
+    debugTokenPrefix4,
   });
   const related = product ? catalog.filter(p => p.id !== product.id).slice(0, 3) : [];
 

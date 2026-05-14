@@ -3,10 +3,11 @@ import type { Storefront } from '@shopify/hydrogen';
 import { LOCALES } from '~/lib/i18n';
 import { withLocalePath } from '~/lib/localePath';
 import { loadStoreCatalog } from '~/lib/shopifyCatalog.server';
+import { storefrontTokenPrefix4FromEnv, type StorefrontTokenEnv } from '~/lib/storefrontEnvDebug';
 
 type HydrogenRouteContext = {
   storefront?: Storefront;
-  env?: { PUBLIC_HOME_COLLECTION_HANDLE?: string };
+  env?: StorefrontTokenEnv & { PUBLIC_HOME_COLLECTION_HANDLE?: string };
 };
 
 function xmlEscape(s: string): string {
@@ -20,9 +21,11 @@ function xmlEscape(s: string): string {
 export async function loader({ request, context }: LoaderFunctionArgs) {
   const origin = new URL(request.url).origin;
   const ctx = context as HydrogenRouteContext;
+  const debugTokenPrefix4 = storefrontTokenPrefix4FromEnv(ctx.env);
   const { products } = await loadStoreCatalog(ctx.storefront, {
     collectionHandle: ctx.env?.PUBLIC_HOME_COLLECTION_HANDLE,
     requestUrl: request.url,
+    debugTokenPrefix4,
   });
   const paths = new Set<string>();
   for (const loc of LOCALES) {

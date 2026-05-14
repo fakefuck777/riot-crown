@@ -7,7 +7,7 @@ import {
   cartSetIdDefault,
 } from '@shopify/hydrogen';
 import { getStorefrontHeaders } from '~/lib/storefrontHeaders';
-import { resolveStorefrontI18nForRequest } from '~/lib/storefrontI18n';
+import { getStorefrontI18n, resolveStorefrontI18nForRequest } from '~/lib/storefrontI18n';
 import type {ServerBuild} from '@remix-run/server-runtime';
 import {
   createCookieSessionStorage,
@@ -15,6 +15,13 @@ import {
   type Session,
 } from '@shopify/remix-oxygen';
 import * as remixBuild from 'virtual:remix/server-build';
+
+/**
+ * When `true`: Hydrogen `i18n` is fixed to EN+US (ignores URL locale / `riot_locale` / session for Storefront).
+ * Catalog GraphQL here has no `@inContext`, but cart built-ins still inject `$country`/`$language` — this flattens that context.
+ * Set back to `false` after debugging Markets vs. API.
+ */
+const STOREFRONT_I18N_DEBUG_FLAT_EN_US = true;
 
 /** `createStorefrontClient` expects the shop’s `*.myshopify.com` host, not a customer-facing custom domain. */
 function normalizeStoreDomain(raw: string): string {
@@ -84,7 +91,9 @@ export default {
       warnIfStorefrontPublicTokenLooksWrong(env.PUBLIC_STOREFRONT_API_TOKEN ?? '', Boolean(privateTok));
       logStorefrontAuthModeOnce(privateTok, publicTok);
 
-      const i18n = resolveStorefrontI18nForRequest(request, env, session);
+      const i18n = STOREFRONT_I18N_DEBUG_FLAT_EN_US
+        ? getStorefrontI18n({ PUBLIC_STOREFRONT_LANGUAGE: 'EN', PUBLIC_STOREFRONT_COUNTRY: 'US' })
+        : resolveStorefrontI18nForRequest(request, env, session);
 
       const { storefront } = createStorefrontClient({
         cache,

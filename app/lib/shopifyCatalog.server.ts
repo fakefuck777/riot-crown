@@ -1,7 +1,7 @@
 /**
  * Shopify Storefront catalog for Hydrogen/Oxygen.
- * - 降级测试：本文件内 GraphQL **不**使用 `@inContext` / `$country` / `$language`，用于确认在无查询级地区约束时 API 是否返回数据。
- * - `server.ts` 仍用 `resolveStorefrontI18nForRequest` 创建 `storefront`；购物车等内置查询若含 `$country` 仍会由 Hydrogen 注入 i18n。
+ * - GraphQL：本文件内 **无** `@inContext` / `$country` / `$language`（目录与 `product(handle)` 均不夹地区参数）。
+ * - `server.ts` 在 `STOREFRONT_I18N_DEBUG_FLAT_EN_US` 为 true 时会把 Hydrogen `i18n` 固定为 EN+US，便于排除 URL/ cookie 市场干扰；购物车等内置查询仍会带 `$country` 时使用该 i18n。
  * - GraphQL: no Product.totalInventory / tracksInventory (avoids extra scopes that break whole query).
  * - Errors: logStorefrontFailure → JSON with extensions/stack/cause (Oxygen logs).
  */
@@ -11,6 +11,17 @@ import { makeSVG } from '~/lib/makeSVG';
 import { PRODUCTS, type ProductData } from '~/lib/products';
 
 const CATALOG_FIRST = 48;
+
+function logStorefrontGraphQLDebug(
+  debugTokenPrefix4: string | undefined,
+  op: string,
+  query: string,
+  variables: Record<string, unknown>,
+): void {
+  const prefix = debugTokenPrefix4 ?? '(loader did not pass token prefix — see storefrontEnvDebug)';
+  console.log('[Storefront GraphQL DEBUG]', { op, storeAccessTokenFirst4: prefix, variables });
+  console.log(`[Storefront GraphQL DEBUG] op=${op} full query:\n${query.trim()}`);
+}
 
 function logStorefrontI18nBeforeQuery(
   storefront: Storefront,
@@ -361,7 +372,7 @@ export type CatalogLoadResult = {
  */
 export async function loadStoreCatalog(
   storefront: Storefront | undefined,
-  opts?: { collectionHandle?: string; requestUrl?: string },
+  opts?: { collectionHandle?: string; requestUrl?: string; debugTokenPrefix4?: string },
 ): Promise<CatalogLoadResult> {
   if (!storefront) {
     return { products: PRODUCTS, source: 'demo' };
@@ -370,6 +381,7 @@ export async function loadStoreCatalog(
     const shop = await fetchShopifyCatalog(storefront, {
       collectionHandle: opts?.collectionHandle,
       requestUrl: opts?.requestUrl,
+      debugTokenPrefix4: opts?.debugTokenPrefix4,
     });
     if (shop.length > 0) {
       return { products: shop, source: 'shopify' };
@@ -382,16 +394,18 @@ export async function loadStoreCatalog(
 
 export async function fetchShopifyCatalog(
   storefront: Storefront,
-  opts?: { collectionHandle?: string; requestUrl?: string },
+  opts?: { collectionHandle?: string; requestUrl?: string; debugTokenPrefix4?: string },
 ): Promise<ProductData[]> {
   const handle = opts?.collectionHandle?.trim();
   const requestUrl = opts?.requestUrl;
+  const debugTokenPrefix4 = opts?.debugTokenPrefix4;
   let nodes: SfProductNode[] = [];
 
   if (handle) {
     try {
       logStorefrontI18nBeforeQuery(storefront, requestUrl, 'CollectionCatalog');
       const variables = { handle, first: CATALOG_FIRST };
+      logStorefrontGraphQLDebug(debugTokenPrefix4, 'CollectionCatalog', COLLECTION_PRODUCTS_QUERY, variables);
       const { data, errors } = await storefront.query(COLLECTION_PRODUCTS_QUERY, {
         variables,
         cache: CacheShort(),
@@ -413,6 +427,7 @@ export async function fetchShopifyCatalog(
       try {
         logStorefrontI18nBeforeQuery(storefront, requestUrl, 'CatalogProducts.fallback');
         const variables = { first: CATALOG_FIRST };
+        logStorefrontGraphQLDebug(debugTokenPrefix4, 'CatalogProducts.fallback', CATALOG_PRODUCTS_QUERY, variables);
         const { data: d2, errors: e2 } = await storefront.query(CATALOG_PRODUCTS_QUERY, {
           variables,
           cache: CacheShort(),
@@ -434,6 +449,7 @@ export async function fetchShopifyCatalog(
     try {
       logStorefrontI18nBeforeQuery(storefront, requestUrl, 'CatalogProducts');
       const variables = { first: CATALOG_FIRST };
+      logStorefrontGraphQLDebug(debugTokenPrefix4, 'CatalogProducts', CATALOG_PRODUCTS_QUERY, variables);
       const { data, errors } = await storefront.query(CATALOG_PRODUCTS_QUERY, {
         variables,
         cache: CacheShort(),
@@ -453,13 +469,16 @@ export async function fetchShopifyCatalog(
 export async function fetchShopifyProductByHandle(
   storefront: Storefront,
   handle: string,
-  requestUrl?: string,
+  opts?: { requestUrl?: string; debugTokenPrefix4?: string },
 ): Promise<ProductData | undefined> {
   if (!handle.trim()) return undefined;
   const h = handle.trim();
+  const requestUrl = opts?.requestUrl;
+  const debugTokenPrefix4 = opts?.debugTokenPrefix4;
   try {
     logStorefrontI18nBeforeQuery(storefront, requestUrl, 'ProductByHandle');
     const variables = { handle: h };
+    logStorefrontGraphQLDebug(debugTokenPrefix4, 'ProductByHandle', PRODUCT_BY_HANDLE_QUERY, variables);
     const { data, errors } = await storefront.query(PRODUCT_BY_HANDLE_QUERY, {
       variables,
       cache: CacheShort(),
@@ -495,6 +514,12 @@ export async function fetchShopifyProductByHandle(
       try {
         logStorefrontI18nBeforeQuery(storefront, requestUrl, 'ProductBruteUnfilteredList');
         const listVars = { first: bruteFirst };
+        logStorefrontGraphQLDebug(
+          debugTokenPrefix4,
+          'ProductBruteUnfilteredList',
+          PRODUCT_BRUTE_UNFILTERED_LIST_QUERY,
+          listVars,
+        );
         const { data: listData, errors: listErr } = await storefront.query(
           PRODUCT_BRUTE_UNFILTERED_LIST_QUERY,
           { variables: listVars, cache: CacheShort() },
@@ -515,6 +540,12 @@ export async function fetchShopifyProductByHandle(
         logStorefrontI18nBeforeQuery(storefront, requestUrl, 'ProductBruteHandleSearch');
         const searchStr = `handle:${h}`;
         const searchVars = { first: 15, search: searchStr };
+        logStorefrontGraphQLDebug(
+          debugTokenPrefix4,
+          'ProductBruteHandleSearch',
+          PRODUCT_BRUTE_HANDLE_SEARCH_QUERY,
+          searchVars,
+        );
         const { data: searchData, errors: searchErr } = await storefront.query(
           PRODUCT_BRUTE_HANDLE_SEARCH_QUERY,
           { variables: searchVars, cache: CacheShort() },

@@ -12,18 +12,21 @@ import { TrustBar } from '~/components/TrustBar';
 import { Testimonials } from '~/components/Testimonials';
 import { Footer } from '~/components/Footer';
 import { loadStoreCatalog } from '~/lib/shopifyCatalog.server';
+import { storefrontTokenPrefix4FromEnv, type StorefrontTokenEnv } from '~/lib/storefrontEnvDebug';
 
 type HydrogenRouteContext = {
   storefront?: Storefront;
-  env?: { PUBLIC_HOME_COLLECTION_HANDLE?: string };
+  env?: StorefrontTokenEnv & { PUBLIC_HOME_COLLECTION_HANDLE?: string };
 };
 
 export async function loader({ request, context }: LoaderFunctionArgs) {
   const siteUrl = new URL(request.url).origin.replace(/\/$/, '');
   const ctx = context as HydrogenRouteContext;
+  const debugTokenPrefix4 = storefrontTokenPrefix4FromEnv(ctx.env);
   const { products: catalogProducts } = await loadStoreCatalog(ctx.storefront, {
     collectionHandle: ctx.env?.PUBLIC_HOME_COLLECTION_HANDLE,
     requestUrl: request.url,
+    debugTokenPrefix4,
   });
   const { buildCatalogItemListJsonLd } = await import('~/lib/schemaOrg');
   return json({

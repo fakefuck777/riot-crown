@@ -3,6 +3,7 @@ import type { Storefront } from '@shopify/hydrogen';
 import type { ProductData } from '~/lib/products';
 import { getProduct } from '~/lib/products';
 import { fetchShopifyProductByHandle } from '~/lib/shopifyCatalog.server';
+import { storefrontTokenPrefix4FromEnv, type StorefrontTokenEnv } from '~/lib/storefrontEnvDebug';
 import { escapeXml } from '~/lib/svgEscape';
 
 const W = 1200;
@@ -40,9 +41,16 @@ function buildProductOgSvg(product: ProductData): string {
 
 export async function loader({ request, params, context }: LoaderFunctionArgs) {
   const id = params.id ?? '';
-  const storefront = (context as { storefront?: Storefront }).storefront;
+  const ctx = context as { storefront?: Storefront; env?: StorefrontTokenEnv };
+  const storefront = ctx.storefront;
+  const debugTokenPrefix4 = storefrontTokenPrefix4FromEnv(ctx.env);
   let product: ProductData | undefined =
-    storefront ? await fetchShopifyProductByHandle(storefront, id, request.url) : undefined;
+    storefront
+      ? await fetchShopifyProductByHandle(storefront, id, {
+          requestUrl: request.url,
+          debugTokenPrefix4,
+        })
+      : undefined;
   if (!product) {
     product = getProduct(id);
   }

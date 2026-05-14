@@ -5,18 +5,22 @@ import { useMemo } from 'react';
 import { useLocale } from '~/lib/LocaleContext';
 import { withLocalePath } from '~/lib/localePath';
 import { loadStoreCatalog } from '~/lib/shopifyCatalog.server';
+import { storefrontTokenPrefix4FromEnv, type StorefrontTokenEnv } from '~/lib/storefrontEnvDebug';
 
 import { SITE_DESCRIPTION, SITE_KEYWORDS, SITE_NAME } from '~/lib/siteMeta';
 
 type HydrogenRouteContext = {
   storefront?: Storefront;
-  env?: { PUBLIC_HOME_COLLECTION_HANDLE?: string };
+  env?: StorefrontTokenEnv & { PUBLIC_HOME_COLLECTION_HANDLE?: string };
 };
 
 export async function loader({ request, context }: LoaderFunctionArgs) {
-  const { products } = await loadStoreCatalog((context as HydrogenRouteContext).storefront, {
-    collectionHandle: (context as HydrogenRouteContext).env?.PUBLIC_HOME_COLLECTION_HANDLE,
+  const ctx = context as HydrogenRouteContext;
+  const debugTokenPrefix4 = storefrontTokenPrefix4FromEnv(ctx.env);
+  const { products } = await loadStoreCatalog(ctx.storefront, {
+    collectionHandle: ctx.env?.PUBLIC_HOME_COLLECTION_HANDLE,
     requestUrl: request.url,
+    debugTokenPrefix4,
   });
   return json({ catalogProducts: products });
 }
