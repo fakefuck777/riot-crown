@@ -53,7 +53,7 @@ export function BundleRecommendation({ mainProductName, onBundleAdd }: BundleRec
             boxShadow: '0 0 15px rgba(255,18,147,0.3)',
           }}
         >
-          添加到购物车
+          ADD TO CART
         </button>
         <button
           onClick={() => setIsVisible(false)}

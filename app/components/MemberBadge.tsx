@@ -18,7 +18,7 @@ export function MemberBadge() {
     level2: {
       name: 'Riot Level 2',
       color: '#C9A84C',
-      next: '消费 $1500 解锁 15% 折扣 + VIP 支持',
+      next: 'Spend $1500 to unlock 15% discount + VIP support',
     },
     level3: {
       name: 'Riot Level 3',

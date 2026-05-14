@@ -56,7 +56,7 @@ export function ExclusiveCollection() {
               color: '#fff',
             }}
           >
-            加入购物车
+            ADD TO CART
           </button>
         </div>
       </div>

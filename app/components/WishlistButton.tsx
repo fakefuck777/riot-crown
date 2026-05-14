@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { useLocale } from '~/lib/LocaleContext';
 
 interface WishlistButtonProps {
   productId: string;
@@ -7,6 +8,7 @@ interface WishlistButtonProps {
 }
 
 export function WishlistButton({ productId, onToggle }: WishlistButtonProps) {
+  const { t } = useLocale();
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [showToast, setShowToast] = useState(false);
 
@@ -43,7 +45,7 @@ export function WishlistButton({ productId, onToggle }: WishlistButtonProps) {
           color: isWishlisted ? '#FF1293' : 'rgba(242,242,242,0.7)',
         }}
       >
-        {isWishlisted ? '♥' : '♡'} 收藏
+        {isWishlisted ? '♥' : '♡'} {t.product.covet}
       </button>
 
       {showToast && (
@@ -56,7 +58,7 @@ export function WishlistButton({ productId, onToggle }: WishlistButtonProps) {
             boxShadow: '0 0 15px rgba(255,18,147,0.3)',
           }}
         >
-          {isWishlisted ? '✓ 已添加到收藏' : '✓ 已从收藏移除'}
+          {isWishlisted ? '✓ Added to Wishlist' : '✓ Removed from Wishlist'}
         </div>
       )}
     </>
