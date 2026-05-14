@@ -5,10 +5,28 @@
  */
 import { CacheShort } from '@shopify/hydrogen';
 import type { Storefront } from '@shopify/hydrogen';
+import type { CountryCode, LanguageCode } from '@shopify/hydrogen-react/storefront-api-types';
 import { makeSVG } from '~/lib/makeSVG';
 import { PRODUCTS, type ProductData } from '~/lib/products';
 
 const CATALOG_FIRST = 48;
+
+/**
+ * Markets / International: Storefront catalog queries must use `@inContext` or
+ * `product` / `collection` can be null when availability is market-specific.
+ * Hydrogen only auto-fills `$country` / `$language` if those placeholders exist in the query string.
+ *
+ * Debug: set `country` / `language` to `CN` / `ZH` to test the China market, or keep `US` / `EN`.
+ * Remove or align with `PUBLIC_STOREFRONT_*` in `storefrontI18n.ts` once confirmed.
+ */
+const CATALOG_IN_CONTEXT: { country: CountryCode; language: LanguageCode } = {
+  country: 'US',
+  language: 'EN',
+};
+
+function catalogContextVariables(): { country: CountryCode; language: LanguageCode } {
+  return { country: CATALOG_IN_CONTEXT.country, language: CATALOG_IN_CONTEXT.language };
+}
 
 /**
  * Serialize Storefront / network errors — GraphQL errors often have extensions;
@@ -72,7 +90,11 @@ const SIZE_CYCLE: ProductData['size'][] = [
 
 /** Storefront catalog query — `nodes` on ProductConnection (API 2024+). */
 const CATALOG_PRODUCTS_QUERY = `#graphql
-  query CatalogProducts($first: Int!) {
+  query CatalogProducts(
+    $first: Int!
+    $country: CountryCode
+    $language: LanguageCode
+  ) @inContext(country: $country, language: $language) {
     products(first: $first, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         id
@@ -106,7 +128,12 @@ const CATALOG_PRODUCTS_QUERY = `#graphql
 `;
 
 const COLLECTION_PRODUCTS_QUERY = `#graphql
-  query CollectionCatalog($handle: String!, $first: Int!) {
+  query CollectionCatalog(
+    $handle: String!
+    $first: Int!
+    $country: CountryCode
+    $language: LanguageCode
+  ) @inContext(country: $country, language: $language) {
     collection(handle: $handle) {
       products(first: $first, sortKey: BEST_SELLING) {
         nodes {
@@ -142,7 +169,11 @@ const COLLECTION_PRODUCTS_QUERY = `#graphql
 `;
 
 const PRODUCT_BY_HANDLE_QUERY = `#graphql
-  query ProductByHandle($handle: String!) {
+  query ProductByHandle(
+    $handle: String!
+    $country: CountryCode
+    $language: LanguageCode
+  ) @inContext(country: $country, language: $language) {
     product(handle: $handle) {
       id
       handle
@@ -338,7 +369,7 @@ export async function fetchShopifyCatalog(
   if (handle) {
     try {
       const { data, errors } = await storefront.query(COLLECTION_PRODUCTS_QUERY, {
-        variables: { handle, first: CATALOG_FIRST },
+        variables: { handle, first: CATALOG_FIRST, ...catalogContextVariables() },
         cache: CacheShort(),
       });
       if (errors?.length) {
@@ -357,7 +388,7 @@ export async function fetchShopifyCatalog(
     if (nodes.length === 0) {
       try {
         const { data: d2, errors: e2 } = await storefront.query(CATALOG_PRODUCTS_QUERY, {
-          variables: { first: CATALOG_FIRST },
+          variables: { first: CATALOG_FIRST, ...catalogContextVariables() },
           cache: CacheShort(),
         });
         if (e2?.length) {
@@ -376,7 +407,7 @@ export async function fetchShopifyCatalog(
   } else {
     try {
       const { data, errors } = await storefront.query(CATALOG_PRODUCTS_QUERY, {
-        variables: { first: CATALOG_FIRST },
+        variables: { first: CATALOG_FIRST, ...catalogContextVariables() },
         cache: CacheShort(),
       });
       if (errors?.length) {
@@ -399,7 +430,7 @@ export async function fetchShopifyProductByHandle(
   const h = handle.trim();
   try {
     const { data, errors } = await storefront.query(PRODUCT_BY_HANDLE_QUERY, {
-      variables: { handle: h },
+      variables: { handle: h, ...catalogContextVariables() },
       cache: CacheShort(),
     });
     if (errors?.length) {
