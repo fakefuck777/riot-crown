@@ -26,7 +26,6 @@ export function EmailCapturePopup() {
     e.preventDefault();
 
     // Mock email capture - replace with actual API call
-    console.log('Email captured:', email);
     localStorage.setItem('riot_email_captured', 'true');
 
     setIsSubmitted(true);

@@ -56,7 +56,6 @@ export function EmailCapturePopupEnhanced({ onClose }: EmailCapturePopupEnhanced
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log('Email captured:', email);
     localStorage.setItem(CAPTURED_KEY, 'true');
     localStorage.removeItem(DISMISSED_KEY);
 

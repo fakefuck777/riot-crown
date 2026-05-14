@@ -41,7 +41,6 @@ export async function loader({ request, context, params }: LoaderFunctionArgs) {
     product = getProduct(handle);
   }
 
-  console.log('[products.$handle loader]', JSON.stringify({ handle, product }, null, 2));
 
   const { buildProductJsonLd } = await import('~/lib/schemaOrg');
   return json({

@@ -21,7 +21,6 @@ export function ARTryOn({ productName, onClose }: ARTryOnProps) {
           const supported = await xrNavigator.xr?.isSessionSupported?.('immersive-ar');
           setIsSupported(!!supported);
         } catch (e) {
-          console.log('AR not supported:', e);
         }
       }
     };
@@ -44,7 +43,6 @@ export function ARTryOn({ productName, onClose }: ARTryOnProps) {
       // - Custom pose estimation for neck/wrist detection
 
       setIsActive(true);
-      console.log('AR Session started for:', productName);
 
       // Mock AR experience
       alert(`AR 试戴已启动：${productName}\n\n这是一个预留接口。\n\n完整实现需要：\n1. WebXR API 集成\n2. 人体姿态检测\n3. 虚拟物体放置\n4. 实时渲染`);
