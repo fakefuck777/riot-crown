@@ -205,7 +205,7 @@ function Model({ material }: { material: typeof MATERIAL_VARIANTS[keyof typeof M
 export function ProductModel({ productName, onMaterialChange, onARClick }: ProductModelProps) {
   const [selectedMaterial, setSelectedMaterial] = useState<keyof typeof MATERIAL_VARIANTS>('pearl_glossy');
   const [isARSupported, setIsARSupported] = useState(false);
-  const { setIsUserInteracting } = useUserInteraction();
+  const { isUserInteracting, setIsUserInteracting } = useUserInteraction();
 
   useEffect(() => {
     setIsARSupported('XRSession' in window || 'webkitXRSession' in window);
@@ -229,10 +229,6 @@ export function ProductModel({ productName, onMaterialChange, onARClick }: Produ
               antialias: true,
               alpha: false,
               powerPreference: 'high-performance',
-              shadowMap: {
-                enabled: true,
-                type: THREE.PCFShadowShadowMap,
-              },
             }}
             onMouseDown={() => setIsUserInteracting(true)}
             onMouseUp={() => setIsUserInteracting(false)}

@@ -161,7 +161,7 @@ export function ScrollNarrative({ onChapterChange }: ScrollNarrativeProps) {
       );
 
       // Chapter 3 strobe effect - only when in viewport
-      gsap.to(chapter3Ref.current, {
+      const strobeAnimation = gsap.to(chapter3Ref.current, {
         boxShadow: '0 0 40px rgba(255,18,147,0.8)',
         duration: 0.3,
         repeat: -1,
@@ -172,11 +172,11 @@ export function ScrollNarrative({ onChapterChange }: ScrollNarrativeProps) {
           start: 'top center',
           end: 'bottom center',
           scrub: 1,
-          onEnter: (self) => {
-            self.getAnimation()?.play();
+          onEnter: () => {
+            strobeAnimation.play();
           },
-          onLeave: (self) => {
-            self.getAnimation()?.pause();
+          onLeave: () => {
+            strobeAnimation.pause();
           },
         },
       });

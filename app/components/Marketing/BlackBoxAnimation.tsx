@@ -104,7 +104,7 @@ export function BlackBoxAnimation({ productName, onClose }: BlackBoxAnimationPro
             <PerspectiveCamera makeDefault position={[0, 0, 5]} fov={50} />
             <ambientLight intensity={0.4} />
             <Environment preset="night" />
-            <BlackBox />
+            <BlackBox isOpen={isOpen} />
           </Canvas>
         </div>
 
