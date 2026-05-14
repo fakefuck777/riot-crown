@@ -1,5 +1,7 @@
 name: Storefront 1000137378
-on: [push]
+on:
+  push:
+    branches: [main]
 
 permissions:
   contents: read
@@ -36,10 +38,11 @@ jobs:
         run: npm ci
 
       - name: Build and Publish to Oxygen
-        run: npx shopify hydrogen deploy
+        run: npx shopify hydrogen deploy --force
         env:
           SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN: ${{ secrets.OXYGEN_DEPLOYMENT_TOKEN_1000137378 }}
           PUBLIC_STOREFRONT_API_TOKEN: ${{ secrets.PUBLIC_STOREFRONT_API_TOKEN }}
           PUBLIC_STORE_DOMAIN: ${{ secrets.PUBLIC_STORE_DOMAIN }}
           PUBLIC_HOME_COLLECTION_HANDLE: ${{ secrets.PUBLIC_HOME_COLLECTION_HANDLE }}
           SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+
