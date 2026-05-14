@@ -5,6 +5,7 @@ import { ARTryOn } from '~/components/3D/ARTryOn';
 import { ScarcityEngine } from '~/components/Marketing/ScarcityEngine';
 import { OthersBuyingNotif } from '~/components/Marketing/OthersBuyingNotif';
 import { BlackBoxAnimation } from '~/components/Marketing/BlackBoxAnimation';
+import { CinematicBackground } from '~/components/3D/CinematicBackground';
 
 interface ProductDetailEnhancedProps {
   product: {
