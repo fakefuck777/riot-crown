@@ -3,7 +3,6 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { useNavigate } from '@remix-run/react';
 import { useLocale } from '~/lib/LocaleContext';
-import { useCart } from '~/lib/CartContext';
 import { usePrefersReducedMotion } from '~/hooks/usePrefersReducedMotion';
 import { withLocalePath } from '~/lib/localePath';
 import type { ProductData } from '~/lib/products';
@@ -16,7 +15,6 @@ interface HeroProductCarouselProps {
 export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
   const { t, locale } = useLocale();
   const navigate = useNavigate();
-  const { addToCart } = useCart();
   const reducedMotion = usePrefersReducedMotion();
   const containerRef = useRef<HTMLDivElement>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
@@ -64,9 +62,6 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
     if (reducedMotion) return;
     autoPlayRef.current = setInterval(nextSlide, 5000);
   };
-
-  // 移动设备上禁用某些动画
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
   return (
     <section

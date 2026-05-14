@@ -1,6 +1,5 @@
 'use client';
 import { useRef, useEffect, useState } from 'react';
-import { useLocale } from '~/lib/LocaleContext';
 
 interface ARTryOnProps {
   productName: string;
@@ -8,7 +7,6 @@ interface ARTryOnProps {
 }
 
 export function ARTryOn({ productName, onClose }: ARTryOnProps) {
-  const { t } = useLocale();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isSupported, setIsSupported] = useState(false);
