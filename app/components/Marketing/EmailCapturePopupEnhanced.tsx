@@ -1,39 +1,64 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface EmailCapturePopupEnhancedProps {
   onClose?: () => void;
 }
 
+const CAPTURED_KEY = 'riot_email_captured';
+const DISMISSED_KEY = 'riot_email_popup_dismissed_at';
+const DISMISS_COOLDOWN_MS = 1000 * 60 * 60 * 24 * 3;
+
 export function EmailCapturePopupEnhanced({ onClose }: EmailCapturePopupEnhancedProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [email, setEmail] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
+
+  const canShowPopup = useCallback(() => {
+    if (localStorage.getItem(CAPTURED_KEY) === 'true') return false;
+
+    const dismissedAt = localStorage.getItem(DISMISSED_KEY);
+    if (!dismissedAt) return true;
+
+    return Date.now() - Number(dismissedAt) > DISMISS_COOLDOWN_MS;
+  }, []);
+
+  const closePopup = useCallback(() => {
+    localStorage.setItem(DISMISSED_KEY, String(Date.now()));
+    setIsVisible(false);
+    onClose?.();
+  }, [onClose]);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const scrollPercent = scrollTop / docHeight;
-      setScrollProgress(Math.min(scrollPercent, 1));
+    if (!canShowPopup()) return;
 
-      // Show popup at 30% scroll
-      if (scrollPercent > 0.3 && !isVisible && !localStorage.getItem('riot_email_captured')) {
+    let hasTriggered = false;
+
+    const handleScroll = () => {
+      if (hasTriggered || isVisible) return;
+
+      const scrollTop = window.scrollY;
+      const docHeight = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
+      const scrollPercent = scrollTop / docHeight;
+
+      if (scrollPercent >= 0.45) {
+        hasTriggered = true;
         setIsVisible(true);
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [isVisible]);
+  }, [canShowPopup, isVisible]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Mock email capture - replace with actual API call
     console.log('Email captured:', email);
-    localStorage.setItem('riot_email_captured', 'true');
+    localStorage.setItem(CAPTURED_KEY, 'true');
+    localStorage.removeItem(DISMISSED_KEY);
 
     setIsSubmitted(true);
     setTimeout(() => {
@@ -48,13 +73,8 @@ export function EmailCapturePopupEnhanced({ onClose }: EmailCapturePopupEnhanced
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-        onClick={() => setIsVisible(false)}
-      />
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={closePopup} />
 
-      {/* Modal */}
       <div
         className="relative max-w-md w-full p-8 rounded-lg animate-fadeIn"
         style={{
@@ -63,10 +83,10 @@ export function EmailCapturePopupEnhanced({ onClose }: EmailCapturePopupEnhanced
           boxShadow: '0 0 40px rgba(255,18,147,0.15)',
         }}
       >
-        {/* Close Button */}
         <button
-          onClick={() => setIsVisible(false)}
+          onClick={closePopup}
           className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+          aria-label="关闭弹窗"
         >
           ✕
         </button>

@@ -27,7 +27,7 @@ function Pearl({ position, scale, color, metallic, roughness, emissiveIntensity,
       meshRef.current.rotation.y += 0.003;
     }
     if (lightRef.current) {
-      lightRef.current.intensity = 1 + Math.sin(clock.getElapsedTime() * 2) * 0.5;
+      lightRef.current.intensity = 1.2 + Math.sin(clock.getElapsedTime() * 2.5) * 0.6;
     }
   });
 
@@ -41,14 +41,15 @@ function Pearl({ position, scale, color, metallic, roughness, emissiveIntensity,
           roughness={roughness}
           emissive={color}
           emissiveIntensity={emissiveIntensity}
-          envMapIntensity={1.5}
+          envMapIntensity={2}
           wireframe={false}
+          toneMapped={true}
         />
       </mesh>
       <pointLight
         ref={lightRef}
-        intensity={1.2}
-        distance={15}
+        intensity={1.5}
+        distance={18}
         color={color}
         decay={2}
         castShadow={true}
@@ -137,18 +138,18 @@ function ParticleSystem() {
     if (!pointsRef.current) return;
 
     const geometry = new THREE.BufferGeometry();
-    const count = 1200;
+    const count = 1500;
     const positions = new Float32Array(count * 3);
     const velocities = new Float32Array(count * 3);
 
     for (let i = 0; i < count * 3; i += 3) {
-      positions[i] = (Math.random() - 0.5) * 30;
-      positions[i + 1] = (Math.random() - 0.5) * 30;
-      positions[i + 2] = (Math.random() - 0.5) * 20;
+      positions[i] = (Math.random() - 0.5) * 35;
+      positions[i + 1] = (Math.random() - 0.5) * 35;
+      positions[i + 2] = (Math.random() - 0.5) * 25;
 
-      velocities[i] = (Math.random() - 0.5) * 0.03;
-      velocities[i + 1] = (Math.random() - 0.5) * 0.03;
-      velocities[i + 2] = (Math.random() - 0.5) * 0.03;
+      velocities[i] = (Math.random() - 0.5) * 0.02;
+      velocities[i + 1] = (Math.random() - 0.5) * 0.02;
+      velocities[i + 2] = (Math.random() - 0.5) * 0.02;
     }
 
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
@@ -161,6 +162,7 @@ function ParticleSystem() {
       [0.43, 0.4, 1], // purple
       [0.43, 0.8, 1], // cyan
       [0.78, 1, 0], // acid
+      [0.93, 0.93, 0.93], // chrome silver
     ];
 
     for (let i = 0; i < count * 3; i += 3) {
@@ -173,11 +175,12 @@ function ParticleSystem() {
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
     const material = new THREE.PointsMaterial({
-      size: 0.2,
+      size: 0.15,
       sizeAttenuation: true,
       transparent: true,
-      opacity: 0.8,
+      opacity: 0.7,
       vertexColors: true,
+      toneMapped: true,
     });
 
     pointsRef.current.geometry = geometry;
@@ -186,8 +189,8 @@ function ParticleSystem() {
 
   useFrame(() => {
     if (pointsRef.current && positionsRef.current && velocitiesRef.current) {
-      pointsRef.current.rotation.x += 0.00008;
-      pointsRef.current.rotation.y += 0.00012;
+      pointsRef.current.rotation.x += 0.00006;
+      pointsRef.current.rotation.y += 0.0001;
 
       const positions = positionsRef.current;
       const velocities = velocitiesRef.current;
@@ -197,13 +200,12 @@ function ParticleSystem() {
         positions[i + 1] += velocities[i + 1];
         positions[i + 2] += velocities[i + 2];
 
-        // Wrap around
-        if (positions[i] > 15) positions[i] = -15;
-        if (positions[i] < -15) positions[i] = 15;
-        if (positions[i + 1] > 15) positions[i + 1] = -15;
-        if (positions[i + 1] < -15) positions[i + 1] = 15;
-        if (positions[i + 2] > 10) positions[i + 2] = -10;
-        if (positions[i + 2] < -10) positions[i + 2] = 10;
+        if (positions[i] > 17.5) positions[i] = -17.5;
+        if (positions[i] < -17.5) positions[i] = 17.5;
+        if (positions[i + 1] > 17.5) positions[i + 1] = -17.5;
+        if (positions[i + 1] < -17.5) positions[i + 1] = 17.5;
+        if (positions[i + 2] > 12.5) positions[i + 2] = -12.5;
+        if (positions[i + 2] < -12.5) positions[i + 2] = 12.5;
       }
 
       (pointsRef.current.geometry as THREE.BufferGeometry).attributes.position.needsUpdate = true;
@@ -218,32 +220,42 @@ function ParticleSystem() {
   );
 }
 
-// ─── Neon Glitch Effect ───────────────────────────────────────────────────
+// ─── Neon Glitch Effect (Premium) ───────────────────────────────────────
 
 function NeonGlitch() {
   const groupRef = useRef<THREE.Group>(null);
+  const glitchStateRef = useRef({ active: false, intensity: 0 });
 
   useFrame(({ clock }) => {
-    if (groupRef.current && Math.random() > 0.95) {
-      groupRef.current.position.x = (Math.random() - 0.5) * 0.1;
-      groupRef.current.position.y = (Math.random() - 0.5) * 0.1;
+    if (!groupRef.current) return;
+
+    const rand = Math.random();
+    if (rand > 0.97) {
+      glitchStateRef.current.active = true;
+      glitchStateRef.current.intensity = Math.random() * 0.15;
+    } else if (glitchStateRef.current.active && rand > 0.5) {
+      glitchStateRef.current.active = false;
+    }
+
+    if (glitchStateRef.current.active) {
+      groupRef.current.position.x = (Math.random() - 0.5) * glitchStateRef.current.intensity;
+      groupRef.current.position.y = (Math.random() - 0.5) * glitchStateRef.current.intensity;
+    } else {
+      groupRef.current.position.x *= 0.9;
+      groupRef.current.position.y *= 0.9;
     }
   });
 
   return (
     <group ref={groupRef}>
-      {/* Glitch lines */}
-      <mesh position={[0, 0, 0.1]}>
-        <planeGeometry args={[20, 0.05]} />
-        <meshBasicMaterial color="#FF1293" transparent opacity={0.3} />
+      {/* Premium glitch lines - sparse, high-contrast */}
+      <mesh position={[0, 1.5, 0.1]}>
+        <planeGeometry args={[20, 0.08]} />
+        <meshBasicMaterial color="#FF1293" transparent opacity={0.25} />
       </mesh>
-      <mesh position={[0, 2, 0.1]}>
-        <planeGeometry args={[15, 0.03]} />
-        <meshBasicMaterial color="#6ECBFF" transparent opacity={0.25} />
-      </mesh>
-      <mesh position={[0, -3, 0.1]}>
-        <planeGeometry args={[18, 0.04]} />
-        <meshBasicMaterial color="#B366FF" transparent opacity={0.2} />
+      <mesh position={[0, -2.5, 0.1]}>
+        <planeGeometry args={[18, 0.06]} />
+        <meshBasicMaterial color="#6ECBFF" transparent opacity={0.2} />
       </mesh>
     </group>
   );
@@ -253,6 +265,7 @@ function NeonGlitch() {
 
 function Scene() {
   const cameraRef = useRef<THREE.PerspectiveCamera>(null);
+  const sceneRef = useRef<THREE.Scene>(null);
 
   useEffect(() => {
     window.isUserInteracting = false;
@@ -262,7 +275,7 @@ function Scene() {
     <>
       <PerspectiveCamera ref={cameraRef} makeDefault position={[0, 0, 8]} fov={50} />
       <OrbitControls
-        enableZoom={true}
+        enableZoom={false}
         enablePan={false}
         autoRotate={!window.isUserInteracting}
         autoRotateSpeed={2}
@@ -270,22 +283,31 @@ function Scene() {
         onEnd={() => (window.isUserInteracting = false)}
       />
 
-      {/* Lighting */}
-      <ambientLight intensity={0.4} color="#ffffff" />
-      <pointLight position={[10, 10, 10]} intensity={1.2} color="#FF1293" />
-      <pointLight position={[-10, -10, 10]} intensity={1} color="#6ECBFF" />
-      <pointLight position={[0, 0, 15]} intensity={0.8} color="#B366FF" />
+      {/* Premium Multi-Layer Lighting */}
+      <ambientLight intensity={0.25} color="#ffffff" />
+
+      {/* Key Light - Pink */}
+      <pointLight position={[8, 6, 8]} intensity={1.5} color="#FF1293" decay={2} />
+
+      {/* Fill Light - Cyan */}
+      <pointLight position={[-8, -6, 8]} intensity={1.2} color="#6ECBFF" decay={2} />
+
+      {/* Rim Light - Purple */}
+      <pointLight position={[0, 0, 12]} intensity={0.9} color="#B366FF" decay={2} />
+
+      {/* Accent Light - Green */}
+      <pointLight position={[6, -8, 6]} intensity={0.7} color="#C8FF00" decay={2} />
 
       {/* Environment */}
       <Environment preset="night" />
+
+      {/* Fog for depth */}
+      <fog attach="fog" args={['#000000', 5, 25]} />
 
       {/* Scene Content */}
       <NecklaceChain />
       <ParticleSystem />
       <NeonGlitch />
-
-      {/* Post-processing */}
-      {/* Bloom and Glitch effects handled via shader materials */}
 
       <Preload all />
     </>
