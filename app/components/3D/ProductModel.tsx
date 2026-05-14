@@ -4,6 +4,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Environment, Preload } from '@react-three/drei';
 import * as THREE from 'three';
 import { useUserInteraction } from '~/lib/UserInteractionContext';
+import { AdvancedVisualEffects } from '~/components/3D/AdvancedVisualEffects';
 
 interface ProductModelProps {
   productName: string;
@@ -250,6 +251,7 @@ export function ProductModel({ productName, onMaterialChange, onARClick }: Produ
             <pointLight position={[5, 5, 5]} intensity={1.5} color="#FF1293" decay={2} />
             <pointLight position={[-5, -5, 5]} intensity={1.2} color="#6ECBFF" decay={2} />
             <directionalLight position={[5, 5, 5]} intensity={0.8} color="#ffffff" castShadow />
+            <AdvancedVisualEffects />
 
             <Environment preset="night" />
 

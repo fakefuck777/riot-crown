@@ -6,6 +6,8 @@ import { ScarcityEngine } from '~/components/Marketing/ScarcityEngine';
 import { OthersBuyingNotif } from '~/components/Marketing/OthersBuyingNotif';
 import { BlackBoxAnimation } from '~/components/Marketing/BlackBoxAnimation';
 import { CinematicBackground } from '~/components/3D/CinematicBackground';
+import { OthersViewingNotif } from '~/components/Marketing/OthersViewingNotif';
+import { ConversionFunnelOptimizer } from '~/components/Marketing/ConversionFunnelOptimizer';
 
 interface ProductDetailEnhancedProps {
   product: {
@@ -96,6 +98,9 @@ export function ProductDetailEnhanced({ product, onAddToCart }: ProductDetailEnh
               launchDate={product.launchDate}
             />
 
+            {/* Others Viewing - Real-time Social Proof */}
+            <OthersViewingNotif productId={product.id} />
+
             {/* Add to Cart Button - Enhanced */}
             <button
               onClick={handleAddToCart}
@@ -146,6 +151,9 @@ export function ProductDetailEnhanced({ product, onAddToCart }: ProductDetailEnh
                 </div>
               </div>
             </div>
+
+            {/* Conversion Funnel - Real-time Analytics */}
+            <ConversionFunnelOptimizer />
 
             {/* Wishlist & Share */}
             <div className="flex gap-3">
