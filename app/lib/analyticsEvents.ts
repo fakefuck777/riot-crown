@@ -49,6 +49,7 @@ export function trackEvent(eventName: AnalyticsEvent, data?: EventData) {
 
   // Console log for development
   if (process.env.NODE_ENV === 'development') {
+    console.log(`[Analytics] ${eventName}`, data);
   }
 }
 

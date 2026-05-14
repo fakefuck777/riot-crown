@@ -131,13 +131,21 @@ const fragmentShader = /* glsl */`
     vec3  paintColor = mix(neonHot, neonPink, colorNoise);
 
     float dripMask = 0.0;
+    dripMask += drip(uv, 0.08, 0.18 * scrollBoost, 0.018);
     dripMask += drip(uv, 0.12, 0.18 * scrollBoost, 0.018);
+    dripMask += drip(uv, 0.20, 0.14 * scrollBoost, 0.012);
     dripMask += drip(uv, 0.27, 0.14 * scrollBoost, 0.012);
+    dripMask += drip(uv, 0.35, 0.22 * scrollBoost, 0.020);
     dripMask += drip(uv, 0.41, 0.22 * scrollBoost, 0.020);
+    dripMask += drip(uv, 0.50, 0.16 * scrollBoost, 0.015);
     dripMask += drip(uv, 0.55, 0.16 * scrollBoost, 0.015);
+    dripMask += drip(uv, 0.60, 0.19 * scrollBoost, 0.011);
     dripMask += drip(uv, 0.63, 0.19 * scrollBoost, 0.011);
+    dripMask += drip(uv, 0.70, 0.13 * scrollBoost, 0.022);
     dripMask += drip(uv, 0.74, 0.13 * scrollBoost, 0.022);
+    dripMask += drip(uv, 0.80, 0.21 * scrollBoost, 0.014);
     dripMask += drip(uv, 0.83, 0.21 * scrollBoost, 0.014);
+    dripMask += drip(uv, 0.88, 0.17 * scrollBoost, 0.016);
     dripMask += drip(uv, 0.91, 0.17 * scrollBoost, 0.016);
     dripMask = clamp(dripMask, 0.0, 1.0);
 
@@ -155,8 +163,8 @@ const fragmentShader = /* glsl */`
                   + vec3(0.98, 0.99, 1.0) * specChrome * 0.44
                   + vec3(1.0, 0.92, 0.98) * microGlint;
 
-    float glow = totalPaint * (1.0 - totalPaint) * 2.95;
-    vec3  glowColor = neonPink * glow * (1.0 + uScrollVel * 2.0) * 0.82;
+    float glow = totalPaint * (1.0 - totalPaint) * 3.8;
+    vec3  glowColor = neonPink * glow * (1.0 + uScrollVel * 2.8) * 1.0;
 
     color = mix(color, litPaint, totalPaint);
     color += glowColor;

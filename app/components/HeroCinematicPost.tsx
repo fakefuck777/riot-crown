@@ -96,9 +96,9 @@ export function HeroCinematicPost({ scrollVelRef }: HeroCinematicPostProps) {
     const bw = Math.max(32, Math.floor(w * bloomScale));
     const bh = Math.max(32, Math.floor(h * bloomScale));
 
-    const bloomStrength = tier === 'high' ? 0.28 : tier === 'mid' ? 0.22 : 0.17;
-    const bloomThreshold = 0.3;
-    const bloom = new UnrealBloomPass(new THREE.Vector2(bw, bh), bloomStrength, 0.42, bloomThreshold);
+    const bloomStrength = tier === 'high' ? 0.42 : tier === 'mid' ? 0.32 : 0.24;
+    const bloomThreshold = 0.25;
+    const bloom = new UnrealBloomPass(new THREE.Vector2(bw, bh), bloomStrength, 0.5, bloomThreshold);
     const film =
       tier === 'low'
         ? null
