@@ -3,6 +3,7 @@ import { useRef, useState, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Environment, Preload } from '@react-three/drei';
 import * as THREE from 'three';
+import { useLocale } from '~/lib/LocaleContext';
 
 interface Product3DViewerProps {
   modelUrl: string;
@@ -31,40 +32,14 @@ function Model() {
   );
 }
 
-// ─── Material Variants ───────────────────────────────────────────────────────
-
-const MATERIAL_VARIANTS = {
-  pearl_white: {
-    name: '珍珠白',
-    color: '#F5F5F5',
-    metalness: 0.3,
-    roughness: 0.4,
-  },
-  pearl_black: {
-    name: '珍珠黑',
-    color: '#1a1a1a',
-    metalness: 0.4,
-    roughness: 0.3,
-  },
-  chrome_gold: {
-    name: '镀金铬',
-    color: '#C9A84C',
-    metalness: 0.95,
-    roughness: 0.1,
-  },
-  chrome_silver: {
-    name: '银铬',
-    color: '#E8E8E8',
-    metalness: 0.98,
-    roughness: 0.05,
-  },
-};
 
 // ─── Product 3D Viewer ───────────────────────────────────────────────────────
 
 export function Product3DViewer({ modelUrl: _modelUrl, productName: _productName, onMaterialChange }: Product3DViewerProps) {
+  const { t } = useLocale();
   const [selectedMaterial, setSelectedMaterial] = useState<keyof typeof MATERIAL_VARIANTS>('pearl_white');
   const [showAR, setShowAR] = useState(false);
+  const [isMobile] = useState(() => /iPhone|iPad|Android|Mobile/i.test(navigator.userAgent));
 
   const handleMaterialChange = (material: keyof typeof MATERIAL_VARIANTS) => {
     setSelectedMaterial(material);
@@ -75,15 +50,18 @@ export function Product3DViewer({ modelUrl: _modelUrl, productName: _productName
     <div className="w-full bg-black rounded-lg overflow-hidden">
       {/* 3D Canvas */}
       <div className="relative w-full h-96 md:h-[600px] bg-gradient-to-b from-gray-900 to-black">
-        <Suspense fallback={<div className="w-full h-full bg-black flex items-center justify-center">
-          <span className="text-gray-500">加载中...</span>
+        <Suspense fallback={<div className="w-full h-full bg-black flex flex-col items-center justify-center gap-3">
+          <div className="w-8 h-8 border-2 border-y2k-pink border-t-transparent rounded-full animate-spin" />
+          <span className="text-y2k-pink text-xs tracking-widest">LOADING...</span>
         </div>}>
           <Canvas
             gl={{
-              antialias: true,
+              antialias: !isMobile,
               alpha: false,
-              powerPreference: 'high-performance',
+              powerPreference: isMobile ? 'low-power' : 'high-performance',
+              precision: isMobile ? 'lowp' : 'highp',
             }}
+            dpr={isMobile ? 1 : [1, 2]}
             onMouseDown={() => (window.isUserInteracting = true)}
             onMouseUp={() => (window.isUserInteracting = false)}
             onTouchStart={() => (window.isUserInteracting = true)}
@@ -127,7 +105,7 @@ export function Product3DViewer({ modelUrl: _modelUrl, productName: _productName
                 color: key.includes('black') ? '#fff' : '#000',
               }}
             >
-              {variant.name}
+              {variant.nameKey}
             </button>
           ))}
         </div>
@@ -141,25 +119,25 @@ export function Product3DViewer({ modelUrl: _modelUrl, productName: _productName
             boxShadow: '0 0 15px rgba(255,18,147,0.3)',
           }}
         >
-          {showAR ? '关闭AR' : '虚拟试戴'}
+          {showAR ? 'CLOSE AR' : 'TRY ON'}
         </button>
       </div>
 
       {/* Product Info */}
       <div className="p-6 border-t border-gray-800">
-        <h3 className="text-xl font-bold text-white mb-2">产品详情</h3>
+        <h3 className="text-xl font-bold text-white mb-2">{t.product.season}</h3>
         <p className="text-sm text-gray-400 mb-4">
-          支持360°旋转 • 材质切换 • AR虚拟试戴
+          360° Rotation • Material Switch • AR Try-On
         </p>
         <div className="flex gap-2">
           <button className="flex-1 px-4 py-2 bg-gradient-to-r from-pink-600 to-pink-500 text-white font-bold uppercase text-sm rounded hover:shadow-lg transition-all"
             style={{
               background: 'linear-gradient(135deg, #FF1293 0%, #FF0080 100%)',
             }}>
-            加入购物车
+            {t.product.acquire}
           </button>
           <button className="flex-1 px-4 py-2 border border-gray-600 text-gray-300 font-bold uppercase text-sm rounded hover:border-pink-500 hover:text-pink-500 transition-all">
-            ♡ 收藏
+            ♡ {t.product.covet}
           </button>
         </div>
       </div>

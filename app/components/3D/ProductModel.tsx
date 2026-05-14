@@ -4,6 +4,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Environment, Preload } from '@react-three/drei';
 import * as THREE from 'three';
 import { useUserInteraction } from '~/lib/UserInteractionContext';
+import { useLocale } from '~/lib/LocaleContext';
 import { AdvancedVisualEffects } from '~/components/3D/AdvancedVisualEffects';
 
 interface ProductModelProps {
@@ -14,7 +15,7 @@ interface ProductModelProps {
 
 const MATERIAL_VARIANTS = {
   pearl_glossy: {
-    name: '珍珠高光',
+    nameKey: 'Pearl Glossy',
     color: '#F5F5F5',
     metalness: 0.4,
     roughness: 0.2,
@@ -22,7 +23,7 @@ const MATERIAL_VARIANTS = {
     emissiveIntensity: 0.15,
   },
   pearl_matte: {
-    name: '珍珠哑光',
+    nameKey: 'Pearl Matte',
     color: '#E8E8E8',
     metalness: 0.2,
     roughness: 0.6,
@@ -30,7 +31,7 @@ const MATERIAL_VARIANTS = {
     emissiveIntensity: 0,
   },
   pearl_oxidized: {
-    name: '珍珠氧化',
+    nameKey: 'Pearl Oxidized',
     color: '#A0A0A0',
     metalness: 0.3,
     roughness: 0.7,
@@ -38,7 +39,7 @@ const MATERIAL_VARIANTS = {
     emissiveIntensity: 0.05,
   },
   chrome_plated: {
-    name: '镀铬',
+    nameKey: 'Chrome Plated',
     color: '#E8E8E8',
     metalness: 0.98,
     roughness: 0.05,
@@ -46,7 +47,7 @@ const MATERIAL_VARIANTS = {
     emissiveIntensity: 0.2,
   },
   chrome_gold: {
-    name: '镀金铬',
+    nameKey: 'Chrome Gold',
     color: '#C9A84C',
     metalness: 0.95,
     roughness: 0.08,
@@ -203,9 +204,11 @@ function Model({ material }: { material: typeof MATERIAL_VARIANTS[keyof typeof M
 }
 
 export function ProductModel({ productName, onMaterialChange, onARClick }: ProductModelProps) {
+  const { t } = useLocale();
   const [selectedMaterial, setSelectedMaterial] = useState<keyof typeof MATERIAL_VARIANTS>('pearl_glossy');
   const [isARSupported, setIsARSupported] = useState(false);
   const { isUserInteracting, setIsUserInteracting } = useUserInteraction();
+  const [isMobile] = useState(() => /iPhone|iPad|Android|Mobile/i.test(navigator.userAgent));
 
   useEffect(() => {
     setIsARSupported('XRSession' in window || 'webkitXRSession' in window);
@@ -221,15 +224,18 @@ export function ProductModel({ productName, onMaterialChange, onARClick }: Produ
   return (
     <div className="w-full bg-void rounded-lg overflow-hidden border border-y2k-pink/20">
       <div className="relative w-full h-96 md:h-[600px] bg-gradient-to-b from-void-plate to-void">
-        <Suspense fallback={<div className="w-full h-full flex items-center justify-center">
-          <span className="text-y2k-pink animate-pulse">加载中...</span>
+        <Suspense fallback={<div className="w-full h-full flex flex-col items-center justify-center gap-3">
+          <div className="w-8 h-8 border-2 border-y2k-pink border-t-transparent rounded-full animate-spin" />
+          <span className="text-y2k-pink text-xs tracking-widest">LOADING...</span>
         </div>}>
           <Canvas
             gl={{
-              antialias: true,
+              antialias: !isMobile,
               alpha: false,
-              powerPreference: 'high-performance',
+              powerPreference: isMobile ? 'low-power' : 'high-performance',
+              precision: isMobile ? 'lowp' : 'highp',
             }}
+            dpr={isMobile ? 1 : [1, 2]}
             onMouseDown={() => setIsUserInteracting(true)}
             onMouseUp={() => setIsUserInteracting(false)}
             onTouchStart={() => setIsUserInteracting(true)}
@@ -259,7 +265,7 @@ export function ProductModel({ productName, onMaterialChange, onARClick }: Produ
       </div>
 
       <div className="p-6 bg-void-plate border-t border-y2k-pink/20">
-        <p className="text-label uppercase tracking-ultra-wide text-y2k-blue mb-4">材质选择</p>
+        <p className="text-label uppercase tracking-ultra-wide text-y2k-blue mb-4">{t.product.sizeLabel}</p>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           {Object.entries(MATERIAL_VARIANTS).map(([key, variant]) => (
             <button
@@ -271,7 +277,7 @@ export function ProductModel({ productName, onMaterialChange, onARClick }: Produ
                   : 'bg-void-pit text-titanium border border-y2k-pink/30 hover:border-y2k-pink/60'
               }`}
             >
-              {variant.name}
+              {variant.nameKey}
             </button>
           ))}
         </div>
@@ -283,7 +289,7 @@ export function ProductModel({ productName, onMaterialChange, onARClick }: Produ
             onClick={onARClick}
             className="w-full px-6 py-3 bg-gradient-to-r from-y2k-pink to-y2k-purple text-white font-bold uppercase rounded transition-all hover:shadow-neon-pink"
           >
-            📱 虚拟试戴 (AR)
+            📱 {t.product.acquire}
           </button>
         </div>
       )}
@@ -291,10 +297,10 @@ export function ProductModel({ productName, onMaterialChange, onARClick }: Produ
       <div className="p-6 bg-void-pit border-t border-y2k-pink/20">
         <h3 className="text-display-lg font-black uppercase text-y2k-pink mb-2">{productName}</h3>
         <p className="text-data text-titanium/70">
-          当前材质：<span className="text-y2k-blue font-bold">{currentMaterial.name}</span>
+          {t.product.sizeSelected.replace('{s}', currentMaterial.nameKey)}
         </p>
         <p className="text-data text-titanium/50 mt-2">
-          拖拽旋转 • 滚轮缩放 • 点击材质切换
+          {t.hero.scroll} • Zoom • Click to Switch
         </p>
       </div>
     </div>
