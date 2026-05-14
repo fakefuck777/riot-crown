@@ -32,15 +32,27 @@ function warnIfStoreDomainIsNotMyshopify(storeDomain: string): void {
   }
 }
 
-function warnIfStorefrontPublicTokenLooksWrong(token: string): void {
-  const t = token.trim();
-  if (!t) return;
-  // Admin API private app token (wrong for Storefront GraphQL `X-Shopify-Storefront-Access-Token`).
+function warnIfStorefrontPublicTokenLooksWrong(publicToken: string, hasPrivateToken: boolean): void {
+  const t = publicToken.trim();
+  if (!t || hasPrivateToken) return;
   if (t.startsWith('shpat_')) {
     console.warn(
       '[storefront] PUBLIC_STOREFRONT_API_TOKEN looks like a Shopify Admin API token (shpat_). ' +
-        'Hydrogen needs the Storefront API access token from your app → Configuration → Storefront API (public token), not the Admin API secret.',
+        'Use the Storefront API access token, or set PRIVATE_STOREFRONT_API_TOKEN for server-side Storefront API.',
     );
+  }
+}
+
+function logStorefrontAuthModeOnce(privateTok: string, publicTok: string): void {
+  const g = globalThis as { __riotStorefrontAuthLogged?: boolean };
+  if (g.__riotStorefrontAuthLogged) return;
+  g.__riotStorefrontAuthLogged = true;
+  if (privateTok) {
+    console.log(
+      '[storefront] Storefront GraphQL uses PRIVATE_STOREFRONT_API_TOKEN (Shopify-Storefront-Private-Token).',
+    );
+  } else if (publicTok) {
+    console.log('[storefront] Storefront GraphQL uses PUBLIC_STOREFRONT_API_TOKEN (X-Shopify-Storefront-Access-Token).');
   }
 }
 
@@ -58,17 +70,31 @@ export default {
       ]);
 
       warnIfStoreDomainIsNotMyshopify(env.PUBLIC_STORE_DOMAIN ?? '');
-      warnIfStorefrontPublicTokenLooksWrong(env.PUBLIC_STOREFRONT_API_TOKEN ?? '');
+
+      const privateTok = (env.PRIVATE_STOREFRONT_API_TOKEN ?? '').trim();
+      const publicTok = (env.PUBLIC_STOREFRONT_API_TOKEN ?? '').trim();
+      const storeDomain = normalizeStoreDomain(env.PUBLIC_STORE_DOMAIN ?? '');
+
+      if (!storeDomain.includes('mock.shop') && !privateTok && !publicTok) {
+        console.error(
+          '[storefront] Missing both PRIVATE_STOREFRONT_API_TOKEN and PUBLIC_STOREFRONT_API_TOKEN — Storefront API calls will fail.',
+        );
+      }
+
+      warnIfStorefrontPublicTokenLooksWrong(env.PUBLIC_STOREFRONT_API_TOKEN ?? '', Boolean(privateTok));
+      logStorefrontAuthModeOnce(privateTok, publicTok);
 
       const i18n = resolveStorefrontI18nForRequest(request, env, session);
 
-      const {storefront} = createStorefrontClient({
+      const { storefront } = createStorefrontClient({
         cache,
         waitUntil,
         i18n,
-        // Oxygen: `PUBLIC_STOREFRONT_API_TOKEN` + `PUBLIC_STORE_DOMAIN` (myshopify.com only — see .env.example).
-        publicStorefrontToken: env.PUBLIC_STOREFRONT_API_TOKEN,
-        storeDomain: normalizeStoreDomain(env.PUBLIC_STORE_DOMAIN ?? ''),
+        // Prefer PRIVATE (Oxygen) → Hydrogen sends `Shopify-Storefront-Private-Token`. Public token is still passed
+        // for `createStorefrontClient` helpers; when private is set, GraphQL requests use the private header.
+        ...(privateTok ? { privateStorefrontToken: privateTok } : {}),
+        publicStorefrontToken: publicTok || privateTok || '',
+        storeDomain,
         storefrontHeaders: getStorefrontHeaders(request),
       });
 
@@ -130,7 +156,13 @@ export class HydrogenSession {
 
 interface HydrogenWorkerEnv {
   SESSION_SECRET: string;
-  PUBLIC_STOREFRONT_API_TOKEN: string;
+  /** Storefront API public access token (optional if `PRIVATE_STOREFRONT_API_TOKEN` is set). */
+  PUBLIC_STOREFRONT_API_TOKEN?: string;
+  /**
+   * Storefront API private access token (Oxygen). When set, Hydrogen uses
+   * `Shopify-Storefront-Private-Token` for server-side GraphQL.
+   */
+  PRIVATE_STOREFRONT_API_TOKEN?: string;
   PUBLIC_STORE_DOMAIN: string;
   PUBLIC_CHECKOUT_DOMAIN?: string;
   PUBLIC_STOREFRONT_LANGUAGE?: string;

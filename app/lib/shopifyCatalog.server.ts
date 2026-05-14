@@ -84,7 +84,7 @@ function logStorefrontFailure(
   console.error(`[${label}]`, JSON.stringify(payload, null, 2));
 }
 
-/** Oxygen: use `PUBLIC_STOREFRONT_API_TOKEN` (not …APITOKEN) — wired in `server.ts` → createStorefrontClient. */
+/** Oxygen: Storefront auth in `server.ts` — `PRIVATE_STOREFRONT_API_TOKEN` (private header) preferred, else `PUBLIC_STOREFRONT_API_TOKEN`. */
 
 const SIZE_CYCLE: ProductData['size'][] = [
   'large', 'tall', 'wide', 'standard', 'tall', 'standard',
