@@ -11,8 +11,6 @@ interface ProductModelProps {
   onARClick?: () => void;
 }
 
-// ─── Material Variants ───────────────────────────────────────────────────────
-
 const MATERIAL_VARIANTS = {
   pearl_glossy: {
     name: '珍珠高光',
@@ -20,7 +18,7 @@ const MATERIAL_VARIANTS = {
     metalness: 0.4,
     roughness: 0.2,
     emissive: '#ffffff',
-    emissiveIntensity: 0.1,
+    emissiveIntensity: 0.15,
   },
   pearl_matte: {
     name: '珍珠哑光',
@@ -44,7 +42,7 @@ const MATERIAL_VARIANTS = {
     metalness: 0.98,
     roughness: 0.05,
     emissive: '#ffffff',
-    emissiveIntensity: 0.15,
+    emissiveIntensity: 0.2,
   },
   chrome_gold: {
     name: '镀金铬',
@@ -52,7 +50,7 @@ const MATERIAL_VARIANTS = {
     metalness: 0.95,
     roughness: 0.08,
     emissive: '#C9A84C',
-    emissiveIntensity: 0.1,
+    emissiveIntensity: 0.15,
   },
   neon_pink: {
     name: '霓虹粉',
@@ -60,11 +58,79 @@ const MATERIAL_VARIANTS = {
     metalness: 0.7,
     roughness: 0.15,
     emissive: '#FF1293',
-    emissiveIntensity: 0.4,
+    emissiveIntensity: 0.5,
   },
 };
 
-// ─── 3D Model Component ───────────────────────────────────────────────────
+function Particles() {
+  const pointsRef = useRef<THREE.Points>(null);
+  const particleCount = 150;
+
+  useEffect(() => {
+    if (!pointsRef.current) return;
+
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+    const velocities = new Float32Array(particleCount * 3);
+
+    for (let i = 0; i < particleCount; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const radius = 1.5 + Math.random() * 1;
+      const height = (Math.random() - 0.5) * 2;
+
+      positions[i * 3] = Math.cos(angle) * radius;
+      positions[i * 3 + 1] = height;
+      positions[i * 3 + 2] = Math.sin(angle) * radius;
+
+      velocities[i * 3] = (Math.random() - 0.5) * 0.02;
+      velocities[i * 3 + 1] = (Math.random() - 0.5) * 0.02;
+      velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.02;
+    }
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    (geometry as unknown as { velocities: Float32Array }).velocities = velocities;
+  }, []);
+
+  useFrame(() => {
+    if (!pointsRef.current) return;
+
+    const positions = pointsRef.current.geometry.attributes.position.array as Float32Array;
+    const velocities = (pointsRef.current.geometry as unknown as { velocities: Float32Array }).velocities;
+
+    for (let i = 0; i < particleCount; i++) {
+      positions[i * 3] += velocities[i * 3];
+      positions[i * 3 + 1] += velocities[i * 3 + 1];
+      positions[i * 3 + 2] += velocities[i * 3 + 2];
+
+      const dist = Math.sqrt(
+        positions[i * 3] ** 2 + positions[i * 3 + 1] ** 2 + positions[i * 3 + 2] ** 2
+      );
+
+      if (dist > 3) {
+        const angle = Math.random() * Math.PI * 2;
+        const radius = 1.5;
+        positions[i * 3] = Math.cos(angle) * radius;
+        positions[i * 3 + 1] = (Math.random() - 0.5) * 2;
+        positions[i * 3 + 2] = Math.sin(angle) * radius;
+      }
+    }
+
+    pointsRef.current.geometry.attributes.position.needsUpdate = true;
+  });
+
+  return (
+    <points ref={pointsRef}>
+      <bufferGeometry />
+      <pointsMaterial
+        size={0.05}
+        color="#FF1293"
+        sizeAttenuation={true}
+        transparent={true}
+        opacity={0.6}
+      />
+    </points>
+  );
+}
 
 function Model({ material }: { material: typeof MATERIAL_VARIANTS[keyof typeof MATERIAL_VARIANTS] }) {
   const groupRef = useRef<THREE.Group>(null);
@@ -79,7 +145,6 @@ function Model({ material }: { material: typeof MATERIAL_VARIANTS[keyof typeof M
 
   return (
     <group ref={groupRef}>
-      {/* Main Pearl */}
       <mesh ref={meshRef} castShadow={true} receiveShadow={true}>
         <sphereGeometry args={[1.2, 64, 64]} />
         <meshStandardMaterial
@@ -88,11 +153,10 @@ function Model({ material }: { material: typeof MATERIAL_VARIANTS[keyof typeof M
           roughness={material.roughness}
           emissive={material.emissive}
           emissiveIntensity={material.emissiveIntensity}
-          envMapIntensity={1.3}
+          envMapIntensity={1.5}
         />
       </mesh>
 
-      {/* Chrome Accents */}
       <mesh position={[-1.5, 0.8, 0]} castShadow={true} receiveShadow={true}>
         <sphereGeometry args={[0.4, 32, 32]} />
         <meshStandardMaterial
@@ -100,7 +164,7 @@ function Model({ material }: { material: typeof MATERIAL_VARIANTS[keyof typeof M
           metalness={0.95}
           roughness={0.08}
           emissive="#ffffff"
-          emissiveIntensity={0.2}
+          emissiveIntensity={0.25}
         />
       </mesh>
       <mesh position={[1.5, 0.8, 0]} castShadow receiveShadow>
@@ -110,18 +174,19 @@ function Model({ material }: { material: typeof MATERIAL_VARIANTS[keyof typeof M
           metalness={0.95}
           roughness={0.08}
           emissive="#ffffff"
-          emissiveIntensity={0.2}
+          emissiveIntensity={0.25}
         />
       </mesh>
 
-      {/* Lighting */}
-      <pointLight position={[2, 2, 2]} intensity={1.2} color="#FF1293" />
-      <pointLight position={[-2, -2, 2]} intensity={1} color="#6ECBFF" />
+      <Particles />
+
+      <pointLight position={[3, 3, 3]} intensity={1.5} color="#FF1293" decay={2} />
+      <pointLight position={[-3, -3, 3]} intensity={1.2} color="#6ECBFF" decay={2} />
+      <pointLight position={[0, 2, -3]} intensity={0.8} color="#B366FF" decay={2} />
+      <directionalLight position={[5, 5, 5]} intensity={0.8} color="#ffffff" castShadow />
     </group>
   );
 }
-
-// ─── Product 3D Viewer ───────────────────────────────────────────────────
 
 export function ProductModel({ productName, onMaterialChange, onARClick }: ProductModelProps) {
   const [selectedMaterial, setSelectedMaterial] = useState<keyof typeof MATERIAL_VARIANTS>('pearl_glossy');
@@ -129,7 +194,6 @@ export function ProductModel({ productName, onMaterialChange, onARClick }: Produ
   const { setIsUserInteracting } = useUserInteraction();
 
   useEffect(() => {
-    // Check AR support
     setIsARSupported('XRSession' in window || 'webkitXRSession' in window);
   }, []);
 
@@ -142,7 +206,6 @@ export function ProductModel({ productName, onMaterialChange, onARClick }: Produ
 
   return (
     <div className="w-full bg-void rounded-lg overflow-hidden border border-y2k-pink/20">
-      {/* 3D Canvas */}
       <div className="relative w-full h-96 md:h-[600px] bg-gradient-to-b from-void-plate to-void">
         <Suspense fallback={<div className="w-full h-full flex items-center justify-center">
           <span className="text-y2k-pink animate-pulse">加载中...</span>
@@ -152,6 +215,10 @@ export function ProductModel({ productName, onMaterialChange, onARClick }: Produ
               antialias: true,
               alpha: false,
               powerPreference: 'high-performance',
+              shadowMap: {
+                enabled: true,
+                type: THREE.PCFShadowShadowMap,
+              },
             }}
             onMouseDown={() => setIsUserInteracting(true)}
             onMouseUp={() => setIsUserInteracting(false)}
@@ -166,15 +233,13 @@ export function ProductModel({ productName, onMaterialChange, onARClick }: Produ
               autoRotateSpeed={3}
             />
 
-            {/* Lighting */}
-            <ambientLight intensity={0.5} color="#ffffff" />
-            <pointLight position={[5, 5, 5]} intensity={1.2} color="#FF1293" />
-            <pointLight position={[-5, -5, 5]} intensity={1} color="#6ECBFF" />
+            <ambientLight intensity={0.6} color="#ffffff" />
+            <pointLight position={[5, 5, 5]} intensity={1.5} color="#FF1293" decay={2} />
+            <pointLight position={[-5, -5, 5]} intensity={1.2} color="#6ECBFF" decay={2} />
+            <directionalLight position={[5, 5, 5]} intensity={0.8} color="#ffffff" castShadow />
 
-            {/* Environment */}
             <Environment preset="night" />
 
-            {/* Model */}
             <Model material={currentMaterial} />
 
             <Preload all />
@@ -182,7 +247,6 @@ export function ProductModel({ productName, onMaterialChange, onARClick }: Produ
         </Suspense>
       </div>
 
-      {/* Material Selector */}
       <div className="p-6 bg-void-plate border-t border-y2k-pink/20">
         <p className="text-label uppercase tracking-ultra-wide text-y2k-blue mb-4">材质选择</p>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -202,7 +266,6 @@ export function ProductModel({ productName, onMaterialChange, onARClick }: Produ
         </div>
       </div>
 
-      {/* AR Try-On Button */}
       {isARSupported && (
         <div className="p-4 bg-void border-t border-y2k-pink/20">
           <button
@@ -214,7 +277,6 @@ export function ProductModel({ productName, onMaterialChange, onARClick }: Produ
         </div>
       )}
 
-      {/* Product Info */}
       <div className="p-6 bg-void-pit border-t border-y2k-pink/20">
         <h3 className="text-display-lg font-black uppercase text-y2k-pink mb-2">{productName}</h3>
         <p className="text-data text-titanium/70">
