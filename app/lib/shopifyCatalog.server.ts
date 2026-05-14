@@ -14,10 +14,8 @@ const CATALOG_FIRST = 48;
 /**
  * Markets / International: Storefront catalog queries must use `@inContext` or
  * `product` / `collection` can be null when availability is market-specific.
- * Hydrogen only auto-fills `$country` / `$language` if those placeholders exist in the query string.
  *
- * Debug: set `country` / `language` to `CN` / `ZH` to test the China market, or keep `US` / `EN`.
- * Remove or align with `PUBLIC_STOREFRONT_*` in `storefrontI18n.ts` once confirmed.
+ * 暴力测试：固定 US + EN，确认与市场/语言上下文无关时再改回 env 或目标市场。
  */
 const CATALOG_IN_CONTEXT: { country: CountryCode; language: LanguageCode } = {
   country: 'US',
@@ -26,6 +24,10 @@ const CATALOG_IN_CONTEXT: { country: CountryCode; language: LanguageCode } = {
 
 function catalogContextVariables(): { country: CountryCode; language: LanguageCode } {
   return { country: CATALOG_IN_CONTEXT.country, language: CATALOG_IN_CONTEXT.language };
+}
+
+function logCurrentApiVariables(variables: Record<string, unknown>): void {
+  console.log('Current API variables:', variables);
 }
 
 /**
@@ -204,6 +206,41 @@ const PRODUCT_BY_HANDLE_QUERY = `#graphql
   }
 `;
 
+/** 暴力测试：`products` 不传 `query`，不按 status / available_for_sale 过滤（由 API 目录规则决定可见集合）。 */
+const PRODUCT_BRUTE_UNFILTERED_LIST_QUERY = `#graphql
+  query ProductBruteUnfilteredList(
+    $first: Int!
+    $country: CountryCode
+    $language: LanguageCode
+  ) @inContext(country: $country, language: $language) {
+    products(first: $first, sortKey: UPDATED_AT, reverse: true) {
+      nodes {
+        handle
+        title
+      }
+    }
+  }
+`;
+
+/**
+ * 暴力测试：仅用 handle 搜索语法，不包含 `status:ACTIVE` 或 `available_for_sale:true` 等子串。
+ */
+const PRODUCT_BRUTE_HANDLE_SEARCH_QUERY = `#graphql
+  query ProductBruteHandleSearch(
+    $first: Int!
+    $search: String!
+    $country: CountryCode
+    $language: LanguageCode
+  ) @inContext(country: $country, language: $language) {
+    products(first: $first, query: $search) {
+      nodes {
+        handle
+        title
+      }
+    }
+  }
+`;
+
 function stripHtml(html: string): string {
   return html
     .replace(/<script[\s\S]*?<\/script>/gi, ' ')
@@ -368,8 +405,10 @@ export async function fetchShopifyCatalog(
 
   if (handle) {
     try {
+      const variables = { handle, first: CATALOG_FIRST, ...catalogContextVariables() };
+      logCurrentApiVariables({ op: 'CollectionCatalog', ...variables });
       const { data, errors } = await storefront.query(COLLECTION_PRODUCTS_QUERY, {
-        variables: { handle, first: CATALOG_FIRST, ...catalogContextVariables() },
+        variables,
         cache: CacheShort(),
       });
       if (errors?.length) {
@@ -387,8 +426,10 @@ export async function fetchShopifyCatalog(
     }
     if (nodes.length === 0) {
       try {
+        const variables = { first: CATALOG_FIRST, ...catalogContextVariables() };
+        logCurrentApiVariables({ op: 'CatalogProducts.fallback', ...variables });
         const { data: d2, errors: e2 } = await storefront.query(CATALOG_PRODUCTS_QUERY, {
-          variables: { first: CATALOG_FIRST, ...catalogContextVariables() },
+          variables,
           cache: CacheShort(),
         });
         if (e2?.length) {
@@ -406,8 +447,10 @@ export async function fetchShopifyCatalog(
     }
   } else {
     try {
+      const variables = { first: CATALOG_FIRST, ...catalogContextVariables() };
+      logCurrentApiVariables({ op: 'CatalogProducts', ...variables });
       const { data, errors } = await storefront.query(CATALOG_PRODUCTS_QUERY, {
-        variables: { first: CATALOG_FIRST, ...catalogContextVariables() },
+        variables,
         cache: CacheShort(),
       });
       if (errors?.length) {
@@ -429,8 +472,10 @@ export async function fetchShopifyProductByHandle(
   if (!handle.trim()) return undefined;
   const h = handle.trim();
   try {
+    const variables = { handle: h, ...catalogContextVariables() };
+    logCurrentApiVariables({ op: 'ProductByHandle', ...variables });
     const { data, errors } = await storefront.query(PRODUCT_BY_HANDLE_QUERY, {
-      variables: { handle: h, ...catalogContextVariables() },
+      variables,
       cache: CacheShort(),
     });
     if (errors?.length) {
@@ -458,6 +503,52 @@ export async function fetchShopifyProductByHandle(
       console.warn(
         `[fetchShopifyProductByHandle] product(handle="${h}") is null — use the product SEO handle from Shopify admin, not the numeric admin id.`,
       );
+
+      const ctx = catalogContextVariables();
+      const bruteFirst = 40;
+
+      try {
+        const listVars = { first: bruteFirst, ...ctx };
+        logCurrentApiVariables({ op: 'ProductBruteUnfilteredList', ...listVars });
+        const { data: listData, errors: listErr } = await storefront.query(
+          PRODUCT_BRUTE_UNFILTERED_LIST_QUERY,
+          { variables: listVars, cache: CacheShort() },
+        );
+        const listNodes =
+          (listData as { products?: { nodes: { handle: string; title: string }[] } } | null)?.products
+            ?.nodes ?? [];
+        const handles = listNodes.map((n) => n.handle);
+        console.log(
+          '[Brute] products() without `query` filter — handles sample:',
+          JSON.stringify({ count: listNodes.length, handles, requested: h, errors: listErr }),
+        );
+      } catch (bruteListErr) {
+        console.error('[Brute] unfiltered list failed', bruteListErr);
+      }
+
+      try {
+        const searchStr = `handle:${h}`;
+        const searchVars = { first: 15, search: searchStr, ...ctx };
+        logCurrentApiVariables({ op: 'ProductBruteHandleSearch', ...searchVars });
+        const { data: searchData, errors: searchErr } = await storefront.query(
+          PRODUCT_BRUTE_HANDLE_SEARCH_QUERY,
+          { variables: searchVars, cache: CacheShort() },
+        );
+        const searchNodes =
+          (searchData as { products?: { nodes: { handle: string; title: string }[] } } | null)?.products
+            ?.nodes ?? [];
+        console.log(
+          '[Brute] products(query: handle only, no status / available_for_sale in string):',
+          JSON.stringify({
+            search: searchStr,
+            matchCount: searchNodes.length,
+            nodes: searchNodes,
+            errors: searchErr,
+          }),
+        );
+      } catch (bruteSearchErr) {
+        console.error('[Brute] handle search failed', bruteSearchErr);
+      }
     }
     if (!node) return undefined;
     return mapNode(node, 0);
