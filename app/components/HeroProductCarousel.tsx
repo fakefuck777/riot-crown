@@ -7,6 +7,7 @@ import { useCart } from '~/lib/CartContext';
 import { usePrefersReducedMotion } from '~/hooks/usePrefersReducedMotion';
 import { withLocalePath } from '~/lib/localePath';
 import type { ProductData } from '~/lib/products';
+import { getDescription } from '~/lib/products';
 
 interface HeroProductCarouselProps {
   products: ProductData[];
@@ -75,16 +76,18 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
         borderBottom: '1px solid rgba(201,168,76,0.25)',
         position: 'relative',
         overflow: 'hidden',
+        background: 'linear-gradient(180deg, rgba(5,5,5,0.8) 0%, rgba(7,7,12,0.6) 50%, rgba(5,5,5,0.8) 100%)',
       }}
     >
-      {/* Cinematic background effect */}
+      {/* Premium Cinematic background effect */}
       <div
         aria-hidden
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'radial-gradient(circle at 20% 30%, rgba(255,18,147,0.12) 0%, transparent 40%), radial-gradient(circle at 80% 70%, rgba(110,203,255,0.12) 0%, transparent 40%)',
+          background: 'radial-gradient(circle at 20% 30%, rgba(255,18,147,0.15) 0%, transparent 40%), radial-gradient(circle at 80% 70%, rgba(110,203,255,0.12) 0%, transparent 40%), radial-gradient(circle at 50% 50%, rgba(201,168,76,0.08) 0%, transparent 50%)',
           pointerEvents: 'none',
+          animation: 'cinematic-pulse 8s ease-in-out infinite',
         }}
       />
       <div className="max-w-7xl mx-auto relative z-10">
@@ -96,9 +99,10 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
               color: '#C9A84C',
               letterSpacing: '0.3em',
               opacity: 0.85,
+              textShadow: '0 0 20px rgba(201,168,76,0.2)',
             }}
           >
-            ✦ FEATURED PIECES ✦
+            ✦ {t.product.featured} ✦
           </p>
           <h2
             style={{
@@ -114,9 +118,10 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
               textShadow: '0 0 40px rgba(255,18,147,0.15)',
+              filter: 'drop-shadow(0 0 20px rgba(201,168,76,0.2))',
             }}
           >
-            SHOP NOW
+            {t.product.shopNow}
           </h2>
           <p
             style={{
@@ -126,6 +131,7 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
               color: 'rgba(242,242,242,0.75)',
               maxWidth: '36rem',
               lineHeight: 1.9,
+              textShadow: '0 2px 8px rgba(0,0,0,0.5)',
             }}
           >
             Explore our latest millennium jewelry collection. Crystal, chrome, and early-2000s attitude.
@@ -137,9 +143,10 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
           ref={containerRef}
           className="relative overflow-hidden rounded-lg cinematic-glow"
           style={{
-            background: 'linear-gradient(135deg, rgba(5,5,5,0.6) 0%, rgba(201,168,76,0.08) 50%, rgba(5,5,5,0.6) 100%)',
-            border: '1px solid rgba(201,168,76,0.3)',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(201,168,76,0.15)',
+            background: 'linear-gradient(135deg, rgba(5,5,5,0.8) 0%, rgba(201,168,76,0.1) 50%, rgba(5,5,5,0.8) 100%)',
+            border: '1px solid rgba(201,168,76,0.4)',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.8), inset 0 1px 0 rgba(201,168,76,0.2), 0 0 40px rgba(201,168,76,0.15)',
+            backdropFilter: 'blur(8px)',
           }}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
@@ -164,9 +171,11 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
                   justifyContent: 'space-between',
                   minHeight: '320px',
                   background: idx === currentIndex
-                    ? 'linear-gradient(135deg, rgba(201,168,76,0.08) 0%, rgba(110,203,255,0.04) 100%)'
+                    ? 'linear-gradient(135deg, rgba(201,168,76,0.12) 0%, rgba(110,203,255,0.06) 100%)'
                     : 'transparent',
                   transition: 'background 0.4s ease',
+                  borderRadius: '8px',
+                  boxShadow: idx === currentIndex ? '0 0 30px rgba(201,168,76,0.2), inset 0 1px 0 rgba(201,168,76,0.1)' : 'none',
                 }}
               >
                 {/* Product Info */}
@@ -180,6 +189,7 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
                       textTransform: 'uppercase',
                       letterSpacing: '0.08em',
                       marginBottom: '0.5rem',
+                      textShadow: '0 2px 8px rgba(0,0,0,0.4)',
                     }}
                   >
                     {product.name}
@@ -205,7 +215,7 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
                       maxWidth: '280px',
                     }}
                   >
-                    {product.description || 'Millennium jewelry crafted for the modern atelier.'}
+                    {getDescription(product, locale) || 'Millennium jewelry crafted for the modern atelier.'}
                   </p>
                 </div>
 
@@ -221,7 +231,7 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
                         marginBottom: '0.25rem',
                       }}
                     >
-                      PRICE
+                      {t.product.price}
                     </p>
                     <p
                       style={{
@@ -263,7 +273,7 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
                       el.style.boxShadow = 'none';
                     }}
                   >
-                    VIEW PIECE
+                    {t.product.viewPiece}
                   </button>
                 </div>
               </div>
@@ -292,16 +302,17 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
               justifyContent: 'center',
               fontSize: '1.2rem',
               transition: 'all 0.3s ease',
+              boxShadow: '0 0 12px rgba(201,168,76,0.15)',
             }}
             onMouseEnter={(e) => {
               const el = e.currentTarget as HTMLElement;
               el.style.background = 'rgba(201,168,76,0.35)';
-              el.style.boxShadow = '0 0 16px rgba(201,168,76,0.3)';
+              el.style.boxShadow = '0 0 24px rgba(201,168,76,0.4), inset 0 1px 0 rgba(255,255,255,0.1)';
             }}
             onMouseLeave={(e) => {
               const el = e.currentTarget as HTMLElement;
               el.style.background = 'rgba(201,168,76,0.2)';
-              el.style.boxShadow = 'none';
+              el.style.boxShadow = '0 0 12px rgba(201,168,76,0.15)';
             }}
           >
             ←
@@ -328,16 +339,17 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
               justifyContent: 'center',
               fontSize: '1.2rem',
               transition: 'all 0.3s ease',
+              boxShadow: '0 0 12px rgba(201,168,76,0.15)',
             }}
             onMouseEnter={(e) => {
               const el = e.currentTarget as HTMLElement;
               el.style.background = 'rgba(201,168,76,0.35)';
-              el.style.boxShadow = '0 0 16px rgba(201,168,76,0.3)';
+              el.style.boxShadow = '0 0 24px rgba(201,168,76,0.4), inset 0 1px 0 rgba(255,255,255,0.1)';
             }}
             onMouseLeave={(e) => {
               const el = e.currentTarget as HTMLElement;
               el.style.background = 'rgba(201,168,76,0.2)';
-              el.style.boxShadow = 'none';
+              el.style.boxShadow = '0 0 12px rgba(201,168,76,0.15)';
             }}
           >
             →
@@ -366,14 +378,21 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
                 borderRadius: '4px',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
+                boxShadow: idx === currentIndex ? '0 0 12px rgba(201,168,76,0.4)' : 'none',
               }}
               onMouseEnter={(e) => {
                 const el = e.currentTarget as HTMLElement;
-                if (idx !== currentIndex) el.style.background = 'rgba(201,168,76,0.5)';
+                if (idx !== currentIndex) {
+                  el.style.background = 'rgba(201,168,76,0.5)';
+                  el.style.boxShadow = '0 0 8px rgba(201,168,76,0.3)';
+                }
               }}
               onMouseLeave={(e) => {
                 const el = e.currentTarget as HTMLElement;
-                if (idx !== currentIndex) el.style.background = 'rgba(201,168,76,0.3)';
+                if (idx !== currentIndex) {
+                  el.style.background = 'rgba(201,168,76,0.3)';
+                  el.style.boxShadow = 'none';
+                }
               }}
             />
           ))}

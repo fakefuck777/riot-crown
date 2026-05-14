@@ -55,7 +55,7 @@ const MATERIAL_VARIANTS = {
     emissiveIntensity: 0.15,
   },
   neon_pink: {
-    name: '霓虹粉',
+    nameKey: 'Neon Pink',
     color: '#FF1293',
     metalness: 0.7,
     roughness: 0.15,
@@ -222,11 +222,11 @@ export function ProductModel({ productName, onMaterialChange, onARClick }: Produ
   const currentMaterial = MATERIAL_VARIANTS[selectedMaterial];
 
   return (
-    <div className="w-full bg-void rounded-lg overflow-hidden border border-y2k-pink/20">
-      <div className="relative w-full h-96 md:h-[600px] bg-gradient-to-b from-void-plate to-void">
+    <div className="w-full bg-void rounded-lg overflow-hidden border border-y2k-pink/20" style={{ boxShadow: '0 0 40px rgba(255,18,147,0.2), inset 0 1px 0 rgba(255,18,147,0.1)' }}>
+      <div className="relative w-full h-96 md:h-[600px] bg-gradient-to-b from-void-plate to-void" style={{ boxShadow: 'inset 0 0 60px rgba(255,18,147,0.08)' }}>
         <Suspense fallback={<div className="w-full h-full flex flex-col items-center justify-center gap-3">
           <div className="w-8 h-8 border-2 border-y2k-pink border-t-transparent rounded-full animate-spin" />
-          <span className="text-y2k-pink text-xs tracking-widest">LOADING...</span>
+          <span className="text-y2k-pink text-xs tracking-widest">{t.product.loading}</span>
         </div>}>
           <Canvas
             gl={{
@@ -265,7 +265,7 @@ export function ProductModel({ productName, onMaterialChange, onARClick }: Produ
       </div>
 
       <div className="p-6 bg-void-plate border-t border-y2k-pink/20">
-        <p className="text-label uppercase tracking-ultra-wide text-y2k-blue mb-4">{t.product.sizeLabel}</p>
+        <p className="text-label uppercase tracking-ultra-wide text-y2k-blue mb-4" style={{ textShadow: '0 0 12px rgba(110,203,255,0.2)' }}>{t.product.sizeLabel}</p>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           {Object.entries(MATERIAL_VARIANTS).map(([key, variant]) => (
             <button
@@ -276,6 +276,10 @@ export function ProductModel({ productName, onMaterialChange, onARClick }: Produ
                   ? 'bg-y2k-pink text-void shadow-neon-pink'
                   : 'bg-void-pit text-titanium border border-y2k-pink/30 hover:border-y2k-pink/60'
               }`}
+              style={{
+                boxShadow: selectedMaterial === key ? '0 0 20px rgba(255,18,147,0.4), inset 0 1px 0 rgba(255,255,255,0.2)' : 'none',
+                transition: 'all 0.3s ease',
+              }}
             >
               {variant.nameKey}
             </button>
@@ -284,12 +288,16 @@ export function ProductModel({ productName, onMaterialChange, onARClick }: Produ
       </div>
 
       {isARSupported && (
-        <div className="p-4 bg-void border-t border-y2k-pink/20">
+        <div className="p-4 bg-void border-t border-y2k-pink/20" style={{ boxShadow: 'inset 0 1px 0 rgba(255,18,147,0.08)' }}>
           <button
             onClick={onARClick}
             className="w-full px-6 py-3 bg-gradient-to-r from-y2k-pink to-y2k-purple text-white font-bold uppercase rounded transition-all hover:shadow-neon-pink"
+            style={{
+              boxShadow: '0 0 24px rgba(255,18,147,0.28), inset 0 1px 0 rgba(255,255,255,0.18)',
+              letterSpacing: '0.12em',
+            }}
           >
-            📱 {t.product.acquire}
+            📱 {t.product.tryOn}
           </button>
         </div>
       )}
@@ -300,7 +308,7 @@ export function ProductModel({ productName, onMaterialChange, onARClick }: Produ
           {t.product.sizeSelected.replace('{s}', currentMaterial.nameKey)}
         </p>
         <p className="text-data text-titanium/50 mt-2">
-          {t.hero.scroll} • Zoom • Click to Switch
+          {t.hero.scroll} • {t.product.zoom} • {t.product.clickSwitch}
         </p>
       </div>
     </div>

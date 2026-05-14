@@ -11,6 +11,57 @@ interface Product3DViewerProps {
   onMaterialChange?: (material: string) => void;
 }
 
+const MATERIAL_VARIANTS = {
+  pearl_glossy: {
+    nameKey: 'Pearl Glossy',
+    color: '#F5F5F5',
+    metalness: 0.4,
+    roughness: 0.2,
+    emissive: '#ffffff',
+    emissiveIntensity: 0.15,
+  },
+  pearl_matte: {
+    nameKey: 'Pearl Matte',
+    color: '#E8E8E8',
+    metalness: 0.2,
+    roughness: 0.6,
+    emissive: '#000000',
+    emissiveIntensity: 0,
+  },
+  pearl_oxidized: {
+    nameKey: 'Pearl Oxidized',
+    color: '#A0A0A0',
+    metalness: 0.3,
+    roughness: 0.7,
+    emissive: '#333333',
+    emissiveIntensity: 0.05,
+  },
+  chrome_plated: {
+    nameKey: 'Chrome Plated',
+    color: '#E8E8E8',
+    metalness: 0.98,
+    roughness: 0.05,
+    emissive: '#ffffff',
+    emissiveIntensity: 0.2,
+  },
+  chrome_gold: {
+    nameKey: 'Chrome Gold',
+    color: '#C9A84C',
+    metalness: 0.95,
+    roughness: 0.08,
+    emissive: '#C9A84C',
+    emissiveIntensity: 0.15,
+  },
+  neon_pink: {
+    nameKey: 'Neon Pink',
+    color: '#FF1293',
+    metalness: 0.7,
+    roughness: 0.15,
+    emissive: '#FF1293',
+    emissiveIntensity: 0.5,
+  },
+};
+
 // ─── 3D Model Loader ───────────────────────────────────────────────────────
 
 function Model() {
@@ -37,7 +88,7 @@ function Model() {
 
 export function Product3DViewer({ modelUrl: _modelUrl, productName: _productName, onMaterialChange }: Product3DViewerProps) {
   const { t } = useLocale();
-  const [selectedMaterial, setSelectedMaterial] = useState<keyof typeof MATERIAL_VARIANTS>('pearl_white');
+  const [selectedMaterial, setSelectedMaterial] = useState<keyof typeof MATERIAL_VARIANTS>('pearl_glossy');
   const [showAR, setShowAR] = useState(false);
   const [isMobile] = useState(() => /iPhone|iPad|Android|Mobile/i.test(navigator.userAgent));
 
@@ -52,7 +103,7 @@ export function Product3DViewer({ modelUrl: _modelUrl, productName: _productName
       <div className="relative w-full h-96 md:h-[600px] bg-gradient-to-b from-gray-900 to-black">
         <Suspense fallback={<div className="w-full h-full bg-black flex flex-col items-center justify-center gap-3">
           <div className="w-8 h-8 border-2 border-y2k-pink border-t-transparent rounded-full animate-spin" />
-          <span className="text-y2k-pink text-xs tracking-widest">LOADING...</span>
+          <span className="text-y2k-pink text-xs tracking-widest">{t.product.loading}</span>
         </div>}>
           <Canvas
             gl={{

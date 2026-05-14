@@ -429,6 +429,15 @@ body {
   }
 }
 
+@keyframes fade-pulse {
+  0%, 100% {
+    opacity: 0.75;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
 @keyframes light-sweep {
   0% {
     background-position: -200% 0;
@@ -461,6 +470,15 @@ body {
   }
   100% {
     background-position: 1000px 0;
+  }
+}
+
+@keyframes premium-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
   }
 }
 

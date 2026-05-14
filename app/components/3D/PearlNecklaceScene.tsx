@@ -340,59 +340,62 @@ export function PearlNecklaceScene() {
   }, []);
 
   return (
-    <div className="relative w-full h-screen bg-void overflow-hidden">
-      <Suspense fallback={
-        <div className="w-full h-full bg-void flex flex-col items-center justify-center gap-4">
-          <div className="w-12 h-12 border-2 border-y2k-pink border-t-transparent rounded-full animate-spin" />
-          <span className="text-y2k-pink text-sm tracking-widest">LOADING ATELIER...</span>
+    <div className="relative w-full min-h-screen bg-void">
+      <div className="relative w-full h-screen overflow-hidden">
+        <Suspense fallback={
+          <div className="w-full h-full bg-void flex flex-col items-center justify-center gap-4">
+            <div className="w-12 h-12 border-2 border-y2k-pink border-t-transparent rounded-full animate-spin" />
+            <span className="text-y2k-pink text-sm tracking-widest">{t.product.loading}</span>
+          </div>
+        }>
+          <Canvas
+            gl={{
+              antialias: !isMobile,
+              alpha: false,
+              powerPreference: isMobile ? 'low-power' : 'high-performance',
+              stencil: false,
+              depth: true,
+              precision: isMobile ? 'lowp' : 'highp',
+            }}
+            dpr={isMobile ? 1 : [1, 2]}
+            performance={{ min: 0.5, max: isMobile ? 0.8 : 1 }}
+          >
+            <Scene />
+          </Canvas>
+        </Suspense>
+
+        {/* Overlay Text */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+          <h1 className="text-brutal-chrome"
+            style={{
+              textShadow: '0 4px 8px rgba(0, 0, 0, 0.9), 0 12px 24px rgba(0, 0, 0, 0.7), inset -2px -2px 4px rgba(0, 0, 0, 0.6), inset 2px 2px 4px rgba(255, 255, 255, 0.4), 0 0 40px rgba(201, 168, 76, 0.25)',
+              letterSpacing: '0.08em',
+              filter: 'brightness(1.2) contrast(1.4) drop-shadow(0 0 30px rgba(201, 168, 76, 0.3))',
+              animation: 'chrome-shine 8s ease-in-out infinite',
+            }}>
+            RIOT CROWN
+          </h1>
+          <p className="text-label uppercase tracking-ultra-wide text-titanium mt-6 px-4"
+            style={{
+              textShadow: '0 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(201, 168, 76, 0.15)',
+              opacity: 0.85,
+              letterSpacing: '0.2em',
+              fontWeight: 500,
+              textAlign: 'center',
+              animation: 'fade-pulse 4s ease-in-out infinite',
+            }}>
+            {t.hero.eyebrow}
+          </p>
         </div>
-      }>
-        <Canvas
-          gl={{
-            antialias: !isMobile,
-            alpha: false,
-            powerPreference: isMobile ? 'low-power' : 'high-performance',
-            stencil: false,
-            depth: true,
-            precision: isMobile ? 'lowp' : 'highp',
-          }}
-          dpr={isMobile ? 1 : [1, 2]}
-          performance={{ min: 0.5, max: isMobile ? 0.8 : 1 }}
-        >
-          <Scene />
-        </Canvas>
-      </Suspense>
 
-      {/* Overlay Text */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-        <h1 className="text-brutal-chrome"
-          style={{
-            textShadow: '0 4px 8px rgba(0, 0, 0, 0.9), 0 12px 24px rgba(0, 0, 0, 0.7), inset -2px -2px 4px rgba(0, 0, 0, 0.6), inset 2px 2px 4px rgba(255, 255, 255, 0.4)',
-            letterSpacing: '0.08em',
-            filter: 'brightness(1.15) contrast(1.35) drop-shadow(0 0 20px rgba(201, 168, 76, 0.2))',
-          }}>
-          RIOT CROWN
-        </h1>
-        <p className="text-label uppercase tracking-ultra-wide text-titanium mt-6"
-          style={{
-            textShadow: '0 2px 8px rgba(0, 0, 0, 0.8)',
-            opacity: 0.85,
-            letterSpacing: '0.2em',
-            fontWeight: 500,
-            paddingX: '1rem',
-            textAlign: 'center',
-          }}>
-          {t.hero.eyebrow}
-        </p>
-      </div>
-
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 pointer-events-none">
-        <div className="animate-bounce text-y2k-pink text-center">
-          <p className="text-label uppercase tracking-wide mb-2">{t.hero.scroll}</p>
-          <svg className="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-          </svg>
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 pointer-events-none">
+          <div className="animate-bounce text-y2k-pink text-center">
+            <p className="text-label uppercase tracking-wide mb-2">{t.hero.scroll}</p>
+            <svg className="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+          </div>
         </div>
       </div>
     </div>

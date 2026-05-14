@@ -43,6 +43,8 @@ export function WishlistButton({ productId, onToggle }: WishlistButtonProps) {
         style={{
           borderColor: isWishlisted ? '#FF1293' : 'rgba(75,85,99,0.5)',
           color: isWishlisted ? '#FF1293' : 'rgba(242,242,242,0.7)',
+          boxShadow: isWishlisted ? '0 0 20px rgba(255,18,147,0.3), inset 0 1px 0 rgba(255,255,255,0.1)' : 'none',
+          transition: 'all 0.3s ease',
         }}
       >
         {isWishlisted ? '♥' : '♡'} {t.product.covet}
@@ -58,7 +60,7 @@ export function WishlistButton({ productId, onToggle }: WishlistButtonProps) {
             boxShadow: '0 0 15px rgba(255,18,147,0.3)',
           }}
         >
-          {isWishlisted ? '✓ Added to Wishlist' : '✓ Removed from Wishlist'}
+          {isWishlisted ? t.product.addedWishlist : t.product.removedWishlist}
         </div>
       )}
     </>
