@@ -1,5 +1,5 @@
 'use client';
-import { useRef, useMemo, useEffect } from 'react';
+import { useRef, useMemo, useEffect, useState } from 'react';
 import { Canvas, useFrame, useThree, invalidate } from '@react-three/fiber';
 import * as THREE from 'three';
 import { usePrefersReducedMotion } from '~/hooks/usePrefersReducedMotion';
@@ -272,8 +272,10 @@ interface GraffitiCanvasProps {
 /** 2× 在清晰度与帧率之间更稳；3× 对全屏后处理过重易卡顿。 */
 const MAX_HERO_DPR = 2;
 
-function heroCanvasDpr(): [number, number] {
-  if (typeof window === 'undefined') return [1, 2];
+/** 与 Node SSR 一致；首帧客户端必须相同，否则 `dpr` 在 DPR=1 设备上会变成 [1,1] 触发 React #418/#425。 */
+const HERO_CANVAS_DPR_SSR: [number, number] = [1, 2];
+
+function readHeroCanvasDpr(): [number, number] {
   const raw = window.devicePixelRatio || 1;
   return [1, Math.min(MAX_HERO_DPR, Math.max(1, raw))];
 }
@@ -281,6 +283,11 @@ function heroCanvasDpr(): [number, number] {
 export function GraffitiCanvas({ scrollVelRef, mouseRef, className }: GraffitiCanvasProps) {
   const reducedMotion = usePrefersReducedMotion();
   const tabVisible = useDocumentVisible();
+  const [dpr, setDpr] = useState<[number, number]>(HERO_CANVAS_DPR_SSR);
+
+  useEffect(() => {
+    setDpr(readHeroCanvasDpr());
+  }, []);
 
   if (reducedMotion) {
     return (
@@ -291,8 +298,6 @@ export function GraffitiCanvas({ scrollVelRef, mouseRef, className }: GraffitiCa
       />
     );
   }
-
-  const dpr = heroCanvasDpr();
 
   return (
     <Canvas
