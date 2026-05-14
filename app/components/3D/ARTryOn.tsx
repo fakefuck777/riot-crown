@@ -17,7 +17,8 @@ export function ARTryOn({ productName, onClose }: ARTryOnProps) {
     const checkARSupport = async () => {
       if ('XRSession' in window) {
         try {
-          const supported = await (navigator as any).xr?.isSessionSupported?.('immersive-ar');
+          const xrNavigator = navigator as unknown as { xr?: { isSessionSupported?: (mode: string) => Promise<boolean> } };
+          const supported = await xrNavigator.xr?.isSessionSupported?.('immersive-ar');
           setIsSupported(!!supported);
         } catch (e) {
           console.log('AR not supported:', e);

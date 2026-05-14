@@ -3,8 +3,19 @@ import { useLoaderData } from '@remix-run/react';
 import { ProductDetailEnhanced } from '~/components/Product/ProductDetailEnhanced';
 import { useCart } from '~/lib/CartContext';
 
+interface LoaderData {
+  product?: {
+    id: string;
+    name: string;
+    price: number;
+    descriptions?: { ZH?: string; EN?: string };
+    material: string;
+    stock: number;
+  };
+}
+
 export default function ProductPageEnhanced() {
-  const { product } = useLoaderData<any>();
+  const { product } = useLoaderData<LoaderData>();
   const { addToCart } = useCart();
 
   if (!product) {

@@ -40,7 +40,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['app/components/GraffitiCanvas.tsx', 'app/components/HeroY2K.tsx', 'app/components/Product3DViewer.tsx'],
+      files: ['app/components/GraffitiCanvas.tsx', 'app/components/HeroY2K.tsx', 'app/components/Product3DViewer.tsx', 'app/components/3D/ProductModel.tsx'],
       rules: {
         // @react-three/fiber uses non-DOM props on <mesh />, <light />, etc.
         'react/no-unknown-property': [

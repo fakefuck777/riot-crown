@@ -14,7 +14,7 @@ export function useGLBModel(url: string): GLBModel | null {
       return modelCache.get(url) || null;
     }
 
-    const { scene, animations } = useGLTF(url) as any;
+    const { scene, animations } = useGLTF(url) as { scene: THREE.Group; animations: THREE.AnimationClip[] };
     const model = { scene, animations };
     modelCache.set(url, model);
     return model;

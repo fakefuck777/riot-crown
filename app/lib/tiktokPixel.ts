@@ -8,7 +8,7 @@ export interface TikTokPixelConfig {
 
 export interface TikTokEvent {
   event: 'PageView' | 'ViewContent' | 'AddToCart' | 'Purchase' | 'InitiateCheckout' | 'CompletePayment';
-  data?: Record<string, any>;
+  data?: Record<string, unknown>;
 }
 
 class TikTokPixelTracker {
@@ -32,8 +32,9 @@ class TikTokPixelTracker {
 
     // Initialize TikTok Pixel
     script.onload = () => {
-      if ((window as any).ttq) {
-        (window as any).ttq.track('PageView');
+      const ttqWindow = window as unknown as { ttq?: { track: (event: string, data?: Record<string, unknown>) => void } };
+      if (ttqWindow.ttq) {
+        ttqWindow.ttq.track('PageView');
       }
     };
 
@@ -43,8 +44,9 @@ class TikTokPixelTracker {
   track(event: TikTokEvent) {
     if (!this.enabled || typeof window === 'undefined') return;
 
-    if ((window as any).ttq) {
-      (window as any).ttq.track(event.event, event.data || {});
+    const ttqWindow = window as unknown as { ttq?: { track: (event: string, data?: Record<string, unknown>) => void } };
+    if (ttqWindow.ttq) {
+      ttqWindow.ttq.track(event.event, event.data || {});
     } else {
       console.warn('[TikTok Pixel] Not initialized yet');
     }

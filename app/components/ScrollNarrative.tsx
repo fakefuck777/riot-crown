@@ -18,7 +18,7 @@ export function ScrollNarrative({ onChapterChange }: ScrollNarrativeProps) {
   const chapter1Ref = useRef<HTMLDivElement>(null);
   const chapter2Ref = useRef<HTMLDivElement>(null);
   const chapter3Ref = useRef<HTMLDivElement>(null);
-  const [currentChapter, setCurrentChapter] = useState(0);
+  const [, setCurrentChapter] = useState(0);
 
   const narratives = {
     EN: {
