@@ -38,19 +38,19 @@ export default function ProductPageEnhanced() {
       product={{
         id: product.id,
         name: product.name,
-        price: product.price,
+        price: String(product.price),
         description: product.descriptions?.ZH || product.descriptions?.EN || '',
         material: product.material,
         stock: product.stock,
         totalStock: 100,
         soldCount: Math.floor(Math.random() * 50),
-        launchDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+        launchDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       }}
       onAddToCart={(item: Record<string, unknown>) => {
         addToCart({
           id: item.productId as string,
           name: item.productName as string,
-          price: product.price,
+          price: String(product.price),
           material: item.material as string,
         });
       }}
