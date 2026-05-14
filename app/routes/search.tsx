@@ -13,11 +13,11 @@ type HydrogenRouteContext = {
   env?: { PUBLIC_HOME_COLLECTION_HANDLE?: string };
 };
 
-export async function loader({ context }: LoaderFunctionArgs) {
-  const { products } = await loadStoreCatalog(
-    (context as HydrogenRouteContext).storefront,
-    (context as HydrogenRouteContext).env?.PUBLIC_HOME_COLLECTION_HANDLE,
-  );
+export async function loader({ request, context }: LoaderFunctionArgs) {
+  const { products } = await loadStoreCatalog((context as HydrogenRouteContext).storefront, {
+    collectionHandle: (context as HydrogenRouteContext).env?.PUBLIC_HOME_COLLECTION_HANDLE,
+    requestUrl: request.url,
+  });
   return json({ catalogProducts: products });
 }
 

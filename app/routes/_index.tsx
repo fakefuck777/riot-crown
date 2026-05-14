@@ -21,10 +21,10 @@ type HydrogenRouteContext = {
 export async function loader({ request, context }: LoaderFunctionArgs) {
   const siteUrl = new URL(request.url).origin.replace(/\/$/, '');
   const ctx = context as HydrogenRouteContext;
-  const { products: catalogProducts } = await loadStoreCatalog(
-    ctx.storefront,
-    ctx.env?.PUBLIC_HOME_COLLECTION_HANDLE,
-  );
+  const { products: catalogProducts } = await loadStoreCatalog(ctx.storefront, {
+    collectionHandle: ctx.env?.PUBLIC_HOME_COLLECTION_HANDLE,
+    requestUrl: request.url,
+  });
   const { buildCatalogItemListJsonLd } = await import('~/lib/schemaOrg');
   return json({
     siteUrl,

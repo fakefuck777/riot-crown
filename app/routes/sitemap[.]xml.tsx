@@ -20,10 +20,10 @@ function xmlEscape(s: string): string {
 export async function loader({ request, context }: LoaderFunctionArgs) {
   const origin = new URL(request.url).origin;
   const ctx = context as HydrogenRouteContext;
-  const { products } = await loadStoreCatalog(
-    ctx.storefront,
-    ctx.env?.PUBLIC_HOME_COLLECTION_HANDLE,
-  );
+  const { products } = await loadStoreCatalog(ctx.storefront, {
+    collectionHandle: ctx.env?.PUBLIC_HOME_COLLECTION_HANDLE,
+    requestUrl: request.url,
+  });
   const paths = new Set<string>();
   for (const loc of LOCALES) {
     paths.add(withLocalePath(loc, '/'));

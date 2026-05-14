@@ -7,7 +7,7 @@ import {
   cartSetIdDefault,
 } from '@shopify/hydrogen';
 import { getStorefrontHeaders } from '~/lib/storefrontHeaders';
-import { getStorefrontI18n } from '~/lib/storefrontI18n';
+import { resolveStorefrontI18nForRequest } from '~/lib/storefrontI18n';
 import type {ServerBuild} from '@remix-run/server-runtime';
 import {
   createCookieSessionStorage,
@@ -29,10 +29,12 @@ export default {
         HydrogenSession.init(request, [env.SESSION_SECRET]),
       ]);
 
+      const i18n = resolveStorefrontI18nForRequest(request, env, session);
+
       const {storefront} = createStorefrontClient({
         cache,
         waitUntil,
-        i18n: getStorefrontI18n(env),
+        i18n,
         // Oxygen secrets: exact keys `PUBLIC_STOREFRONT_API_TOKEN` + `PUBLIC_STORE_DOMAIN` (see .env.example).
         publicStorefrontToken: env.PUBLIC_STOREFRONT_API_TOKEN,
         storeDomain: env.PUBLIC_STORE_DOMAIN,

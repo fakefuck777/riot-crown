@@ -1,33 +1,33 @@
 /**
  * Shopify Storefront catalog for Hydrogen/Oxygen.
+ * - 降级测试：本文件内 GraphQL **不**使用 `@inContext` / `$country` / `$language`，用于确认在无查询级地区约束时 API 是否返回数据。
+ * - `server.ts` 仍用 `resolveStorefrontI18nForRequest` 创建 `storefront`；购物车等内置查询若含 `$country` 仍会由 Hydrogen 注入 i18n。
  * - GraphQL: no Product.totalInventory / tracksInventory (avoids extra scopes that break whole query).
  * - Errors: logStorefrontFailure → JSON with extensions/stack/cause (Oxygen logs).
  */
 import { CacheShort } from '@shopify/hydrogen';
 import type { Storefront } from '@shopify/hydrogen';
-import type { CountryCode, LanguageCode } from '@shopify/hydrogen-react/storefront-api-types';
 import { makeSVG } from '~/lib/makeSVG';
 import { PRODUCTS, type ProductData } from '~/lib/products';
 
 const CATALOG_FIRST = 48;
 
-/**
- * Markets / International: Storefront catalog queries must use `@inContext` or
- * `product` / `collection` can be null when availability is market-specific.
- *
- * 暴力测试：固定 US + EN，确认与市场/语言上下文无关时再改回 env 或目标市场。
- */
-const CATALOG_IN_CONTEXT: { country: CountryCode; language: LanguageCode } = {
-  country: 'US',
-  language: 'EN',
-};
-
-function catalogContextVariables(): { country: CountryCode; language: LanguageCode } {
-  return { country: CATALOG_IN_CONTEXT.country, language: CATALOG_IN_CONTEXT.language };
-}
-
-function logCurrentApiVariables(variables: Record<string, unknown>): void {
-  console.log('Current API variables:', variables);
+function logStorefrontI18nBeforeQuery(
+  storefront: Storefront,
+  requestUrl: string | undefined,
+  op: string,
+): void {
+  const i18n = (storefront as { i18n?: { country?: string; language?: string } }).i18n;
+  console.log('Current context:', i18n);
+  let pathname = '';
+  try {
+    pathname = requestUrl ? new URL(requestUrl).pathname : '';
+  } catch {
+    pathname = '';
+  }
+  if (requestUrl) {
+    console.log('Current request path (compare to locale prefix / Markets):', { pathname, op });
+  }
 }
 
 /**
@@ -90,13 +90,9 @@ const SIZE_CYCLE: ProductData['size'][] = [
   'large', 'tall', 'wide', 'standard', 'tall', 'standard',
 ];
 
-/** Storefront catalog query — `nodes` on ProductConnection (API 2024+). */
+/** Storefront catalog query — `nodes` on ProductConnection (API 2024+). 无 `@inContext`（降级测试）。 */
 const CATALOG_PRODUCTS_QUERY = `#graphql
-  query CatalogProducts(
-    $first: Int!
-    $country: CountryCode
-    $language: LanguageCode
-  ) @inContext(country: $country, language: $language) {
+  query CatalogProducts($first: Int!) {
     products(first: $first, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         id
@@ -130,12 +126,7 @@ const CATALOG_PRODUCTS_QUERY = `#graphql
 `;
 
 const COLLECTION_PRODUCTS_QUERY = `#graphql
-  query CollectionCatalog(
-    $handle: String!
-    $first: Int!
-    $country: CountryCode
-    $language: LanguageCode
-  ) @inContext(country: $country, language: $language) {
+  query CollectionCatalog($handle: String!, $first: Int!) {
     collection(handle: $handle) {
       products(first: $first, sortKey: BEST_SELLING) {
         nodes {
@@ -171,11 +162,7 @@ const COLLECTION_PRODUCTS_QUERY = `#graphql
 `;
 
 const PRODUCT_BY_HANDLE_QUERY = `#graphql
-  query ProductByHandle(
-    $handle: String!
-    $country: CountryCode
-    $language: LanguageCode
-  ) @inContext(country: $country, language: $language) {
+  query ProductByHandle($handle: String!) {
     product(handle: $handle) {
       id
       handle
@@ -206,13 +193,9 @@ const PRODUCT_BY_HANDLE_QUERY = `#graphql
   }
 `;
 
-/** 暴力测试：`products` 不传 `query`，不按 status / available_for_sale 过滤（由 API 目录规则决定可见集合）。 */
+/** 暴力测试：`products` 不传 `query`；无 `@inContext`（降级测试）。 */
 const PRODUCT_BRUTE_UNFILTERED_LIST_QUERY = `#graphql
-  query ProductBruteUnfilteredList(
-    $first: Int!
-    $country: CountryCode
-    $language: LanguageCode
-  ) @inContext(country: $country, language: $language) {
+  query ProductBruteUnfilteredList($first: Int!) {
     products(first: $first, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         handle
@@ -226,12 +209,7 @@ const PRODUCT_BRUTE_UNFILTERED_LIST_QUERY = `#graphql
  * 暴力测试：仅用 handle 搜索语法，不包含 `status:ACTIVE` 或 `available_for_sale:true` 等子串。
  */
 const PRODUCT_BRUTE_HANDLE_SEARCH_QUERY = `#graphql
-  query ProductBruteHandleSearch(
-    $first: Int!
-    $search: String!
-    $country: CountryCode
-    $language: LanguageCode
-  ) @inContext(country: $country, language: $language) {
+  query ProductBruteHandleSearch($first: Int!, $search: String!) {
     products(first: $first, query: $search) {
       nodes {
         handle
@@ -377,16 +355,20 @@ export type CatalogLoadResult = {
 
 /**
  * Shopify catalog when the API returns at least one product; otherwise the built-in demo list.
+ * `requestUrl` 用于日志对比 `storefront.i18n` 与当前路径（含 `/ja/` 等 locale 前缀）。
  */
 export async function loadStoreCatalog(
   storefront: Storefront | undefined,
-  collectionHandle?: string,
+  opts?: { collectionHandle?: string; requestUrl?: string },
 ): Promise<CatalogLoadResult> {
   if (!storefront) {
     return { products: PRODUCTS, source: 'demo' };
   }
   try {
-    const shop = await fetchShopifyCatalog(storefront, { collectionHandle });
+    const shop = await fetchShopifyCatalog(storefront, {
+      collectionHandle: opts?.collectionHandle,
+      requestUrl: opts?.requestUrl,
+    });
     if (shop.length > 0) {
       return { products: shop, source: 'shopify' };
     }
@@ -398,15 +380,16 @@ export async function loadStoreCatalog(
 
 export async function fetchShopifyCatalog(
   storefront: Storefront,
-  opts?: { collectionHandle?: string },
+  opts?: { collectionHandle?: string; requestUrl?: string },
 ): Promise<ProductData[]> {
   const handle = opts?.collectionHandle?.trim();
+  const requestUrl = opts?.requestUrl;
   let nodes: SfProductNode[] = [];
 
   if (handle) {
     try {
-      const variables = { handle, first: CATALOG_FIRST, ...catalogContextVariables() };
-      logCurrentApiVariables({ op: 'CollectionCatalog', ...variables });
+      logStorefrontI18nBeforeQuery(storefront, requestUrl, 'CollectionCatalog');
+      const variables = { handle, first: CATALOG_FIRST };
       const { data, errors } = await storefront.query(COLLECTION_PRODUCTS_QUERY, {
         variables,
         cache: CacheShort(),
@@ -426,8 +409,8 @@ export async function fetchShopifyCatalog(
     }
     if (nodes.length === 0) {
       try {
-        const variables = { first: CATALOG_FIRST, ...catalogContextVariables() };
-        logCurrentApiVariables({ op: 'CatalogProducts.fallback', ...variables });
+        logStorefrontI18nBeforeQuery(storefront, requestUrl, 'CatalogProducts.fallback');
+        const variables = { first: CATALOG_FIRST };
         const { data: d2, errors: e2 } = await storefront.query(CATALOG_PRODUCTS_QUERY, {
           variables,
           cache: CacheShort(),
@@ -447,8 +430,8 @@ export async function fetchShopifyCatalog(
     }
   } else {
     try {
-      const variables = { first: CATALOG_FIRST, ...catalogContextVariables() };
-      logCurrentApiVariables({ op: 'CatalogProducts', ...variables });
+      logStorefrontI18nBeforeQuery(storefront, requestUrl, 'CatalogProducts');
+      const variables = { first: CATALOG_FIRST };
       const { data, errors } = await storefront.query(CATALOG_PRODUCTS_QUERY, {
         variables,
         cache: CacheShort(),
@@ -468,12 +451,13 @@ export async function fetchShopifyCatalog(
 export async function fetchShopifyProductByHandle(
   storefront: Storefront,
   handle: string,
+  requestUrl?: string,
 ): Promise<ProductData | undefined> {
   if (!handle.trim()) return undefined;
   const h = handle.trim();
   try {
-    const variables = { handle: h, ...catalogContextVariables() };
-    logCurrentApiVariables({ op: 'ProductByHandle', ...variables });
+    logStorefrontI18nBeforeQuery(storefront, requestUrl, 'ProductByHandle');
+    const variables = { handle: h };
     const { data, errors } = await storefront.query(PRODUCT_BY_HANDLE_QUERY, {
       variables,
       cache: CacheShort(),
@@ -504,12 +488,11 @@ export async function fetchShopifyProductByHandle(
         `[fetchShopifyProductByHandle] product(handle="${h}") is null — use the product SEO handle from Shopify admin, not the numeric admin id.`,
       );
 
-      const ctx = catalogContextVariables();
       const bruteFirst = 40;
 
       try {
-        const listVars = { first: bruteFirst, ...ctx };
-        logCurrentApiVariables({ op: 'ProductBruteUnfilteredList', ...listVars });
+        logStorefrontI18nBeforeQuery(storefront, requestUrl, 'ProductBruteUnfilteredList');
+        const listVars = { first: bruteFirst };
         const { data: listData, errors: listErr } = await storefront.query(
           PRODUCT_BRUTE_UNFILTERED_LIST_QUERY,
           { variables: listVars, cache: CacheShort() },
@@ -527,9 +510,9 @@ export async function fetchShopifyProductByHandle(
       }
 
       try {
+        logStorefrontI18nBeforeQuery(storefront, requestUrl, 'ProductBruteHandleSearch');
         const searchStr = `handle:${h}`;
-        const searchVars = { first: 15, search: searchStr, ...ctx };
-        logCurrentApiVariables({ op: 'ProductBruteHandleSearch', ...searchVars });
+        const searchVars = { first: 15, search: searchStr };
         const { data: searchData, errors: searchErr } = await storefront.query(
           PRODUCT_BRUTE_HANDLE_SEARCH_QUERY,
           { variables: searchVars, cache: CacheShort() },

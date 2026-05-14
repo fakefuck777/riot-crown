@@ -38,11 +38,11 @@ function buildProductOgSvg(product: ProductData): string {
 </svg>`;
 }
 
-export async function loader({ params, context }: LoaderFunctionArgs) {
+export async function loader({ request, params, context }: LoaderFunctionArgs) {
   const id = params.id ?? '';
   const storefront = (context as { storefront?: Storefront }).storefront;
   let product: ProductData | undefined =
-    storefront ? await fetchShopifyProductByHandle(storefront, id) : undefined;
+    storefront ? await fetchShopifyProductByHandle(storefront, id, request.url) : undefined;
   if (!product) {
     product = getProduct(id);
   }

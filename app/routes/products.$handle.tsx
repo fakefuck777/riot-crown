@@ -35,17 +35,19 @@ export async function loader({ request, context, params }: LoaderFunctionArgs) {
   const ctx = context as HydrogenRouteContext;
   const storefront = ctx.storefront;
 
-  let product = storefront ? await fetchShopifyProductByHandle(storefront, handle) : undefined;
+  let product = storefront
+    ? await fetchShopifyProductByHandle(storefront, handle, request.url)
+    : undefined;
   if (!product) {
     product = getProduct(handle);
   }
 
   console.log('[products.$handle loader]', JSON.stringify({ handle, product }, null, 2));
 
-  const { products: catalog } = await loadStoreCatalog(
-    storefront,
-    ctx.env?.PUBLIC_HOME_COLLECTION_HANDLE,
-  );
+  const { products: catalog } = await loadStoreCatalog(storefront, {
+    collectionHandle: ctx.env?.PUBLIC_HOME_COLLECTION_HANDLE,
+    requestUrl: request.url,
+  });
   const related = product ? catalog.filter(p => p.id !== product.id).slice(0, 3) : [];
 
   const { buildProductJsonLd } = await import('~/lib/schemaOrg');
