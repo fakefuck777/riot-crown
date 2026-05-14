@@ -31,6 +31,7 @@ import { SkipToMain } from '~/components/SkipToMain';
 import { ViewportModeSync } from '~/components/ViewportModeSync';
 import { CartProvider, useCart } from '~/lib/CartContext';
 import { MemberProvider } from '~/lib/MemberContext';
+import { UserInteractionProvider } from '~/lib/UserInteractionContext';
 import { LOCALE_BCP47, LOCALES } from '~/lib/i18n';
 import { sumCartLineTotals, formatYenTotal } from '~/lib/price';
 import {
@@ -217,7 +218,9 @@ function Layout({
           <ViewportModeSync />
           <CartProvider>
             <MemberProvider>
-              <AppShell>{children}</AppShell>
+              <UserInteractionProvider>
+                <AppShell>{children}</AppShell>
+              </UserInteractionProvider>
             </MemberProvider>
           </CartProvider>
         </LocaleProvider>

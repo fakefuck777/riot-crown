@@ -3,6 +3,7 @@ import { useRef, useState, Suspense, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Environment, Preload } from '@react-three/drei';
 import * as THREE from 'three';
+import { useUserInteraction } from '~/lib/UserInteractionContext';
 
 interface ProductModelProps {
   productName: string;
@@ -68,9 +69,10 @@ const MATERIAL_VARIANTS = {
 function Model({ material }: { material: typeof MATERIAL_VARIANTS[keyof typeof MATERIAL_VARIANTS] }) {
   const groupRef = useRef<THREE.Group>(null);
   const meshRef = useRef<THREE.Mesh>(null);
+  const { isUserInteracting } = useUserInteraction();
 
   useFrame(() => {
-    if (groupRef.current && !window.isUserInteracting) {
+    if (groupRef.current && !isUserInteracting) {
       groupRef.current.rotation.y += 0.005;
     }
   });
@@ -124,6 +126,7 @@ function Model({ material }: { material: typeof MATERIAL_VARIANTS[keyof typeof M
 export function ProductModel({ productName, onMaterialChange, onARClick }: ProductModelProps) {
   const [selectedMaterial, setSelectedMaterial] = useState<keyof typeof MATERIAL_VARIANTS>('pearl_glossy');
   const [isARSupported, setIsARSupported] = useState(false);
+  const { setIsUserInteracting } = useUserInteraction();
 
   useEffect(() => {
     // Check AR support
@@ -150,16 +153,16 @@ export function ProductModel({ productName, onMaterialChange, onARClick }: Produ
               alpha: false,
               powerPreference: 'high-performance',
             }}
-            onMouseDown={() => (window.isUserInteracting = true)}
-            onMouseUp={() => (window.isUserInteracting = false)}
-            onTouchStart={() => (window.isUserInteracting = true)}
-            onTouchEnd={() => (window.isUserInteracting = false)}
+            onMouseDown={() => setIsUserInteracting(true)}
+            onMouseUp={() => setIsUserInteracting(false)}
+            onTouchStart={() => setIsUserInteracting(true)}
+            onTouchEnd={() => setIsUserInteracting(false)}
           >
             <PerspectiveCamera makeDefault position={[0, 0, 3]} fov={50} />
             <OrbitControls
               enableZoom={true}
               enablePan={true}
-              autoRotate={!window.isUserInteracting}
+              autoRotate={!isUserInteracting}
               autoRotateSpeed={3}
             />
 
