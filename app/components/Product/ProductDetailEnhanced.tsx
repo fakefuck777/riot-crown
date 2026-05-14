@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { ProductModel } from '~/components/3D/ProductModel';
 import { ARTryOn } from '~/components/3D/ARTryOn';
 import { ScarcityEngine } from '~/components/Marketing/ScarcityEngine';
@@ -18,7 +18,7 @@ interface ProductDetailEnhancedProps {
     soldCount?: number;
     launchDate?: Date;
   };
-  onAddToCart?: (product: any) => void;
+  onAddToCart?: (product: Record<string, unknown>) => void;
 }
 
 export function ProductDetailEnhanced({ product, onAddToCart }: ProductDetailEnhancedProps) {

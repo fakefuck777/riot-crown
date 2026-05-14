@@ -1,6 +1,5 @@
 'use client';
 import { useMember } from '~/lib/MemberContext';
-import { useLocale } from '~/lib/LocaleContext';
 
 export function ExclusiveCollection() {
   const { tier, hasEarlyAccess } = useMember();

@@ -78,7 +78,7 @@ function Model({ material }: { material: typeof MATERIAL_VARIANTS[keyof typeof M
   return (
     <group ref={groupRef}>
       {/* Main Pearl */}
-      <mesh ref={meshRef} castShadow receiveShadow>
+      <mesh ref={meshRef} castShadow={true} receiveShadow={true}>
         <sphereGeometry args={[1.2, 128, 128]} />
         <meshStandardMaterial
           color={material.color}
@@ -91,7 +91,7 @@ function Model({ material }: { material: typeof MATERIAL_VARIANTS[keyof typeof M
       </mesh>
 
       {/* Chrome Accents */}
-      <mesh position={[-1.5, 0.8, 0]} castShadow receiveShadow>
+      <mesh position={[-1.5, 0.8, 0]} castShadow={true} receiveShadow={true}>
         <sphereGeometry args={[0.4, 64, 64]} />
         <meshStandardMaterial
           color="#E8E8E8"

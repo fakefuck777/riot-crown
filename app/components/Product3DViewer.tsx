@@ -62,7 +62,7 @@ const MATERIAL_VARIANTS = {
 
 // ─── Product 3D Viewer ───────────────────────────────────────────────────────
 
-export function Product3DViewer({ modelUrl, productName, onMaterialChange }: Product3DViewerProps) {
+export function Product3DViewer({ _modelUrl, _productName, onMaterialChange }: Product3DViewerProps) {
   const [selectedMaterial, setSelectedMaterial] = useState<keyof typeof MATERIAL_VARIANTS>('pearl_white');
   const [showAR, setShowAR] = useState(false);
 

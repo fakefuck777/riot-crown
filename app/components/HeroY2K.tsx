@@ -168,7 +168,7 @@ function ParticleSystem() {
 
 function HeroScene() {
   const { camera } = useThree();
-  const controlsRef = useRef<any>(null);
+  const _controlsRef = useRef<Record<string, unknown> | null>(null);
 
   useEffect(() => {
     camera.position.set(0, 0, 8);

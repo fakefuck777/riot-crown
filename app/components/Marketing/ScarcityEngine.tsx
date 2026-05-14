@@ -8,10 +8,10 @@ interface ScarcityEngineProps {
   launchDate?: Date;
 }
 
-export function ScarcityEngine({ productName, totalStock, soldCount, launchDate }: ScarcityEngineProps) {
+export function ScarcityEngine({ _productName, totalStock, soldCount, launchDate }: ScarcityEngineProps) {
   const [timeLeft, setTimeLeft] = useState<string>('');
   const [stockPercent, setStockPercent] = useState(0);
-  const [showUrgency, setShowUrgency] = useState(false);
+  const [_showUrgency, setShowUrgency] = useState(false);
 
   useEffect(() => {
     const updateCountdown = () => {
