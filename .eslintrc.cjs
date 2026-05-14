@@ -40,10 +40,31 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['app/components/GraffitiCanvas.tsx'],
+      files: ['app/components/GraffitiCanvas.tsx', 'app/components/HeroY2K.tsx', 'app/components/Product3DViewer.tsx'],
       rules: {
-        // @react-three/fiber uses non-DOM props on <shaderMaterial /> etc.
-        'react/no-unknown-property': 'off',
+        // @react-three/fiber uses non-DOM props on <mesh />, <light />, etc.
+        'react/no-unknown-property': [
+          'error',
+          {
+            ignore: [
+              'args',
+              'position',
+              'castShadow',
+              'receiveShadow',
+              'metalness',
+              'roughness',
+              'emissive',
+              'emissiveIntensity',
+              'envMapIntensity',
+              'intensity',
+              'distance',
+              'decay',
+              'scale',
+              'rotation',
+              'ref',
+            ],
+          },
+        ],
       },
     },
   ],

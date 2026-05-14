@@ -375,18 +375,23 @@ export async function loadStoreCatalog(
   opts?: { collectionHandle?: string; requestUrl?: string; debugTokenPrefix4?: string },
 ): Promise<CatalogLoadResult> {
   if (!storefront) {
+    console.log('[loadStoreCatalog] No storefront object — using demo products');
     return { products: PRODUCTS, source: 'demo' };
   }
   try {
+    console.log('[loadStoreCatalog] Attempting to fetch Shopify catalog...');
     const shop = await fetchShopifyCatalog(storefront, {
       collectionHandle: opts?.collectionHandle,
       requestUrl: opts?.requestUrl,
       debugTokenPrefix4: opts?.debugTokenPrefix4,
     });
+    console.log(`[loadStoreCatalog] Fetched ${shop.length} products from Shopify`);
     if (shop.length > 0) {
       return { products: shop, source: 'shopify' };
     }
+    console.log('[loadStoreCatalog] Shopify returned 0 products — falling back to demo');
   } catch (e) {
+    console.error('[loadStoreCatalog] Exception caught:', e);
     logStorefrontFailure('loadStoreCatalog', { note: 'unexpected throw' }, undefined, e);
   }
   return { products: PRODUCTS, source: 'demo' };
@@ -450,15 +455,40 @@ export async function fetchShopifyCatalog(
       logStorefrontI18nBeforeQuery(storefront, requestUrl, 'CatalogProducts');
       const variables = { first: CATALOG_FIRST };
       logStorefrontGraphQLDebug(debugTokenPrefix4, 'CatalogProducts', CATALOG_PRODUCTS_QUERY, variables);
-      const { data, errors } = await storefront.query(CATALOG_PRODUCTS_QUERY, {
+      console.log('[fetchShopifyCatalog] Querying all published products (no collection filter)...');
+      const response = await storefront.query(CATALOG_PRODUCTS_QUERY, {
         variables,
         cache: CacheShort(),
       });
+      console.log('[fetchShopifyCatalog] Full response from storefront.query:', JSON.stringify(response, null, 2));
+
+      // Handle both response shapes: { data, errors } and direct { products: { nodes } }
+      let data = response;
+      let errors = undefined;
+
+      if ('data' in response && 'errors' in response) {
+        // Standard GraphQL response shape
+        data = response.data;
+        errors = response.errors;
+      } else if ('products' in response) {
+        // Direct response shape from Hydrogen
+        data = response;
+      }
+
       if (errors?.length) {
+        console.error('[fetchShopifyCatalog] GraphQL errors:', JSON.stringify(errors, null, 2));
         logStorefrontFailure('fetchShopifyCatalog.products', { mode: 'allPublishedProducts' }, errors);
       }
-      nodes = (data as { products?: { nodes: SfProductNode[] } } | null)?.products?.nodes ?? [];
+
+      const productsData = (data as { products?: { nodes: SfProductNode[] } } | null)?.products;
+      console.log('[fetchShopifyCatalog] Raw products data:', JSON.stringify(productsData, null, 2));
+      nodes = productsData?.nodes ?? [];
+      console.log(`[fetchShopifyCatalog] Got ${nodes.length} products from Shopify API`);
+      if (nodes.length === 0) {
+        console.warn('[fetchShopifyCatalog] No products returned. Checking if data structure is correct:', JSON.stringify(data, null, 2));
+      }
     } catch (e) {
+      console.error('[fetchShopifyCatalog] Exception:', e);
       logStorefrontFailure('fetchShopifyCatalog.products.exception', { mode: 'allPublishedProducts' }, undefined, e);
     }
   }

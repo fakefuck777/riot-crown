@@ -22,11 +22,15 @@ import { GhostNav }        from '~/components/GhostNav';
 import { CartDrawer }      from '~/components/CartDrawer';
 import { CheckoutPortal }  from '~/components/CheckoutPortal';
 import { StickyConversionBar } from '~/components/StickyConversionBar';
+import { EmailCapturePopupEnhanced } from '~/components/Marketing/EmailCapturePopupEnhanced';
+import { ExitIntentPopup } from '~/components/ExitIntentPopup';
+import { BundleRecommendation } from '~/components/BundleRecommendation';
 import { useInertiaScroll } from '~/hooks/useInertiaScroll';
 import { LocaleProvider, useLocale } from '~/lib/LocaleContext';
 import { SkipToMain } from '~/components/SkipToMain';
 import { ViewportModeSync } from '~/components/ViewportModeSync';
 import { CartProvider, useCart } from '~/lib/CartContext';
+import { MemberProvider } from '~/lib/MemberContext';
 import { LOCALE_BCP47, LOCALES } from '~/lib/i18n';
 import { sumCartLineTotals, formatYenTotal } from '~/lib/price';
 import {
@@ -161,6 +165,11 @@ function AppShell({ children }: { children: React.ReactNode }) {
         {children}
       </div>
       <StickyConversionBar />
+
+      {/* Marketing Popups */}
+      <EmailCapturePopupEnhanced />
+      <ExitIntentPopup />
+      <BundleRecommendation mainProductName="Pearl Necklace" />
     </>
   );
 }
@@ -207,7 +216,9 @@ function Layout({
           <SyncDocumentLang />
           <ViewportModeSync />
           <CartProvider>
-            <AppShell>{children}</AppShell>
+            <MemberProvider>
+              <AppShell>{children}</AppShell>
+            </MemberProvider>
           </CartProvider>
         </LocaleProvider>
         <ScrollRestoration />

@@ -1,5 +1,5 @@
 'use client';
-import { useRef, useEffect, useLayoutEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import { gsap } from 'gsap';
 import { useLocale } from '~/lib/LocaleContext';
 import { usePrefersReducedMotion } from '~/hooks/usePrefersReducedMotion';
@@ -21,7 +21,7 @@ export function Testimonials() {
   const itemsRef   = useRef<(HTMLDivElement | null)[]>([]);
   const played     = useRef(false);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!reducedMotion) return;
     if (played.current) return;
     played.current = true;

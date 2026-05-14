@@ -1,7 +1,7 @@
 'use client';
 import { useRef, useMemo, useEffect, useState } from 'react';
-import { Canvas, useFrame, useThree, invalidate } from '@react-three/fiber';
 import * as THREE from 'three';
+import { Canvas, useFrame, useThree, invalidate } from '@react-three/fiber';
 import { usePrefersReducedMotion } from '~/hooks/usePrefersReducedMotion';
 import { useDocumentVisible } from '~/hooks/useDocumentVisible';
 import { HeroCinematicPost } from '~/components/HeroCinematicPost';

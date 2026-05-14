@@ -4,7 +4,7 @@ import { useLoaderData } from '@remix-run/react';
 import { useEffect } from 'react';
 import type { Storefront } from '@shopify/hydrogen';
 import { SITE_DESCRIPTION, SITE_HOME_TITLE, SITE_KEYWORDS } from '~/lib/siteMeta';
-import { Hero } from '~/components/Hero';
+import { PearlNecklaceScene } from '~/components/3D/PearlNecklaceScene';
 import { Manifesto } from '~/components/Manifesto';
 import { ProductGrid } from '~/components/ProductGrid';
 import { ScarcityEngine } from '~/components/ScarcityEngine';
@@ -59,7 +59,7 @@ export default function Index() {
   return (
     <main>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: catalogJsonLd }} />
-      <Hero />
+      <PearlNecklaceScene />
       <Manifesto />
       <ProductGrid products={catalogProducts} />
       <ScarcityEngine products={catalogProducts} />

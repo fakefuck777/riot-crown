@@ -4,10 +4,15 @@ export type StorefrontTokenEnv = {
   PUBLIC_STOREFRONT_API_TOKEN?: string;
 };
 
-/** First 4 chars of the token Hydrogen will prefer for Storefront API (private, else public). */
+/**
+ * Returns a safe debug label showing which token mode is active and its first 6 chars.
+ * Private token takes precedence (Hydrogen uses Shopify-Storefront-Private-Token header).
+ * Public token must be the Storefront API token (starts with 2b10 or similar), NOT an Admin token (shpa/shpat_).
+ */
 export function storefrontTokenPrefix4FromEnv(env: StorefrontTokenEnv | undefined): string {
-  const raw =
-    (env?.PRIVATE_STOREFRONT_API_TOKEN ?? '').trim() || (env?.PUBLIC_STOREFRONT_API_TOKEN ?? '').trim();
-  if (!raw) return 'NONE';
-  return raw.slice(0, 4);
+  const priv = (env?.PRIVATE_STOREFRONT_API_TOKEN ?? '').trim();
+  const pub  = (env?.PUBLIC_STOREFRONT_API_TOKEN ?? '').trim();
+  if (priv) return `PRIVATE:${priv.slice(0, 6)}`;
+  if (pub)  return `PUBLIC:${pub.slice(0, 6)}`;
+  return 'NONE';
 }

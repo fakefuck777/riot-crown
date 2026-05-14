@@ -1,5 +1,5 @@
 'use client';
-import { useRef, useEffect, useLayoutEffect, lazy, Suspense } from 'react';
+import { useRef, useEffect, lazy, Suspense } from 'react';
 import { gsap } from 'gsap';
 import { useLocale } from '~/lib/LocaleContext';
 import { usePrefersReducedMotion } from '~/hooks/usePrefersReducedMotion';
@@ -64,7 +64,7 @@ export function Hero() {
   }, [reducedMotion]);
 
   // Entrance — staggered; layout effect avoids first paint stuck at opacity:0; context cleans StrictMode remounts.
-  useLayoutEffect(() => {
+  useEffect(() => {
     const root = heroRootRef.current;
     if (!root) return;
 

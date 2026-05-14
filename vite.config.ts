@@ -35,7 +35,16 @@ export default defineConfig(({isSsrBuild}) => ({
       conditions: ['worker', 'browser', 'module', 'import', 'default'],
     },
     optimizeDeps: {
-      include: ['react-dom/server.browser', 'gsap'],
+      include: [
+        'use-sync-external-store/shim/with-selector.js',
+        'prop-types',
+        'react-dom/client',
+        'scheduler',
+        'react-reconciler',
+        'react-reconciler/constants',
+        'react-dom/server.browser',
+        'gsap',
+      ],
     },
   },
   optimizeDeps: {
