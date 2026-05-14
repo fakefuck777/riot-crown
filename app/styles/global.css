@@ -520,7 +520,64 @@ a[href],
   -webkit-tap-highlight-color: rgba(201, 168, 76, 0.1);
 }
 
-/* ─── RESPONSIVE GRIDS ────────────────────────────────────────── */
+/* ─── MOBILE OPTIMIZATION ────────────────────────────────────── */
+@media (max-width: 768px) {
+  .text-brutal-chrome {
+    font-size: clamp(2.5rem, 12vw, 4rem) !important;
+  }
+
+  .cinematic-glow {
+    animation: cinematic-glow 4s ease-in-out infinite;
+  }
+
+  /* Reduce animation complexity on mobile */
+  @media (prefers-reduced-motion: reduce) {
+    .cinematic-glow,
+    .cinematic-pulse,
+    .light-sweep,
+    .floating-particles,
+    .shimmer-effect {
+      animation: none !important;
+    }
+  }
+}
+
+/* iOS Safari specific optimizations */
+@supports (-webkit-touch-callout: none) {
+  body {
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  .text-brutal-chrome {
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  canvas {
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+}
+
+/* Android specific optimizations */
+@media (pointer: coarse) {
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .text-brutal-chrome {
+    -webkit-font-smoothing: subpixel-antialiased;
+  }
+}
+
+/* High DPI screens */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .text-brutal-chrome {
+    -webkit-font-smoothing: antialiased;
+  }
+}
 @media (max-width: 768px) {
   .testimonials-grid {
     grid-template-columns: 1fr !important;

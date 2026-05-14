@@ -64,6 +64,9 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
     autoPlayRef.current = setInterval(nextSlide, 5000);
   };
 
+  // 移动设备上禁用某些动画
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
   return (
     <section
       className="w-full bg-void-pit py-16 md:py-24 px-8 md:px-16 lg:px-24 cinematic-glow"

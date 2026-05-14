@@ -142,12 +142,13 @@ function ParticleSystem() {
   const pointsRef = useRef<THREE.Points>(null);
   const positionsRef = useRef<Float32Array | null>(null);
   const velocitiesRef = useRef<Float32Array | null>(null);
+  const [isMobile] = useState(() => /iPhone|iPad|Android|Mobile/i.test(navigator.userAgent));
 
   useEffect(() => {
     if (!pointsRef.current) return;
 
     const geometry = new THREE.BufferGeometry();
-    const count = 1500;
+    const count = isMobile ? 600 : 1500; // 减少移动设备上的粒子数
     const positions = new Float32Array(count * 3);
     const velocities = new Float32Array(count * 3);
 
@@ -184,17 +185,17 @@ function ParticleSystem() {
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
     const material = new THREE.PointsMaterial({
-      size: 0.15,
+      size: isMobile ? 0.12 : 0.15,
       sizeAttenuation: true,
       transparent: true,
-      opacity: 0.7,
+      opacity: isMobile ? 0.5 : 0.7,
       vertexColors: true,
       toneMapped: true,
     });
 
     pointsRef.current.geometry = geometry;
     pointsRef.current.material = material;
-  }, []);
+  }, [isMobile]);
 
   useFrame(() => {
     if (pointsRef.current && positionsRef.current && velocitiesRef.current) {
@@ -327,18 +328,36 @@ function Scene() {
 
 export function PearlNecklaceScene() {
   const { t } = useLocale();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768 || /iPhone|iPad|Android|Mobile/i.test(navigator.userAgent));
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   return (
     <div className="relative w-full h-screen bg-void overflow-hidden">
-      <Suspense fallback={<div className="w-full h-full bg-void flex items-center justify-center"><span className="text-y2k-pink animate-pulse">加载中...</span></div>}>
+      <Suspense fallback={
+        <div className="w-full h-full bg-void flex flex-col items-center justify-center gap-4">
+          <div className="w-12 h-12 border-2 border-y2k-pink border-t-transparent rounded-full animate-spin" />
+          <span className="text-y2k-pink text-sm tracking-widest">LOADING ATELIER...</span>
+        </div>
+      }>
         <Canvas
           gl={{
-            antialias: true,
+            antialias: !isMobile,
             alpha: false,
-            powerPreference: 'high-performance',
+            powerPreference: isMobile ? 'low-power' : 'high-performance',
             stencil: false,
             depth: true,
+            precision: isMobile ? 'lowp' : 'highp',
           }}
-          dpr={[1, 2]}
+          dpr={isMobile ? 1 : [1, 2]}
+          performance={{ min: 0.5, max: isMobile ? 0.8 : 1 }}
         >
           <Scene />
         </Canvas>
@@ -360,6 +379,8 @@ export function PearlNecklaceScene() {
             opacity: 0.85,
             letterSpacing: '0.2em',
             fontWeight: 500,
+            paddingX: '1rem',
+            textAlign: 'center',
           }}>
           {t.hero.eyebrow}
         </p>
