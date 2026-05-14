@@ -1,5 +1,6 @@
 'use client';
 import { useRef, useEffect, useState } from 'react';
+import { useLocale } from '~/lib/LocaleContext';
 
 interface ARTryOnProps {
   productName: string;
@@ -7,6 +8,7 @@ interface ARTryOnProps {
 }
 
 export function ARTryOn({ productName, onClose }: ARTryOnProps) {
+  const { t } = useLocale();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isSupported, setIsSupported] = useState(false);
@@ -31,7 +33,7 @@ export function ARTryOn({ productName, onClose }: ARTryOnProps) {
   const startARSession = async () => {
     try {
       if (!('XRSession' in window)) {
-        alert('你的设备不支持 AR。请使用支持 WebXR 的浏览器。');
+        alert('Your device does not support AR. Please use a WebXR-compatible browser.');
         return;
       }
 
@@ -45,10 +47,10 @@ export function ARTryOn({ productName, onClose }: ARTryOnProps) {
       setIsActive(true);
 
       // Mock AR experience
-      alert(`AR 试戴已启动：${productName}\n\n这是一个预留接口。\n\n完整实现需要：\n1. WebXR API 集成\n2. 人体姿态检测\n3. 虚拟物体放置\n4. 实时渲染`);
+      alert(`AR Try-On Started: ${productName}\n\nThis is a placeholder interface.\n\nFull implementation requires:\n1. WebXR API integration\n2. Body pose detection\n3. Virtual object placement\n4. Real-time rendering`);
     } catch (error) {
       console.error('AR Error:', error);
-      alert('AR 启动失败，请检查浏览器支持情况。');
+      alert('AR startup failed. Please check your browser support.');
     }
   };
 
@@ -61,10 +63,10 @@ export function ARTryOn({ productName, onClose }: ARTryOnProps) {
     return (
       <div className="p-6 bg-void-pit rounded border border-y2k-pink/20 text-center">
         <p className="text-data text-titanium/70 mb-4">
-          你的设备暂不支持 AR 试戴功能。
+          Your device does not support AR Try-On functionality.
         </p>
         <p className="text-label text-y2k-blue/50">
-          请使用支持 WebXR 的现代浏览器（Chrome、Firefox、Safari 15+）
+          Please use a modern WebXR-compatible browser (Chrome, Firefox, Safari 15+)
         </p>
       </div>
     );
@@ -90,13 +92,13 @@ export function ARTryOn({ productName, onClose }: ARTryOnProps) {
             onClick={stopARSession}
             className="px-6 py-3 bg-y2k-pink text-white font-bold uppercase rounded hover:shadow-neon-pink transition-all"
           >
-            关闭 AR
+            CLOSE AR
           </button>
         </div>
 
         {/* AR Info */}
         <div className="absolute top-8 left-8 text-white">
-          <p className="text-label uppercase tracking-wide mb-2">AR 试戴模式</p>
+          <p className="text-label uppercase tracking-wide mb-2">AR TRY-ON MODE</p>
           <p className="text-data text-titanium/70">{productName}</p>
         </div>
       </div>
@@ -105,18 +107,18 @@ export function ARTryOn({ productName, onClose }: ARTryOnProps) {
 
   return (
     <div className="p-6 bg-void-pit rounded border border-y2k-pink/20">
-      <h3 className="text-display-lg font-black uppercase text-y2k-pink mb-4">虚拟试戴</h3>
+      <h3 className="text-display-lg font-black uppercase text-y2k-pink mb-4">VIRTUAL TRY-ON</h3>
       <p className="text-data text-titanium/70 mb-6">
-        使用你的设备摄像头，在现实中虚拟试戴 {productName}。
+        Use your device camera to virtually try on {productName} in real-time.
       </p>
       <button
         onClick={startARSession}
         className="w-full px-6 py-4 bg-gradient-to-r from-y2k-pink to-y2k-purple text-white font-bold uppercase rounded transition-all hover:shadow-neon-pink"
       >
-        📱 启动 AR 试戴
+        📱 START AR TRY-ON
       </button>
       <p className="text-label text-y2k-blue/50 mt-4 text-center">
-        需要支持 WebXR 的浏览器
+        Requires WebXR-compatible browser
       </p>
     </div>
   );
