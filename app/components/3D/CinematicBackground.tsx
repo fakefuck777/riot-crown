@@ -1,6 +1,6 @@
 'use client';
 import { useRef, useEffect } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
 interface CinematicBackgroundProps {

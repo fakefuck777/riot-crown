@@ -40,7 +40,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['app/components/GraffitiCanvas.tsx', 'app/components/HeroY2K.tsx', 'app/components/Product3DViewer.tsx', 'app/components/3D/ProductModel.tsx', 'app/components/Marketing/BlackBoxAnimation.tsx'],
+      files: ['app/components/GraffitiCanvas.tsx', 'app/components/HeroY2K.tsx', 'app/components/Product3DViewer.tsx', 'app/components/3D/**/*.tsx', 'app/components/Marketing/BlackBoxAnimation.tsx', 'app/components/Product/ProductDetailEnhanced.tsx'],
       rules: {
         // @react-three/fiber uses non-DOM props on <mesh />, <light />, etc.
         'react/no-unknown-property': [
@@ -70,6 +70,7 @@ module.exports = {
               'sizeAttenuation',
               'transparent',
               'opacity',
+              'blending',
             ],
           },
         ],
