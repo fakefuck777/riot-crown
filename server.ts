@@ -16,6 +16,22 @@ import {
 } from '@shopify/remix-oxygen';
 import * as remixBuild from 'virtual:remix/server-build';
 
+/** `createStorefrontClient` expects the shop’s `*.myshopify.com` host, not a customer-facing custom domain. */
+function normalizeStoreDomain(raw: string): string {
+  return raw.trim().replace(/^https?:\/\//i, '').split('/')[0] ?? '';
+}
+
+function warnIfStoreDomainIsNotMyshopify(storeDomain: string): void {
+  const host = normalizeStoreDomain(storeDomain).toLowerCase();
+  if (!host || host === 'mock.shop') return;
+  if (!host.endsWith('.myshopify.com')) {
+    console.warn(
+      '[storefront] PUBLIC_STORE_DOMAIN should be your-store.myshopify.com (from Shopify admin), not a custom domain. Current value:',
+      host,
+    );
+  }
+}
+
 export default {
   async fetch(
     request: Request,
@@ -29,15 +45,17 @@ export default {
         HydrogenSession.init(request, [env.SESSION_SECRET]),
       ]);
 
+      warnIfStoreDomainIsNotMyshopify(env.PUBLIC_STORE_DOMAIN ?? '');
+
       const i18n = resolveStorefrontI18nForRequest(request, env, session);
 
       const {storefront} = createStorefrontClient({
         cache,
         waitUntil,
         i18n,
-        // Oxygen secrets: exact keys `PUBLIC_STOREFRONT_API_TOKEN` + `PUBLIC_STORE_DOMAIN` (see .env.example).
+        // Oxygen: `PUBLIC_STOREFRONT_API_TOKEN` + `PUBLIC_STORE_DOMAIN` (myshopify.com only — see .env.example).
         publicStorefrontToken: env.PUBLIC_STOREFRONT_API_TOKEN,
-        storeDomain: env.PUBLIC_STORE_DOMAIN,
+        storeDomain: normalizeStoreDomain(env.PUBLIC_STORE_DOMAIN ?? ''),
         storefrontHeaders: getStorefrontHeaders(request),
       });
 

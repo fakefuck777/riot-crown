@@ -90,7 +90,9 @@ const SIZE_CYCLE: ProductData['size'][] = [
   'large', 'tall', 'wide', 'standard', 'tall', 'standard',
 ];
 
-/** Storefront catalog query — `nodes` on ProductConnection (API 2024+). 无 `@inContext`（降级测试）。 */
+/** Storefront catalog query — `nodes` on ProductConnection (API 2024+). 无 `@inContext`（降级测试）。
+ * 说明：Storefront `products` / `product(handle:)` **没有** Admin 里那种 `publishedStatus: PUBLISHED` 参数；
+ * 能查到的已是「对该 Storefront 渠道已发布」的商品；未发布到 Headless/Storefront 的会表现为 null / 空列表。 */
 const CATALOG_PRODUCTS_QUERY = `#graphql
   query CatalogProducts($first: Int!) {
     products(first: $first, sortKey: UPDATED_AT, reverse: true) {
