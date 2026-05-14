@@ -63,6 +63,7 @@ function Pearl({ position, scale, color, metallic, roughness, emissiveIntensity,
 function NecklaceChain() {
   const groupRef = useRef<THREE.Group>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const scrollProgressRef = useRef(0);
 
   useFrame(({ clock }) => {
     if (groupRef.current) {
@@ -71,9 +72,11 @@ function NecklaceChain() {
         groupRef.current.rotation.x = Math.cos(clock.getElapsedTime() * 0.3) * 0.05;
       }
       // 滚动时碎裂重组
-      if (scrollProgress > 0.3) {
-        const scale = 1 - scrollProgress * 0.5;
+      if (scrollProgressRef.current > 0.3) {
+        const scale = 1 - scrollProgressRef.current * 0.5;
         groupRef.current.scale.set(scale, scale, scale);
+      } else {
+        groupRef.current.scale.set(1, 1, 1);
       }
     }
   });
@@ -83,10 +86,12 @@ function NecklaceChain() {
       const scrollTop = window.scrollY;
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
       const scrollPercent = scrollTop / docHeight;
-      setScrollProgress(Math.min(scrollPercent, 1));
+      const progress = Math.min(scrollPercent, 1);
+      setScrollProgress(progress);
+      scrollProgressRef.current = progress;
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
