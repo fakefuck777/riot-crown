@@ -35,12 +35,12 @@ export default function ProductPageEnhanced() {
         soldCount: Math.floor(Math.random() * 50),
         launchDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
       }}
-      onAddToCart={(item) => {
+      onAddToCart={(item: Record<string, unknown>) => {
         addToCart({
-          id: item.productId,
-          name: item.productName,
+          id: item.productId as string,
+          name: item.productName as string,
           price: product.price,
-          material: item.material,
+          material: item.material as string,
         });
       }}
     />

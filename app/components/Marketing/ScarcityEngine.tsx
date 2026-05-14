@@ -8,7 +8,7 @@ interface ScarcityEngineProps {
   launchDate?: Date;
 }
 
-export function ScarcityEngine({ _productName, totalStock, soldCount, launchDate }: ScarcityEngineProps) {
+export function ScarcityEngine({ productName: _productName, totalStock, soldCount, launchDate }: ScarcityEngineProps) {
   const [timeLeft, setTimeLeft] = useState<string>('');
   const [stockPercent, setStockPercent] = useState(0);
   const [_showUrgency, setShowUrgency] = useState(false);

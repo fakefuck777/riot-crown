@@ -62,7 +62,7 @@ const MATERIAL_VARIANTS = {
 
 // ─── Product 3D Viewer ───────────────────────────────────────────────────────
 
-export function Product3DViewer({ _modelUrl, _productName, onMaterialChange }: Product3DViewerProps) {
+export function Product3DViewer({ modelUrl: _modelUrl, productName: _productName, onMaterialChange }: Product3DViewerProps) {
   const [selectedMaterial, setSelectedMaterial] = useState<keyof typeof MATERIAL_VARIANTS>('pearl_white');
   const [showAR, setShowAR] = useState(false);
 
@@ -147,7 +147,7 @@ export function Product3DViewer({ _modelUrl, _productName, onMaterialChange }: P
 
       {/* Product Info */}
       <div className="p-6 border-t border-gray-800">
-        <h3 className="text-xl font-bold text-white mb-2">{productName}</h3>
+        <h3 className="text-xl font-bold text-white mb-2">产品详情</h3>
         <p className="text-sm text-gray-400 mb-4">
           支持360°旋转 • 材质切换 • AR虚拟试戴
         </p>

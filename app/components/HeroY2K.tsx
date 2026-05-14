@@ -168,7 +168,6 @@ function ParticleSystem() {
 
 function HeroScene() {
   const { camera } = useThree();
-  const _controlsRef = useRef<Record<string, unknown> | null>(null);
 
   useEffect(() => {
     camera.position.set(0, 0, 8);
@@ -179,7 +178,6 @@ function HeroScene() {
     <>
       <PerspectiveCamera makeDefault position={[0, 0, 8]} fov={50} />
       <OrbitControls
-        ref={controlsRef}
         enableZoom={true}
         enablePan={false}
         autoRotate={true}

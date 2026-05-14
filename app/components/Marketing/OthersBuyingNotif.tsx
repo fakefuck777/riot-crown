@@ -7,7 +7,7 @@ interface OthersBuyingNotifProps {
   onClose?: () => void;
 }
 
-export function OthersBuyingNotif({ _productName, isVisible, onClose }: OthersBuyingNotifProps) {
+export function OthersBuyingNotif({ productName: _productName, isVisible, onClose }: OthersBuyingNotifProps) {
   const [notifications, setNotifications] = useState<Array<{ id: string; name: string; action: string }>>([]);
 
   useEffect(() => {
