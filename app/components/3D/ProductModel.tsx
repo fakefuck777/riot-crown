@@ -136,12 +136,23 @@ function Model({ material }: { material: typeof MATERIAL_VARIANTS[keyof typeof M
   const groupRef = useRef<THREE.Group>(null);
   const meshRef = useRef<THREE.Mesh>(null);
   const { isUserInteracting } = useUserInteraction();
+  const materialTransitionRef = useRef(1);
 
   useFrame(() => {
     if (groupRef.current && !isUserInteracting) {
       groupRef.current.rotation.y += 0.005;
     }
+
+    if (meshRef.current && materialTransitionRef.current < 1) {
+      materialTransitionRef.current = Math.min(materialTransitionRef.current + 0.05, 1);
+      const mat = meshRef.current.material as THREE.MeshStandardMaterial;
+      mat.opacity = materialTransitionRef.current;
+    }
   });
+
+  useEffect(() => {
+    materialTransitionRef.current = 0;
+  }, [material]);
 
   return (
     <group ref={groupRef}>
@@ -154,6 +165,8 @@ function Model({ material }: { material: typeof MATERIAL_VARIANTS[keyof typeof M
           emissive={material.emissive}
           emissiveIntensity={material.emissiveIntensity}
           envMapIntensity={1.5}
+          transparent={true}
+          opacity={1}
         />
       </mesh>
 
