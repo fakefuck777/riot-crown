@@ -6,6 +6,7 @@ import type { Storefront } from '@shopify/hydrogen';
 import { SITE_DESCRIPTION, SITE_HOME_TITLE, SITE_KEYWORDS } from '~/lib/siteMeta';
 import { PearlNecklaceScene } from '~/components/3D/PearlNecklaceScene';
 import { Manifesto } from '~/components/Manifesto';
+import { ScrollNarrative } from '~/components/ScrollNarrative';
 import { ProductGrid } from '~/components/ProductGrid';
 import { ScarcityEngine } from '~/components/ScarcityEngine';
 import { TrustBar } from '~/components/TrustBar';
@@ -61,6 +62,7 @@ export default function Index() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: catalogJsonLd }} />
       <PearlNecklaceScene />
       <Manifesto />
+      <ScrollNarrative />
       <ProductGrid products={catalogProducts} />
       <ScarcityEngine products={catalogProducts} />
       <TrustBar />
