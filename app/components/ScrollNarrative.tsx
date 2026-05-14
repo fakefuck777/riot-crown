@@ -160,22 +160,32 @@ export function ScrollNarrative({ onChapterChange }: ScrollNarrativeProps) {
         }
       );
 
-      // Chapter 3 strobe effect
+      // Chapter 3 strobe effect - only when in viewport
       gsap.to(chapter3Ref.current, {
         boxShadow: '0 0 40px rgba(255,18,147,0.8)',
         duration: 0.3,
         repeat: -1,
         yoyo: true,
+        paused: true,
         scrollTrigger: {
           trigger: chapter3Ref.current,
           start: 'top center',
           end: 'bottom center',
           scrub: 1,
+          onEnter: (self) => {
+            self.getAnimation()?.play();
+          },
+          onLeave: (self) => {
+            self.getAnimation()?.pause();
+          },
         },
       });
     }, containerRef);
 
-    return () => ctx.revert();
+    return () => {
+      ctx.revert();
+      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+    };
   }, [reducedMotion, locale, onChapterChange]);
 
   return (
