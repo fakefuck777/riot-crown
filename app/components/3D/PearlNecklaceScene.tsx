@@ -4,6 +4,7 @@ import { useRef, useEffect, useState, Suspense, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Environment, Preload } from '@react-three/drei';
 import * as THREE from 'three';
+import { useLocale } from '~/lib/LocaleContext';
 
 // ─── Pearl Component ───────────────────────────────────────────────────────
 
@@ -325,6 +326,7 @@ function Scene() {
 // ─── Pearl Necklace Scene Component ───────────────────────────────────────
 
 export function PearlNecklaceScene() {
+  const { t } = useLocale();
   return (
     <div className="relative w-full h-screen bg-void overflow-hidden">
       <Suspense fallback={<div className="w-full h-full bg-void flex items-center justify-center"><span className="text-y2k-pink animate-pulse">加载中...</span></div>}>
@@ -359,14 +361,14 @@ export function PearlNecklaceScene() {
             letterSpacing: '0.2em',
             fontWeight: 500,
           }}>
-          MILLENNIUM ATELIER · LUXURY JEWELRY
+          {t.hero.eyebrow}
         </p>
       </div>
 
       {/* Scroll Indicator */}
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 pointer-events-none">
         <div className="animate-bounce text-y2k-pink text-center">
-          <p className="text-label uppercase tracking-wide mb-2">向下滚动</p>
+          <p className="text-label uppercase tracking-wide mb-2">{t.hero.scroll}</p>
           <svg className="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
           </svg>

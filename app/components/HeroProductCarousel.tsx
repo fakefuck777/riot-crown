@@ -66,31 +66,43 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
 
   return (
     <section
-      className="w-full bg-void-pit py-16 md:py-24 px-8 md:px-16 lg:px-24"
+      className="w-full bg-void-pit py-16 md:py-24 px-8 md:px-16 lg:px-24 cinematic-glow"
       style={{
-        borderTop: '1px solid rgba(201,168,76,0.15)',
-        borderBottom: '1px solid rgba(201,168,76,0.15)',
+        borderTop: '1px solid rgba(201,168,76,0.25)',
+        borderBottom: '1px solid rgba(201,168,76,0.25)',
+        position: 'relative',
+        overflow: 'hidden',
       }}
     >
-      <div className="max-w-7xl mx-auto">
+      {/* Cinematic background effect */}
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'radial-gradient(circle at 20% 30%, rgba(255,18,147,0.12) 0%, transparent 40%), radial-gradient(circle at 80% 70%, rgba(110,203,255,0.12) 0%, transparent 40%)',
+          pointerEvents: 'none',
+        }}
+      />
+      <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
         <div className="mb-12 md:mb-16">
           <p
-            className="text-label mb-3 md:mb-4"
+            className="text-label mb-3 md:mb-4 cinematic-pulse"
             style={{
               color: '#C9A84C',
               letterSpacing: '0.3em',
-              opacity: 0.75,
+              opacity: 0.85,
             }}
           >
-            FEATURED PIECES
+            ✦ FEATURED PIECES ✦
           </p>
           <h2
             style={{
               fontFamily: 'var(--font-y2k-display), "Monument Extended", "Helvetica Neue", sans-serif',
               fontWeight: 800,
-              fontSize: 'clamp(1.8rem, 4vw, 3rem)',
-              letterSpacing: '0.06em',
+              fontSize: 'clamp(2rem, 4.5vw, 3.5rem)',
+              letterSpacing: '0.08em',
               color: '#F2F2F2',
               textTransform: 'uppercase',
               marginBottom: '1rem',
@@ -98,6 +110,7 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
+              textShadow: '0 0 40px rgba(255,18,147,0.15)',
             }}
           >
             SHOP NOW
@@ -105,11 +118,11 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
           <p
             style={{
               fontFamily: 'var(--font-mono)',
-              fontSize: '0.7rem',
+              fontSize: '0.75rem',
               letterSpacing: '0.12em',
-              color: 'rgba(242,242,242,0.65)',
-              maxWidth: '32rem',
-              lineHeight: 1.8,
+              color: 'rgba(242,242,242,0.75)',
+              maxWidth: '36rem',
+              lineHeight: 1.9,
             }}
           >
             Explore our latest millennium jewelry collection. Crystal, chrome, and early-2000s attitude.
@@ -119,11 +132,11 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
         {/* Carousel Container */}
         <div
           ref={containerRef}
-          className="relative overflow-hidden rounded-lg"
+          className="relative overflow-hidden rounded-lg cinematic-glow"
           style={{
-            background: 'rgba(5,5,5,0.5)',
-            border: '1px solid rgba(201,168,76,0.2)',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(201,168,76,0.1)',
+            background: 'linear-gradient(135deg, rgba(5,5,5,0.6) 0%, rgba(201,168,76,0.08) 50%, rgba(5,5,5,0.6) 100%)',
+            border: '1px solid rgba(201,168,76,0.3)',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(201,168,76,0.15)',
           }}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
