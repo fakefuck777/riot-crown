@@ -10,8 +10,9 @@ const modelCache = new Map<string, GLBModel>();
 
 export function useGLBModel(url: string): GLBModel | null {
   try {
-    if (modelCache.has(url)) {
-      return modelCache.get(url) || null;
+    const cached = modelCache.get(url);
+    if (cached) {
+      return cached;
     }
 
     const { scene, animations } = useGLTF(url) as { scene: THREE.Group; animations: THREE.AnimationClip[] };

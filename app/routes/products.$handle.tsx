@@ -11,7 +11,6 @@ import {
 import { withLocalePath } from '~/lib/localePath';
 import {
   fetchShopifyProductByHandle,
-  loadStoreCatalog,
 } from '~/lib/shopifyCatalog.server';
 import { storefrontTokenPrefix4FromEnv, type StorefrontTokenEnv } from '~/lib/storefrontEnvDebug';
 import { getProduct } from '~/lib/products';

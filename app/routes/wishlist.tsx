@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useLocale } from '~/lib/LocaleContext';
 
 export default function WishlistPage() {
   const [wishlist, setWishlist] = useState<string[]>([]);
