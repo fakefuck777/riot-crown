@@ -19,7 +19,8 @@ export default defineConfig({
     command: `npx shopify hydrogen preview --port ${port}`,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
+    // `hydrogen preview` cold start + CI runners can exceed 120s (GitHub Actions timeout).
+    timeout: 300_000,
     stdout: 'pipe',
     stderr: 'pipe',
   },

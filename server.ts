@@ -32,6 +32,18 @@ function warnIfStoreDomainIsNotMyshopify(storeDomain: string): void {
   }
 }
 
+function warnIfStorefrontPublicTokenLooksWrong(token: string): void {
+  const t = token.trim();
+  if (!t) return;
+  // Admin API private app token (wrong for Storefront GraphQL `X-Shopify-Storefront-Access-Token`).
+  if (t.startsWith('shpat_')) {
+    console.warn(
+      '[storefront] PUBLIC_STOREFRONT_API_TOKEN looks like a Shopify Admin API token (shpat_). ' +
+        'Hydrogen needs the Storefront API access token from your app → Configuration → Storefront API (public token), not the Admin API secret.',
+    );
+  }
+}
+
 export default {
   async fetch(
     request: Request,
@@ -46,6 +58,7 @@ export default {
       ]);
 
       warnIfStoreDomainIsNotMyshopify(env.PUBLIC_STORE_DOMAIN ?? '');
+      warnIfStorefrontPublicTokenLooksWrong(env.PUBLIC_STOREFRONT_API_TOKEN ?? '');
 
       const i18n = resolveStorefrontI18nForRequest(request, env, session);
 

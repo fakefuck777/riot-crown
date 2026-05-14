@@ -8,6 +8,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Playwright `webServer` (hydrogen preview) can be slow on cold CI; keep headroom above default job cap.
+    timeout-minutes: 30
     env:
       SESSION_SECRET: '01234567890123456789012345678901'
       PUBLIC_STOREFRONT_API_TOKEN: '000000000000000000000000000000'
