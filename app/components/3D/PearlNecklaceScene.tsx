@@ -340,8 +340,8 @@ export function PearlNecklaceScene() {
   }, []);
 
   return (
-    <div className="relative w-full bg-void">
-      <div className="relative w-full h-[85vh] md:h-screen overflow-hidden">
+    <div className="relative w-full bg-void" style={{ touchAction: 'auto' }}>
+      <div className="relative w-full h-[85vh] md:h-screen overflow-hidden" style={{ touchAction: 'pan-y' }}>
         <Suspense fallback={
           <div className="w-full h-full bg-void flex flex-col items-center justify-center gap-4">
             <div className="w-12 h-12 border-2 border-y2k-pink border-t-transparent rounded-full animate-spin" />
@@ -359,6 +359,7 @@ export function PearlNecklaceScene() {
             }}
             dpr={isMobile ? 1 : [1, 2]}
             performance={{ min: 0.5, max: isMobile ? 0.8 : 1 }}
+            style={{ pointerEvents: isMobile ? 'none' : 'auto' }}
           >
             <Scene />
           </Canvas>
