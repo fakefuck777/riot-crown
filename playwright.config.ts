@@ -20,7 +20,8 @@ export default defineConfig({
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     // `hydrogen preview` cold start + CI runners can exceed 120s (GitHub Actions timeout).
-    timeout: 300_000,
+    // Increased to 600s (10 minutes) for complex builds with 3D components
+    timeout: 600_000,
     stdout: 'pipe',
     stderr: 'pipe',
   },
