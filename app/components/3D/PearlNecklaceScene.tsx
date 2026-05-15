@@ -340,8 +340,8 @@ export function PearlNecklaceScene() {
   }, []);
 
   return (
-    <div className="relative w-full min-h-screen bg-void">
-      <div className="relative w-full h-screen overflow-hidden">
+    <div className="relative w-full bg-void">
+      <div className="relative w-full h-[85vh] md:h-screen overflow-hidden">
         <Suspense fallback={
           <div className="w-full h-full bg-void flex flex-col items-center justify-center gap-4">
             <div className="w-12 h-12 border-2 border-y2k-pink border-t-transparent rounded-full animate-spin" />

@@ -65,13 +65,14 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
 
   return (
     <section
-      className="w-full bg-void-pit py-16 md:py-24 px-8 md:px-16 lg:px-24 cinematic-glow"
+      className="w-full bg-void-pit py-20 md:py-32 px-8 md:px-16 lg:px-24 cinematic-glow"
       style={{
-        borderTop: '1px solid rgba(201,168,76,0.25)',
-        borderBottom: '1px solid rgba(201,168,76,0.25)',
+        borderTop: '2px solid rgba(201,168,76,0.35)',
+        borderBottom: '2px solid rgba(201,168,76,0.35)',
         position: 'relative',
         overflow: 'hidden',
-        background: 'linear-gradient(180deg, rgba(5,5,5,0.8) 0%, rgba(7,7,12,0.6) 50%, rgba(5,5,5,0.8) 100%)',
+        background: 'linear-gradient(180deg, rgba(5,5,5,0.95) 0%, rgba(7,7,12,0.8) 50%, rgba(5,5,5,0.95) 100%)',
+        boxShadow: 'inset 0 0 80px rgba(201,168,76,0.08), 0 20px 60px rgba(0,0,0,0.8)',
       }}
     >
       {/* Premium Cinematic background effect */}
@@ -87,14 +88,16 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
       />
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
-        <div className="mb-12 md:mb-16">
+        <div className="mb-12 md:mb-20">
           <p
             className="text-label mb-3 md:mb-4 cinematic-pulse"
             style={{
-              color: '#C9A84C',
+              color: '#FF1293',
               letterSpacing: '0.3em',
-              opacity: 0.85,
-              textShadow: '0 0 20px rgba(201,168,76,0.2)',
+              opacity: 0.95,
+              textShadow: '0 0 24px rgba(255,18,147,0.3)',
+              fontSize: '0.7rem',
+              fontWeight: 600,
             }}
           >
             ✦ {t.product.featured} ✦
@@ -102,18 +105,18 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
           <h2
             style={{
               fontFamily: 'var(--font-y2k-display), "Monument Extended", "Helvetica Neue", sans-serif',
-              fontWeight: 800,
-              fontSize: 'clamp(2rem, 4.5vw, 3.5rem)',
-              letterSpacing: '0.08em',
+              fontWeight: 900,
+              fontSize: 'clamp(2.5rem, 5.5vw, 4rem)',
+              letterSpacing: '0.06em',
               color: '#F2F2F2',
               textTransform: 'uppercase',
-              marginBottom: '1rem',
-              background: 'linear-gradient(135deg, #F2F2F2 0%, #C9A84C 50%, #A8A8A8 100%)',
+              marginBottom: '1.5rem',
+              background: 'linear-gradient(135deg, #FF1293 0%, #C9A84C 50%, #F2F2F2 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
-              textShadow: '0 0 40px rgba(255,18,147,0.15)',
-              filter: 'drop-shadow(0 0 20px rgba(201,168,76,0.2))',
+              textShadow: '0 0 60px rgba(255,18,147,0.2)',
+              filter: 'drop-shadow(0 0 30px rgba(255,18,147,0.25))',
             }}
           >
             {t.product.shopNow}
@@ -121,27 +124,28 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
           <p
             style={{
               fontFamily: 'var(--font-mono)',
-              fontSize: '0.75rem',
+              fontSize: '0.8rem',
               letterSpacing: '0.12em',
-              color: 'rgba(242,242,242,0.75)',
-              maxWidth: '36rem',
-              lineHeight: 1.9,
+              color: 'rgba(242,242,242,0.85)',
+              maxWidth: '42rem',
+              lineHeight: 2,
               textShadow: '0 2px 8px rgba(0,0,0,0.5)',
+              fontWeight: 500,
             }}
           >
-            Explore our latest millennium jewelry collection. Crystal, chrome, and early-2000s attitude.
+            Millennium jewelry for the discerning eye. Limited pieces, hand-finished, worn by those who understand that luxury whispers.
           </p>
         </div>
 
         {/* Carousel Container */}
         <div
           ref={containerRef}
-          className="relative overflow-hidden rounded-lg cinematic-glow"
+          className="relative overflow-hidden rounded-xl cinematic-glow"
           style={{
-            background: 'linear-gradient(135deg, rgba(5,5,5,0.8) 0%, rgba(201,168,76,0.1) 50%, rgba(5,5,5,0.8) 100%)',
-            border: '1px solid rgba(201,168,76,0.4)',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.8), inset 0 1px 0 rgba(201,168,76,0.2), 0 0 40px rgba(201,168,76,0.15)',
-            backdropFilter: 'blur(8px)',
+            background: 'linear-gradient(135deg, rgba(5,5,5,0.9) 0%, rgba(255,18,147,0.08) 50%, rgba(5,5,5,0.9) 100%)',
+            border: '2px solid rgba(255,18,147,0.5)',
+            boxShadow: '0 30px 80px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,18,147,0.25), 0 0 60px rgba(255,18,147,0.2)',
+            backdropFilter: 'blur(12px)',
           }}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}

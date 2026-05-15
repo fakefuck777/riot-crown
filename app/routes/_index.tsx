@@ -63,9 +63,9 @@ export default function Index() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: catalogJsonLd }} />
       <PearlNecklaceScene />
       <HeroProductCarousel products={catalogProducts} />
+      <ProductGrid products={catalogProducts} />
       <Manifesto />
       <ScrollNarrative />
-      <ProductGrid products={catalogProducts} />
       <ScarcityEngine products={catalogProducts} />
       <TrustBar />
       <Testimonials />
