@@ -38,7 +38,6 @@ export function Hero() {
     return () => window.removeEventListener('wheel', onWheel);
   }, [reducedMotion]);
 
-  /** 视差倾斜：仅在 pointer 移动时驱动 quickTo，避免与 WebGL 争抢「每帧空转」的 rAF。 */
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
@@ -63,7 +62,6 @@ export function Hero() {
     return () => window.removeEventListener('mousemove', onMove);
   }, [reducedMotion]);
 
-  // Entrance — staggered; layout effect avoids first paint stuck at opacity:0; context cleans StrictMode remounts.
   useEffect(() => {
     const root = heroRootRef.current;
     if (!root) return;
@@ -125,7 +123,6 @@ export function Hero() {
     return () => ctx.revert();
   }, [reducedMotion]);
 
-  // If GSAP never completes (rare WebKit / extension edge cases), never leave hero copy invisible.
   useEffect(() => {
     if (reducedMotion) return;
     const targets = [
@@ -156,7 +153,6 @@ export function Hero() {
       className="relative isolate w-full min-h-screen min-h-dvh bg-void"
       style={{ overflow: 'hidden' }}
     >
-      {/* WebGL — own layer, never 3D-tilted (tilting the whole section made the fluid read “smaller” under perspective). */}
       <div
         className="pointer-events-none absolute inset-0 z-0 min-h-dvh w-full"
         aria-hidden
@@ -172,7 +168,6 @@ export function Hero() {
         </Suspense>
       </div>
 
-      {/* Foreground: veils + copy — subtle parallax tilt only here */}
       <div
         ref={sectionRef}
         className="pointer-events-none absolute inset-0 z-[1] min-h-dvh w-full"
@@ -182,7 +177,6 @@ export function Hero() {
           backfaceVisibility: 'hidden',
         }}
       >
-        {/* 单层暗角：压住中心过曝，减少与流体霓虹的「抢色」 */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
@@ -200,7 +194,6 @@ export function Hero() {
 
         {!reducedMotion ? <div className="y2k-hero-chrome-orbit" aria-hidden /> : null}
 
-        {/* Main content — full-width column; title scales to viewport (editorial left anchor) */}
         <div className="pointer-events-auto absolute inset-0 flex w-full max-w-full flex-col justify-center px-8 md:px-16 lg:px-24">
 
         <div className="y2k-hero-glyph-row" aria-hidden>
@@ -223,7 +216,6 @@ export function Hero() {
           </div>
         ) : null}
 
-        {/* Eyebrow */}
         <p
           ref={eyebrowRef}
           className="w-full max-w-full"
@@ -240,12 +232,11 @@ export function Hero() {
           {t.hero.eyebrow}
         </p>
 
-        {/* Title — block spans column width; fluid type (was capped at 16rem so wide screens felt “short”) */}
         <h1
           ref={titleRef}
-          className=”w-full max-w-full”
+          className="w-full max-w-full"
           style={{
-            fontFamily: '”Monument Extended”, “Helvetica Neue”, “Arial Black”, sans-serif',
+            fontFamily: '"Monument Extended", "Helvetica Neue", "Arial Black", sans-serif',
             fontWeight: 900,
             fontSize: 'clamp(6rem, min(18vw, 26vh), 32rem)',
             lineHeight: 0.85,
@@ -263,7 +254,6 @@ export function Hero() {
           {t.hero.title1} {t.hero.title2}
         </h1>
 
-        {/* Gold divider — draws across on entrance */}
         <div
           ref={dividerRef}
           style={{
@@ -277,7 +267,6 @@ export function Hero() {
           }}
         />
 
-        {/* Subtitle + metadata row */}
         <div ref={subtitleRef} style={{ opacity: 0 }}>
           <p
             className="y2k-hero-body-copy"
@@ -294,7 +283,6 @@ export function Hero() {
           >
             {t.hero.subtitle}
           </p>
-          {/* Metadata strip */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
             <span style={{
               fontFamily: 'var(--font-mono)',
@@ -347,7 +335,6 @@ export function Hero() {
         </div>
         </div>
 
-        {/* Scroll indicator — bottom center */}
         <div
           ref={scrollRef}
           className="absolute bottom-10 left-1/2 flex -translate-x-1/2 flex-col items-center gap-3"
@@ -370,7 +357,6 @@ export function Hero() {
           }} />
         </div>
 
-        {/* Corner coordinates — editorial detail */}
         <div className="pointer-events-none absolute bottom-10 left-8 md:left-16" style={{
           fontFamily: 'var(--font-mono)',
           fontSize: '0.5rem',
