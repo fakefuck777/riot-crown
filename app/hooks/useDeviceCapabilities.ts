@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-interface NavigatorWithDeviceMemory extends Navigator {
+interface NavigatorWithDeviceMemory {
   deviceMemory?: number;
   hardwareConcurrency?: number;
   connection?: {
