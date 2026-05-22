@@ -238,17 +238,18 @@ export function Hero() {
           style={{
             fontFamily: '"Monument Extended", "Helvetica Neue", "Arial Black", sans-serif',
             fontWeight: 900,
-            fontSize: 'clamp(6rem, min(18vw, 26vh), 32rem)',
-            lineHeight: 0.85,
-            letterSpacing: '-0.02em',
+            fontSize: 'clamp(8rem, min(22vw, 32vh), 42rem)',
+            lineHeight: 0.9,
+            letterSpacing: '-0.03em',
             textTransform: 'uppercase',
-            background: 'linear-gradient(135deg, #E8E8E8 0%, #C0C0C0 25%, #A8A8A8 50%, #808080 75%, #606060 100%)',
+            background: 'linear-gradient(135deg, #E8E8E8 0%, #C0C0C0 25%, #E8E8E8 50%, #B0B0B0 75%, #E8E8E8 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
             opacity: 0,
             textShadow: 'none',
-            filter: 'drop-shadow(0 0 30px rgba(192,192,192,0.4)) drop-shadow(0 0 60px rgba(192,192,192,0.2))',
+            filter: 'drop-shadow(0 0 40px rgba(192,192,192,0.4)) drop-shadow(0 0 80px rgba(192,192,192,0.2))',
+            whiteSpace: 'nowrap',
           }}
         >
           {t.hero.title1} {t.hero.title2}
