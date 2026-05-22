@@ -247,17 +247,17 @@ export function Hero() {
           style={{
             fontFamily: '”Monument Extended”, “Helvetica Neue”, “Arial Black”, sans-serif',
             fontWeight: 900,
-            fontSize: 'clamp(5.5rem, min(16vw, 24vh), 28rem)',
+            fontSize: 'clamp(6rem, min(18vw, 26vh), 32rem)',
             lineHeight: 0.85,
             letterSpacing: '-0.02em',
             textTransform: 'uppercase',
-            color: '#F2F2F2',
+            background: 'linear-gradient(135deg, #E8E8E8 0%, #C0C0C0 25%, #A8A8A8 50%, #808080 75%, #606060 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
             opacity: 0,
-            textShadow: `
-              0 0 80px rgba(255,255,255,0.12),
-              0 0 120px rgba(192,192,192,0.12),
-              0 2px 0 rgba(0,0,0,0.9)
-            `,
+            textShadow: 'none',
+            filter: 'drop-shadow(0 0 30px rgba(192,192,192,0.4)) drop-shadow(0 0 60px rgba(192,192,192,0.2))',
           }}
         >
           {t.hero.title1} {t.hero.title2}
