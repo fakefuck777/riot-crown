@@ -65,7 +65,7 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
 
   return (
     <section
-      className="w-full bg-void-pit py-20 md:py-32 px-8 md:px-16 lg:px-24 cinematic-glow"
+      className="w-full bg-void-pit py-12 md:py-20 lg:py-24 px-8 md:px-16 lg:px-24 cinematic-glow"
       style={{
         borderTop: '2px solid rgba(201,168,76,0.35)',
         borderBottom: '2px solid rgba(201,168,76,0.35)',
@@ -88,7 +88,7 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
       />
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
-        <div className="mb-12 md:mb-20">
+        <div className="mb-8 md:mb-14">
           <p
             className="text-label mb-3 md:mb-4 cinematic-pulse"
             style={{
@@ -103,8 +103,8 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
             ✦ {t.product.featured} ✦
           </p>
           <h2
+            className="font-y2k"
             style={{
-              fontFamily: 'var(--font-y2k-display), "Monument Extended", "Helvetica Neue", sans-serif',
               fontWeight: 900,
               fontSize: 'clamp(2.5rem, 5.5vw, 4rem)',
               letterSpacing: '0.06em',
@@ -122,18 +122,20 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
             {t.product.shopNow}
           </h2>
           <p
+            className="font-editorial"
             style={{
-              fontFamily: 'var(--font-mono)',
-              fontSize: '0.8rem',
-              letterSpacing: '0.12em',
-              color: 'rgba(242,242,242,0.85)',
+              fontSize: 'clamp(0.95rem, 1.35vw, 1.1rem)',
+              letterSpacing: '0.04em',
+              fontStyle: 'italic',
+              color: 'rgba(242,242,242,0.88)',
               maxWidth: '42rem',
-              lineHeight: 2,
-              textShadow: '0 2px 8px rgba(0,0,0,0.5)',
+              lineHeight: 1.75,
+              textShadow: '0 2px 12px rgba(0,0,0,0.55), 0 0 28px rgba(201,168,76,0.12)',
               fontWeight: 500,
             }}
           >
-            Millennium jewelry for the discerning eye. Limited pieces, hand-finished, worn by those who understand that luxury whispers.
+            Millennium jewelry for the discerning eye. Limited pieces, hand-finished, worn by those who understand that luxury
+            whispers.
           </p>
         </div>
 
@@ -180,8 +182,8 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
                 {/* Product Info */}
                 <div>
                   <h3
+                    className="font-y2k"
                     style={{
-                      fontFamily: 'var(--font-display)',
                       fontSize: 'clamp(1.2rem, 3vw, 1.8rem)',
                       fontWeight: 700,
                       color: '#F2F2F2',

@@ -1,10 +1,53 @@
 'use client';
 /* eslint-disable react/no-unknown-property, @typescript-eslint/no-unused-vars */
-import { useRef, useEffect, useState, Suspense, useMemo } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import {
+  Component,
+  type ErrorInfo,
+  type ReactNode,
+  createContext,
+  useCallback,
+  useContext,
+  useRef,
+  useEffect,
+  useLayoutEffect,
+  useState,
+  Suspense,
+  useMemo,
+} from 'react';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Environment, Preload } from '@react-three/drei';
 import * as THREE from 'three';
 import { useLocale } from '~/lib/LocaleContext';
+import { useDeviceCapabilities, getSceneQualityTier, getParticleCount, getPearlSegments } from '~/hooks/useDeviceCapabilities';
+
+declare global {
+  interface Window {
+    isUserInteracting?: boolean;
+  }
+}
+
+/** 画质档位：由 Canvas 外传入，避免 R3F 树内重复测 UA / 宽度 */
+type PearlSceneQuality = {
+  /** 球体经纬分段（上限 64 桌面 / 40 移动，显著低于原 128²） */
+  pearlSegments: number;
+  /** 小颗珍珠再降一档分段，近似 LOD */
+  pearlSegmentsSmall: number;
+  meshShadows: boolean;
+  /** 仅少数关键珍珠挂点光源，且永不 castShadow（原 14×点光+阴影极重） */
+  attachedPointLight: 'none' | 'subtle' | 'full';
+  envMapIntensity: number;
+  /** ACES tone mapping exposure（电影感高光压暗部抬） */
+  toneExposure: number;
+};
+
+const PearlSceneQualityContext = createContext<PearlSceneQuality>({
+  pearlSegments: 64,
+  pearlSegmentsSmall: 40,
+  meshShadows: true,
+  attachedPointLight: 'subtle',
+  envMapIntensity: 2,
+  toneExposure: 1.06,
+});
 
 // ─── Pearl Component ───────────────────────────────────────────────────────
 
@@ -16,11 +59,31 @@ interface PearlProps {
   roughness: number;
   emissiveIntensity: number;
   isChrome?: boolean;
+  /** 是否使用「小珍珠」较低分段 */
+  lowDetail?: boolean;
+  /** 是否允许挂载呼吸点光（由 NecklaceChain 按索引控制数量） */
+  allowAttachedLight?: boolean;
 }
 
-function Pearl({ position, scale, color, metallic, roughness, emissiveIntensity, isChrome }: PearlProps) {
+function Pearl({
+  position,
+  scale,
+  color,
+  metallic,
+  roughness,
+  emissiveIntensity,
+  isChrome: _isChrome,
+  lowDetail,
+  allowAttachedLight,
+}: PearlProps) {
+  const q = useContext(PearlSceneQualityContext);
   const meshRef = useRef<THREE.Mesh>(null);
   const lightRef = useRef<THREE.PointLight>(null);
+  const segments = lowDetail ? q.pearlSegmentsSmall : q.pearlSegments;
+  const showLight =
+    allowAttachedLight &&
+    q.attachedPointLight !== 'none' &&
+    (q.attachedPointLight === 'full' || q.attachedPointLight === 'subtle');
 
   useFrame(({ clock }) => {
     if (meshRef.current && !window.isUserInteracting) {
@@ -30,34 +93,37 @@ function Pearl({ position, scale, color, metallic, roughness, emissiveIntensity,
       const breathe = 1 + Math.sin(clock.getElapsedTime() * 1.2) * 0.08;
       meshRef.current.scale.set(breathe, breathe, breathe);
     }
-    if (lightRef.current) {
-      lightRef.current.intensity = 1.5 + Math.sin(clock.getElapsedTime() * 2.5) * 0.8;
+    if (lightRef.current && showLight) {
+      const base = q.attachedPointLight === 'full' ? 1.35 : 0.85;
+      lightRef.current.intensity = base + Math.sin(clock.getElapsedTime() * 2.5) * 0.45;
     }
   });
 
   return (
     <group position={position}>
-      <mesh ref={meshRef} scale={scale} castShadow={true} receiveShadow={true}>
-        <sphereGeometry args={[1, 128, 128]} />
+      <mesh ref={meshRef} scale={scale} castShadow={q.meshShadows} receiveShadow={q.meshShadows}>
+        <sphereGeometry args={[1, segments, segments]} />
         <meshStandardMaterial
           color={color}
           metalness={metallic}
           roughness={roughness}
           emissive={color}
           emissiveIntensity={emissiveIntensity}
-          envMapIntensity={2}
+          envMapIntensity={q.envMapIntensity}
           wireframe={false}
           toneMapped={true}
         />
       </mesh>
-      <pointLight
-        ref={lightRef}
-        intensity={1.5}
-        distance={18}
-        color={color}
-        decay={2}
-        castShadow={true}
-      />
+      {showLight ? (
+        <pointLight
+          ref={lightRef}
+          intensity={0.9}
+          distance={16}
+          color={color}
+          decay={2}
+          castShadow={false}
+        />
+      ) : null}
     </group>
   );
 }
@@ -65,9 +131,16 @@ function Pearl({ position, scale, color, metallic, roughness, emissiveIntensity,
 // ─── Necklace Chain ───────────────────────────────────────────────────────
 
 function NecklaceChain() {
+  const q = useContext(PearlSceneQualityContext);
   const groupRef = useRef<THREE.Group>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
   const scrollProgressRef = useRef(0);
+
+  const lightIndices = useMemo(() => {
+    if (q.attachedPointLight === 'none') return new Set<number>();
+    if (q.attachedPointLight === 'subtle') return new Set([0, 1, 2]);
+    return new Set([0, 1, 2, 5, 6, 10, 11]);
+  }, [q.attachedPointLight]);
 
   useFrame(({ clock }) => {
     if (groupRef.current) {
@@ -130,7 +203,12 @@ function NecklaceChain() {
   return (
     <group ref={groupRef}>
       {pearlData.map((props, i) => (
-        <Pearl key={i} {...props} />
+        <Pearl
+          key={i}
+          {...props}
+          lowDetail={props.scale < 0.85}
+          allowAttachedLight={lightIndices.has(i)}
+        />
       ))}
     </group>
   );
@@ -142,13 +220,13 @@ function ParticleSystem() {
   const pointsRef = useRef<THREE.Points>(null);
   const positionsRef = useRef<Float32Array | null>(null);
   const velocitiesRef = useRef<Float32Array | null>(null);
-  const [isMobile] = useState(() => /iPhone|iPad|Android|Mobile/i.test(navigator.userAgent));
+  const caps = useDeviceCapabilities();
+  const count = getParticleCount(caps);
 
   useEffect(() => {
     if (!pointsRef.current) return;
 
     const geometry = new THREE.BufferGeometry();
-    const count = isMobile ? 600 : 1500; // 减少移动设备上的粒子数
     const positions = new Float32Array(count * 3);
     const velocities = new Float32Array(count * 3);
 
@@ -185,17 +263,17 @@ function ParticleSystem() {
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
     const material = new THREE.PointsMaterial({
-      size: isMobile ? 0.12 : 0.15,
+      size: caps.isMobile ? 0.12 : 0.15,
       sizeAttenuation: true,
       transparent: true,
-      opacity: isMobile ? 0.5 : 0.7,
+      opacity: caps.isMobile ? 0.5 : 0.7,
       vertexColors: true,
       toneMapped: true,
     });
 
     pointsRef.current.geometry = geometry;
     pointsRef.current.material = material;
-  }, [isMobile]);
+  }, [count, caps.isMobile]);
 
   useFrame(() => {
     if (pointsRef.current && positionsRef.current && velocitiesRef.current) {
@@ -271,11 +349,121 @@ function NeonGlitch() {
   );
 }
 
+/** ACES 电影级色调 + WebGL context lost → 父级静态回退（仍保证首屏品牌可见） */
+function GlFilmicAndContextGuard({ onWebglContextLost }: { onWebglContextLost: () => void }) {
+  const gl = useThree((s) => s.gl);
+  const q = useContext(PearlSceneQualityContext);
+
+  useLayoutEffect(() => {
+    gl.outputColorSpace = THREE.SRGBColorSpace;
+    gl.toneMapping = THREE.ACESFilmicToneMapping;
+    gl.toneMappingExposure = q.toneExposure;
+    gl.setClearColor('#050505', 1);
+  }, [gl, q.toneExposure]);
+
+  useEffect(() => {
+    const canvas = gl.domElement;
+    const lost = (e: Event) => {
+      (e as WebGLContextEvent).preventDefault?.();
+      onWebglContextLost();
+    };
+    canvas.addEventListener('webglcontextlost', lost, false);
+    return () => canvas.removeEventListener('webglcontextlost', lost);
+  }, [gl, onWebglContextLost]);
+
+  return null;
+}
+
+function CanvasInner({ onWebglContextLost }: { onWebglContextLost: () => void }) {
+  return (
+    <>
+      <GlFilmicAndContextGuard onWebglContextLost={onWebglContextLost} />
+      <Scene />
+    </>
+  );
+}
+
+class PearlCanvasErrorBoundary extends Component<
+  { children: ReactNode; fallback: ReactNode },
+  { hasError: boolean }
+> {
+  state = { hasError: false };
+
+  static getDerivedStateFromError(): { hasError: boolean } {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.error('[PearlNecklaceScene] Canvas error:', error.message, info.componentStack);
+  }
+
+  render() {
+    if (this.state.hasError) return this.props.fallback;
+    return this.props.children;
+  }
+}
+
+/** WebGL 不可用或已丢失时：同构图层 + 霓虹氛围，避免空白 / “没加载” */
+function StaticPearlFallback({
+  eyebrow,
+  scrollLabel,
+}: {
+  eyebrow: string;
+  scrollLabel: string;
+}) {
+  return (
+    <>
+      <div
+        className="absolute inset-0 bg-void"
+        aria-hidden
+        style={{
+          background:
+            'radial-gradient(ellipse 85% 55% at 50% 38%, rgba(255,18,147,0.12) 0%, transparent 52%), radial-gradient(ellipse 55% 45% at 82% 62%, rgba(110,203,255,0.08) 0%, transparent 48%), radial-gradient(ellipse 50% 35% at 18% 70%, rgba(179,102,255,0.06) 0%, transparent 45%), #050505',
+        }}
+      />
+      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+        <h1
+          className="text-brutal-chrome"
+          style={{
+            textShadow:
+              '0 4px 8px rgba(0, 0, 0, 0.9), 0 12px 24px rgba(0, 0, 0, 0.7), inset -2px -2px 4px rgba(0, 0, 0, 0.6), inset 2px 2px 4px rgba(255, 255, 255, 0.4), 0 0 40px rgba(201, 168, 76, 0.25)',
+            letterSpacing: '0.08em',
+            filter: 'brightness(1.2) contrast(1.4) drop-shadow(0 0 30px rgba(201, 168, 76, 0.3))',
+            animation: 'chrome-shine 8s ease-in-out infinite',
+          }}
+        >
+          RIOT CROWN
+        </h1>
+        <p
+          className="text-label uppercase tracking-ultra-wide text-titanium mt-6 px-4"
+          style={{
+            textShadow: '0 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(201, 168, 76, 0.15)',
+            opacity: 0.85,
+            letterSpacing: '0.2em',
+            fontWeight: 500,
+            textAlign: 'center',
+            animation: 'fade-pulse 4s ease-in-out infinite',
+          }}
+        >
+          {eyebrow}
+        </p>
+      </div>
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 pointer-events-none">
+        <div className="animate-bounce text-y2k-pink text-center">
+          <p className="text-label uppercase tracking-wide mb-2">{scrollLabel}</p>
+          <svg className="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+          </svg>
+        </div>
+      </div>
+    </>
+  );
+}
+
 // ─── Main Scene ───────────────────────────────────────────────────────────
 
 function Scene() {
   const cameraRef = useRef<THREE.PerspectiveCamera>(null);
-  const sceneRef = useRef<THREE.Scene>(null);
 
   useEffect(() => {
     window.isUserInteracting = false;
@@ -289,24 +477,28 @@ function Scene() {
         enablePan={false}
         autoRotate={!window.isUserInteracting}
         autoRotateSpeed={2}
-        onStart={() => (window.isUserInteracting = true)}
-        onEnd={() => (window.isUserInteracting = false)}
+        onStart={() => {
+          window.isUserInteracting = true;
+        }}
+        onEnd={() => {
+          window.isUserInteracting = false;
+        }}
       />
 
-      {/* Premium Multi-Layer Lighting */}
+      {/* Premium Multi-Layer Lighting（场景级；珍珠上不再各挂 castShadow 点光） */}
       <ambientLight intensity={0.25} color="#ffffff" />
 
       {/* Key Light - Pink */}
-      <pointLight position={[8, 6, 8]} intensity={1.5} color="#FF1293" decay={2} />
+      <pointLight position={[8, 6, 8]} intensity={1.5} color="#FF1293" decay={2} castShadow={false} />
 
       {/* Fill Light - Cyan */}
-      <pointLight position={[-8, -6, 8]} intensity={1.2} color="#6ECBFF" decay={2} />
+      <pointLight position={[-8, -6, 8]} intensity={1.2} color="#6ECBFF" decay={2} castShadow={false} />
 
       {/* Rim Light - Purple */}
-      <pointLight position={[0, 0, 12]} intensity={0.9} color="#B366FF" decay={2} />
+      <pointLight position={[0, 0, 12]} intensity={0.9} color="#B366FF" decay={2} castShadow={false} />
 
       {/* Accent Light - Green */}
-      <pointLight position={[6, -8, 6]} intensity={0.7} color="#C8FF00" decay={2} />
+      <pointLight position={[6, -8, 6]} intensity={0.7} color="#C8FF00" decay={2} castShadow={false} />
 
       {/* Environment */}
       <Environment preset="night" />
@@ -330,6 +522,33 @@ export function PearlNecklaceScene() {
   const { t } = useLocale();
   const [isMobile, setIsMobile] = useState(false);
 
+  const sceneQuality = useMemo<PearlSceneQuality>(() => {
+    if (isMobile) {
+      return {
+        pearlSegments: 40,
+        pearlSegmentsSmall: 28,
+        meshShadows: false,
+        attachedPointLight: 'subtle',
+        envMapIntensity: 2.65,
+        toneExposure: 0.98,
+      };
+    }
+    return {
+      pearlSegments: 64,
+      pearlSegmentsSmall: 40,
+      meshShadows: true,
+      attachedPointLight: 'full',
+      envMapIntensity: 2.1,
+      toneExposure: 1.08,
+    };
+  }, [isMobile]);
+
+  const [useStaticFallback, setUseStaticFallback] = useState(false);
+
+  const handleWebglContextLost = useCallback(() => {
+    setUseStaticFallback(true);
+  }, []);
+
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768 || /iPhone|iPad|Android|Mobile/i.test(navigator.userAgent));
@@ -342,62 +561,89 @@ export function PearlNecklaceScene() {
   return (
     <div className="relative w-full bg-void" style={{ touchAction: 'auto' }}>
       <div className="relative w-full h-[85vh] md:h-screen overflow-hidden" style={{ touchAction: 'pan-y' }}>
-        <Suspense fallback={
-          <div className="w-full h-full bg-void flex flex-col items-center justify-center gap-4">
-            <div className="w-12 h-12 border-2 border-y2k-pink border-t-transparent rounded-full animate-spin" />
-            <span className="text-y2k-pink text-sm tracking-widest">{t.product.loading}</span>
-          </div>
-        }>
-          <Canvas
-            gl={{
-              antialias: !isMobile,
-              alpha: false,
-              powerPreference: isMobile ? 'low-power' : 'high-performance',
-              stencil: false,
-              depth: true,
-              precision: isMobile ? 'lowp' : 'highp',
-            }}
-            dpr={isMobile ? 1 : [1, 2]}
-            performance={{ min: 0.5, max: isMobile ? 0.8 : 1 }}
-            style={{ pointerEvents: isMobile ? 'none' : 'auto' }}
-          >
-            <Scene />
-          </Canvas>
-        </Suspense>
+        {useStaticFallback ? (
+          <StaticPearlFallback eyebrow={t.hero.eyebrow} scrollLabel={t.hero.scroll} />
+        ) : (
+          <>
+            <Suspense
+              fallback={
+                <div className="w-full h-full bg-void flex flex-col items-center justify-center gap-4">
+                  <div className="w-12 h-12 border-2 border-y2k-pink border-t-transparent rounded-full animate-spin" />
+                  <span className="text-y2k-pink text-sm tracking-widest">{t.product.loading}</span>
+                </div>
+              }
+            >
+              <PearlSceneQualityContext.Provider value={sceneQuality}>
+                <PearlCanvasErrorBoundary
+                  fallback={
+                    <StaticPearlFallback eyebrow={t.hero.eyebrow} scrollLabel={t.hero.scroll} />
+                  }
+                >
+                  <Canvas
+                    gl={{
+                      antialias: !isMobile,
+                      alpha: false,
+                      powerPreference: isMobile ? 'low-power' : 'high-performance',
+                      stencil: false,
+                      depth: true,
+                      precision: isMobile ? 'lowp' : 'highp',
+                      failIfMajorPerformanceCaveat: false,
+                    }}
+                    dpr={isMobile ? 1 : [1, 2]}
+                    performance={{ min: 0.3, max: isMobile ? 1 : 1 }}
+                    style={{
+                      pointerEvents: 'auto',
+                      touchAction: isMobile ? 'pan-y' : 'auto',
+                    }}
+                    aria-label="Interactive 3D pearl necklace scene"
+                    role="img"
+                  >
+                    <CanvasInner onWebglContextLost={handleWebglContextLost} />
+                  </Canvas>
+                </PearlCanvasErrorBoundary>
+              </PearlSceneQualityContext.Provider>
+            </Suspense>
 
-        {/* Overlay Text */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-          <h1 className="text-brutal-chrome"
-            style={{
-              textShadow: '0 4px 8px rgba(0, 0, 0, 0.9), 0 12px 24px rgba(0, 0, 0, 0.7), inset -2px -2px 4px rgba(0, 0, 0, 0.6), inset 2px 2px 4px rgba(255, 255, 255, 0.4), 0 0 40px rgba(201, 168, 76, 0.25)',
-              letterSpacing: '0.08em',
-              filter: 'brightness(1.2) contrast(1.4) drop-shadow(0 0 30px rgba(201, 168, 76, 0.3))',
-              animation: 'chrome-shine 8s ease-in-out infinite',
-            }}>
-            RIOT CROWN
-          </h1>
-          <p className="text-label uppercase tracking-ultra-wide text-titanium mt-6 px-4"
-            style={{
-              textShadow: '0 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(201, 168, 76, 0.15)',
-              opacity: 0.85,
-              letterSpacing: '0.2em',
-              fontWeight: 500,
-              textAlign: 'center',
-              animation: 'fade-pulse 4s ease-in-out infinite',
-            }}>
-            {t.hero.eyebrow}
-          </p>
-        </div>
+            {/* Overlay Text */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <h1
+                className="text-brutal-chrome"
+                style={{
+                  textShadow:
+                    '0 4px 8px rgba(0, 0, 0, 0.9), 0 12px 24px rgba(0, 0, 0, 0.7), inset -2px -2px 4px rgba(0, 0, 0, 0.6), inset 2px 2px 4px rgba(255, 255, 255, 0.4), 0 0 40px rgba(201, 168, 76, 0.25)',
+                  letterSpacing: '0.08em',
+                  filter: 'brightness(1.2) contrast(1.4) drop-shadow(0 0 30px rgba(201, 168, 76, 0.3))',
+                  animation: 'chrome-shine 8s ease-in-out infinite',
+                }}
+              >
+                RIOT CROWN
+              </h1>
+              <p
+                className="text-label uppercase tracking-ultra-wide text-titanium mt-6 px-4"
+                style={{
+                  textShadow: '0 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(201, 168, 76, 0.15)',
+                  opacity: 0.85,
+                  letterSpacing: '0.2em',
+                  fontWeight: 500,
+                  textAlign: 'center',
+                  animation: 'fade-pulse 4s ease-in-out infinite',
+                }}
+              >
+                {t.hero.eyebrow}
+              </p>
+            </div>
 
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 pointer-events-none">
-          <div className="animate-bounce text-y2k-pink text-center">
-            <p className="text-label uppercase tracking-wide mb-2">{t.hero.scroll}</p>
-            <svg className="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-            </svg>
-          </div>
-        </div>
+            {/* Scroll Indicator */}
+            <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 pointer-events-none">
+              <div className="animate-bounce text-y2k-pink text-center">
+                <p className="text-label uppercase tracking-wide mb-2">{t.hero.scroll}</p>
+                <svg className="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                </svg>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

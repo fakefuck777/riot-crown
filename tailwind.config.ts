@@ -33,6 +33,9 @@ export default {
       fontFamily: {
         display: ['var(--font-display)', 'sans-serif'],
         mono:    ['var(--font-mono)', 'monospace'],
+        y2k:     ['var(--font-y2k-display)', 'var(--font-display)', 'sans-serif'],
+        editorial: ['var(--font-editorial)', 'Georgia', 'serif'],
+        body:    ['var(--font-body)', 'system-ui', 'sans-serif'],
       },
       letterSpacing: {
         'ultra-wide':       '0.35em',

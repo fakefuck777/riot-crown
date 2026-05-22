@@ -40,6 +40,8 @@
   --y2k-acid:     #c8ff00;
   --font-body:    'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-y2k-display: 'Syne', var(--font-display);
+  /** 点缀用高定衬线（轮播副文案 / 少量 editorial），主视觉仍为 Syne + Oswald */
+  --font-editorial: 'Playfair Display', Georgia, 'Times New Roman', serif;
 }
 
 /* ─── RESET ───────────────────────────────────────────────────── */
@@ -79,6 +81,7 @@ body {
   overflow-x: clip;
   background: var(--void);
   font-family: var(--font-body);
+  font-feature-settings: 'kern' 1, 'liga' 1;
   /* Coarse pointers: avoid accidental horizontal pans stealing vertical scroll */
   touch-action: pan-y pinch-zoom;
 }
@@ -212,11 +215,13 @@ body {
 
   /* Metallic Chrome Effect for Hero Title */
   .text-brutal-chrome {
+    font-family: var(--font-y2k-display), var(--font-display);
     font-size: clamp(5.5rem, 14vw, 16rem);
     line-height: 0.85;
     letter-spacing: -0.02em;
     text-transform: uppercase;
     font-weight: 900;
+    font-feature-settings: 'kern' 1, 'liga' 1;
     background: linear-gradient(
       135deg,
       #ffffff 0%,
