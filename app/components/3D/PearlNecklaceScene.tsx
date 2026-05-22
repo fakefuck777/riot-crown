@@ -187,8 +187,8 @@ function NecklaceChain() {
       // Center - neon pink (main pearl)
       { position: [0, 0, 0], scale: 1.5, color: '#FF1293', metallic: 0.85, roughness: 0.15, emissiveIntensity: 0.5, isChrome: true },
       // Gold accents
-      { position: [-2.5, 1.2, 0], scale: 1, color: '#C9A84C', metallic: 0.95, roughness: 0.08, emissiveIntensity: 0.35 },
-      { position: [2.5, 1.2, 0], scale: 1, color: '#C9A84C', metallic: 0.95, roughness: 0.08, emissiveIntensity: 0.35 },
+      { position: [-2.5, 1.2, 0], scale: 1, color: '#C0C0C0', metallic: 0.95, roughness: 0.08, emissiveIntensity: 0.35 },
+      { position: [2.5, 1.2, 0], scale: 1, color: '#C0C0C0', metallic: 0.95, roughness: 0.08, emissiveIntensity: 0.35 },
       // Pink sides
       { position: [-4, -0.5, 0], scale: 0.8, color: '#FF1293', metallic: 0.8, roughness: 0.2, emissiveIntensity: 0.4 },
       { position: [4, -0.5, 0], scale: 0.8, color: '#FF1293', metallic: 0.8, roughness: 0.2, emissiveIntensity: 0.4 },
@@ -241,13 +241,13 @@ function ParticleSystem() {
     const velocities = new Float32Array(count * 3);
 
     for (let i = 0; i < count * 3; i += 3) {
-      positions[i] = (Math.random() - 0.5) * 35;
-      positions[i + 1] = (Math.random() - 0.5) * 35;
-      positions[i + 2] = (Math.random() - 0.5) * 25;
+      positions[i] = (Math.random() - 0.5) * 30;
+      positions[i + 1] = (Math.random() - 0.5) * 30;
+      positions[i + 2] = (Math.random() - 0.5) * 20;
 
-      velocities[i] = (Math.random() - 0.5) * 0.02;
-      velocities[i + 1] = (Math.random() - 0.5) * 0.02;
-      velocities[i + 2] = (Math.random() - 0.5) * 0.02;
+      velocities[i] = (Math.random() - 0.5) * 0.015;
+      velocities[i + 1] = (Math.random() - 0.5) * 0.015;
+      velocities[i + 2] = (Math.random() - 0.5) * 0.015;
     }
 
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
@@ -273,12 +273,12 @@ function ParticleSystem() {
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
     const material = new THREE.PointsMaterial({
-      size: caps.isMobile ? 0.12 : 0.15,
+      size: caps.isMobile ? 0.1 : 0.12,
       sizeAttenuation: true,
       transparent: true,
-      opacity: caps.isMobile ? 0.5 : 0.7,
+      opacity: caps.isMobile ? 0.4 : 0.6,
       vertexColors: true,
-      toneMapped: true,
+      toneMapped: false,
     });
 
     pointsRef.current.geometry = geometry;
@@ -495,20 +495,17 @@ function Scene() {
         }}
       />
 
-      {/* Premium Multi-Layer Lighting（场景级；珍珠上不再各挂 castShadow 点光） */}
-      <ambientLight intensity={0.25} color="#ffffff" />
+      {/* Optimized Lighting */}
+      <ambientLight intensity={0.3} color="#ffffff" />
 
       {/* Key Light - Pink */}
-      <pointLight position={[8, 6, 8]} intensity={1.5} color="#FF1293" decay={2} castShadow={false} />
+      <pointLight position={[8, 6, 8]} intensity={1.2} color="#FF1293" decay={2} castShadow={false} />
 
       {/* Fill Light - Cyan */}
-      <pointLight position={[-8, -6, 8]} intensity={1.2} color="#6ECBFF" decay={2} castShadow={false} />
+      <pointLight position={[-8, -6, 8]} intensity={0.9} color="#6ECBFF" decay={2} castShadow={false} />
 
       {/* Rim Light - Purple */}
-      <pointLight position={[0, 0, 12]} intensity={0.9} color="#B366FF" decay={2} castShadow={false} />
-
-      {/* Accent Light - Green */}
-      <pointLight position={[6, -8, 6]} intensity={0.7} color="#C8FF00" decay={2} castShadow={false} />
+      <pointLight position={[0, 0, 12]} intensity={0.6} color="#B366FF" decay={2} castShadow={false} />
 
       {/* Environment */}
       <Environment preset="night" />
@@ -531,25 +528,26 @@ function Scene() {
 export function PearlNecklaceScene() {
   const { t } = useLocale();
   const [isMobile, setIsMobile] = useState(false);
+  const [isCanvasReady, setIsCanvasReady] = useState(false);
 
   const sceneQuality = useMemo<PearlSceneQuality>(() => {
     if (isMobile) {
       return {
-        pearlSegments: 40,
-        pearlSegmentsSmall: 28,
+        pearlSegments: 32,
+        pearlSegmentsSmall: 20,
         meshShadows: false,
-        attachedPointLight: 'subtle',
-        envMapIntensity: 2.65,
-        toneExposure: 0.98,
+        attachedPointLight: 'none',
+        envMapIntensity: 2.2,
+        toneExposure: 0.95,
       };
     }
     return {
-      pearlSegments: 64,
-      pearlSegmentsSmall: 40,
-      meshShadows: true,
-      attachedPointLight: 'full',
-      envMapIntensity: 2.1,
-      toneExposure: 1.08,
+      pearlSegments: 48,
+      pearlSegmentsSmall: 32,
+      meshShadows: false,
+      attachedPointLight: 'subtle',
+      envMapIntensity: 1.8,
+      toneExposure: 1.05,
     };
   }, [isMobile]);
 
@@ -568,6 +566,11 @@ export function PearlNecklaceScene() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  useEffect(() => {
+    const timer = setTimeout(() => setIsCanvasReady(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="relative w-full bg-void" style={{ touchAction: 'auto' }}>
       <div className="relative w-full h-[85vh] md:h-screen overflow-hidden" style={{ touchAction: 'pan-y' }}>
@@ -575,52 +578,54 @@ export function PearlNecklaceScene() {
           <StaticPearlFallback eyebrow={t.hero.eyebrow} scrollLabel={t.hero.scroll} />
         ) : (
           <>
-            <Suspense
-              fallback={
-                <div className="w-full h-full bg-void flex flex-col items-center justify-center gap-4">
-                  <div className="w-12 h-12 border-2 border-y2k-pink border-t-transparent rounded-full animate-spin" />
-                  <span className="text-y2k-pink text-sm tracking-widest">{t.product.loading}</span>
-                </div>
-              }
-            >
-              <PearlSceneQualityContext.Provider value={sceneQuality}>
-                <PearlCanvasErrorBoundary
-                  fallback={
-                    <StaticPearlFallback eyebrow={t.hero.eyebrow} scrollLabel={t.hero.scroll} />
-                  }
-                >
-                  <Canvas
-                    gl={{
-                      antialias: !isMobile,
-                      alpha: false,
-                      powerPreference: isMobile ? 'low-power' : 'high-performance',
-                      stencil: false,
-                      depth: true,
-                      precision: isMobile ? 'lowp' : 'highp',
-                      failIfMajorPerformanceCaveat: false,
-                      preserveDrawingBuffer: true,
-                    }}
-                    dpr={isMobile ? 1 : [1, 2]}
-                    performance={{ min: 0.3, max: isMobile ? 1 : 1 }}
-                    style={{
-                      pointerEvents: 'auto',
-                      touchAction: isMobile ? 'pan-y' : 'auto',
-                    }}
-                    aria-label="Interactive 3D pearl necklace scene"
-                    role="img"
+            {isCanvasReady && (
+              <Suspense
+                fallback={
+                  <div className="w-full h-full bg-void flex flex-col items-center justify-center gap-4">
+                    <div className="w-12 h-12 border-2 border-y2k-pink border-t-transparent rounded-full animate-spin" />
+                    <span className="text-y2k-pink text-sm tracking-widest">{t.product.loading}</span>
+                  </div>
+                }
+              >
+                <PearlSceneQualityContext.Provider value={sceneQuality}>
+                  <PearlCanvasErrorBoundary
+                    fallback={
+                      <StaticPearlFallback eyebrow={t.hero.eyebrow} scrollLabel={t.hero.scroll} />
+                    }
                   >
-                    <CanvasInner onWebglContextLost={handleWebglContextLost} />
-                  </Canvas>
-                </PearlCanvasErrorBoundary>
-              </PearlSceneQualityContext.Provider>
-            </Suspense>
+                    <Canvas
+                      gl={{
+                        antialias: !isMobile,
+                        alpha: false,
+                        powerPreference: isMobile ? 'low-power' : 'high-performance',
+                        stencil: false,
+                        depth: true,
+                        precision: isMobile ? 'lowp' : 'highp',
+                        failIfMajorPerformanceCaveat: false,
+                        preserveDrawingBuffer: false,
+                      }}
+                      dpr={isMobile ? 1 : [1, 1.5]}
+                      performance={{ min: 0.5, max: isMobile ? 1 : 1 }}
+                      style={{
+                        pointerEvents: 'auto',
+                        touchAction: isMobile ? 'pan-y' : 'auto',
+                      }}
+                      aria-label="Interactive 3D pearl necklace scene"
+                      role="img"
+                    >
+                      <CanvasInner onWebglContextLost={handleWebglContextLost} />
+                    </Canvas>
+                  </PearlCanvasErrorBoundary>
+                </PearlSceneQualityContext.Provider>
+              </Suspense>
+            )}
 
-            {/* Overlay Text - 居中高级设计 */}
+            {/* Overlay Text - Centered Premium Design */}
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              {/* 顶部品牌标语 */}
-              <div className="mb-8 text-center">
+              {/* Top Brand Tagline */}
+              <div className="mb-4 md:mb-6 text-center">
                 <p
-                  className="text-xs md:text-sm uppercase tracking-widest text-y2k-pink mb-4"
+                  className="text-xs md:text-sm uppercase tracking-widest text-y2k-pink"
                   style={{
                     textShadow: '0 0 20px rgba(255, 18, 147, 0.5)',
                     letterSpacing: '0.3em',
@@ -631,27 +636,28 @@ export function PearlNecklaceScene() {
                 </p>
               </div>
 
-              {/* 中心标题 - 优化尺寸和布局 */}
+              {/* Center Title - Silver Metallic Premium */}
               <h1
-                className="text-4xl md:text-6xl lg:text-7xl font-bold text-center"
+                className="font-black text-center leading-none whitespace-nowrap"
                 style={{
-                  textShadow:
-                    '0 4px 8px rgba(0, 0, 0, 0.9), 0 12px 24px rgba(0, 0, 0, 0.7), inset -2px -2px 4px rgba(0, 0, 0, 0.6), inset 2px 2px 4px rgba(255, 255, 255, 0.4), 0 0 40px rgba(201, 168, 76, 0.25)',
-                  letterSpacing: '0.08em',
-                  filter: 'brightness(1.2) contrast(1.4) drop-shadow(0 0 30px rgba(201, 168, 76, 0.3))',
-                  animation: 'chrome-shine 8s ease-in-out infinite',
-                  background: 'linear-gradient(135deg, #C9A84C 0%, #E8E8E8 50%, #C9A84C 100%)',
+                  fontSize: 'clamp(3.5rem, 18vw, 16rem)',
+                  background: 'linear-gradient(135deg, #ffffff 0%, #f2f2f2 15%, #e8e8e8 30%, #d4d4d4 50%, #a8a8a8 70%, #808080 85%, #606060 100%)',
                   backgroundClip: 'text',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
-                  color: '#C9A84C',
+                  textShadow: 'none',
+                  filter: 'drop-shadow(0 0 30px rgba(232, 232, 232, 0.3)) drop-shadow(0 0 60px rgba(168, 168, 168, 0.15))',
+                  letterSpacing: '-0.03em',
+                  fontFamily: 'var(--font-y2k-display), var(--font-display)',
+                  animation: 'chrome-shine 6s ease-in-out infinite',
+                  overflow: 'visible',
                 }}
               >
                 RIOT CROWN
               </h1>
 
-              {/* 底部装饰线 */}
-              <div className="mt-8 flex items-center gap-4">
+              {/* Bottom Decorative Line */}
+              <div className="mt-6 md:mt-8 flex items-center gap-4">
                 <div className="w-12 h-px bg-gradient-to-r from-transparent to-y2k-pink" />
                 <span className="text-xs uppercase tracking-widest text-y2k-pink opacity-70">Premium Collection</span>
                 <div className="w-12 h-px bg-gradient-to-l from-transparent to-y2k-pink" />

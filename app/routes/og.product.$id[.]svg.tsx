@@ -31,7 +31,7 @@ function buildProductOgSvg(product: ProductData): string {
   <rect width="${W}" height="${H}" fill="#050508"/>
   <rect width="${W}" height="${H}" fill="url(#bg)"/>
   <rect x="0" y="0" width="${W}" height="4" fill="url(#line)"/>
-  <text x="72" y="110" fill="#C9A84C" font-family="ui-monospace,monospace" font-size="20" letter-spacing="0.42em">RIOT CROWN</text>
+  <text x="72" y="110" fill="#C0C0C0" font-family="ui-monospace,monospace" font-size="20" letter-spacing="0.42em">RIOT CROWN</text>
   <text x="72" y="240" fill="#F2F2F2" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="46" font-weight="700">${name}</text>
   <text x="72" y="318" fill="#A8A8A8" font-family="ui-monospace,monospace" font-size="26" letter-spacing="0.12em">${material}</text>
   <text x="72" y="420" fill="#F2F2F2" font-family="ui-monospace,monospace" font-size="40" letter-spacing="0.08em">${price}</text>

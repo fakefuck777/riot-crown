@@ -232,7 +232,7 @@ export function Hero() {
             fontSize: '0.6rem',
             letterSpacing: '0.35em',
             textTransform: 'uppercase',
-            color: 'rgba(201,168,76,0.7)',
+            color: 'rgba(192,192,192,0.7)',
             marginBottom: '2rem',
             opacity: 0,
           }}
@@ -243,11 +243,11 @@ export function Hero() {
         {/* Title — block spans column width; fluid type (was capped at 16rem so wide screens felt “short”) */}
         <h1
           ref={titleRef}
-          className="w-full max-w-full"
+          className=”w-full max-w-full”
           style={{
-            fontFamily: '"Monument Extended", "Helvetica Neue", "Arial Black", sans-serif',
+            fontFamily: '”Monument Extended”, “Helvetica Neue”, “Arial Black”, sans-serif',
             fontWeight: 900,
-            fontSize: 'clamp(4.25rem, min(14vw, 22vh), 22rem)',
+            fontSize: 'clamp(5.5rem, min(16vw, 24vh), 28rem)',
             lineHeight: 0.85,
             letterSpacing: '-0.02em',
             textTransform: 'uppercase',
@@ -255,14 +255,12 @@ export function Hero() {
             opacity: 0,
             textShadow: `
               0 0 80px rgba(255,255,255,0.12),
-              0 0 120px rgba(201,168,76,0.08),
+              0 0 120px rgba(192,192,192,0.12),
               0 2px 0 rgba(0,0,0,0.9)
             `,
           }}
         >
-          {t.hero.title1}
-          <br />
-          {t.hero.title2}
+          {t.hero.title1} {t.hero.title2}
         </h1>
 
         {/* Gold divider — draws across on entrance */}
@@ -273,9 +271,9 @@ export function Hero() {
             height: '1px',
             marginTop: '2.5rem',
             marginBottom: '2rem',
-            background: 'linear-gradient(90deg, #C9A84C, rgba(201,168,76,0.2))',
+            background: 'linear-gradient(90deg, #C0C0C0, rgba(192,192,192,0.2))',
             opacity: 0,
-            boxShadow: '0 0 12px rgba(201,168,76,0.3)',
+            boxShadow: '0 0 12px rgba(192,192,192,0.3)',
           }}
         />
 
@@ -302,7 +300,7 @@ export function Hero() {
               fontFamily: 'var(--font-mono)',
               fontSize: '0.55rem',
               letterSpacing: '0.15em',
-              color: 'rgba(201,168,76,0.5)',
+              color: 'rgba(192,192,192,0.5)',
             }}>
               15 {t.hero.artifacts}
             </span>
@@ -334,7 +332,7 @@ export function Hero() {
               onClick={() => {
                 document.getElementById('collection')?.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="border border-[rgba(201,168,76,0.55)] bg-[rgba(201,168,76,0.1)] px-8 py-3 uppercase tracking-[0.28em] text-chrome transition-colors hover:border-[#C9A84C] hover:bg-[rgba(201,168,76,0.18)]"
+              className="border border-[rgba(192,192,192,0.55)] bg-[rgba(192,192,192,0.1)] px-8 py-3 uppercase tracking-[0.28em] text-chrome transition-colors hover:border-[#C0C0C0] hover:bg-[rgba(192,192,192,0.18)]"
               style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem' }}
             >
               {t.hero.shopCta}
@@ -367,7 +365,7 @@ export function Hero() {
           <div style={{
             width: '1px',
             height: '48px',
-            background: 'linear-gradient(to bottom, rgba(201,168,76,0.5), transparent)',
+            background: 'linear-gradient(to bottom, rgba(192,192,192,0.5), transparent)',
             animation: reducedMotion ? 'none' : 'pulse 2.4s ease-in-out infinite',
           }} />
         </div>

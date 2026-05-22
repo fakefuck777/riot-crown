@@ -160,11 +160,11 @@ export function ProductCard({
       onTouchStart={onTouchGlow}
     >
       <div
-        className="pointer-events-none absolute left-3 top-3 z-20 h-3 w-3 border-l border-t border-[rgba(201,168,76,0.55)] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+        className="pointer-events-none absolute left-3 top-3 z-20 h-3 w-3 border-l border-t border-[rgba(192,192,192,0.55)] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute bottom-3 right-3 z-20 h-3 w-3 border-r border-b border-[rgba(201,168,76,0.55)] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+        className="pointer-events-none absolute bottom-3 right-3 z-20 h-3 w-3 border-r border-b border-[rgba(192,192,192,0.55)] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
         aria-hidden
       />
       {/* Image */}
@@ -212,11 +212,11 @@ export function ProductCard({
           transition: 'opacity 0.4s ease',
           backgroundImage: `
             radial-gradient(1.5px 1.5px at 18% 22%, rgba(255,255,255,0.95) 0%, transparent 100%),
-            radial-gradient(1px   1px   at 78% 12%, rgba(201,168,76,0.9)  0%, transparent 100%),
+            radial-gradient(1px   1px   at 78% 12%, rgba(192,192,192,0.9)  0%, transparent 100%),
             radial-gradient(1px   1px   at 52% 68%, rgba(255,255,255,0.8) 0%, transparent 100%),
-            radial-gradient(1.5px 1.5px at 8%  78%, rgba(201,168,76,0.7)  0%, transparent 100%),
+            radial-gradient(1.5px 1.5px at 8%  78%, rgba(192,192,192,0.7)  0%, transparent 100%),
             radial-gradient(1px   1px   at 90% 52%, rgba(255,255,255,0.85) 0%, transparent 100%),
-            radial-gradient(1px   1px   at 32% 88%, rgba(201,168,76,0.75) 0%, transparent 100%),
+            radial-gradient(1px   1px   at 32% 88%, rgba(192,192,192,0.75) 0%, transparent 100%),
             radial-gradient(2px   2px   at 62% 38%, rgba(255,255,255,0.5) 0%, transparent 100%),
             radial-gradient(1px   1px   at 44% 8%,  rgba(255,18,147,0.7)  0%, transparent 100%)
           `,
@@ -264,7 +264,7 @@ export function ProductCard({
             fontFamily: 'var(--font-mono)',
             fontSize: '0.8rem',
             letterSpacing: '-0.02em',
-            color: '#C9A84C',
+            color: '#C0C0C0',
             fontWeight: 300,
           }}>
             {product.price}
@@ -289,8 +289,8 @@ export function ProductCard({
             width: '100%',
             padding: '0.65rem 0',
             background: 'transparent',
-            border: '0.5px solid rgba(201,168,76,0.5)',
-            color: '#C9A84C',
+            border: '0.5px solid rgba(192,192,192,0.5)',
+            color: '#C0C0C0',
             fontFamily: 'var(--font-mono)',
             fontSize: '0.58rem',
             letterSpacing: '0.3em',
@@ -302,14 +302,14 @@ export function ProductCard({
           }}
           onMouseEnter={(e) => {
             const btn = e.currentTarget;
-            btn.style.borderColor = 'rgba(201,168,76,1)';
+            btn.style.borderColor = 'rgba(192,192,192,1)';
             btn.style.color = '#F2F2F2';
-            btn.style.background = 'rgba(201,168,76,0.08)';
+            btn.style.background = 'rgba(192,192,192,0.08)';
           }}
           onMouseLeave={(e) => {
             const btn = e.currentTarget;
-            btn.style.borderColor = 'rgba(201,168,76,0.5)';
-            btn.style.color = '#C9A84C';
+            btn.style.borderColor = 'rgba(192,192,192,0.5)';
+            btn.style.color = '#C0C0C0';
             btn.style.background = 'transparent';
           }}
         >
@@ -319,14 +319,14 @@ export function ProductCard({
 
       {/* Corner bracket — top left */}
       <div className="absolute top-3 left-3 pointer-events-none opacity-0 group-hover:opacity-60 transition-opacity duration-500">
-        <div style={{ width: '12px', height: '1px', background: '#C9A84C' }} />
-        <div style={{ width: '1px', height: '12px', background: '#C9A84C' }} />
+        <div style={{ width: '12px', height: '1px', background: '#C0C0C0' }} />
+        <div style={{ width: '1px', height: '12px', background: '#C0C0C0' }} />
       </div>
 
       {/* Corner bracket — top right */}
       <div className="absolute top-3 right-3 pointer-events-none opacity-0 group-hover:opacity-60 transition-opacity duration-500 flex flex-col items-end">
-        <div style={{ width: '12px', height: '1px', background: '#C9A84C' }} />
-        <div style={{ width: '1px', height: '12px', background: '#C9A84C', marginLeft: 'auto' }} />
+        <div style={{ width: '12px', height: '1px', background: '#C0C0C0' }} />
+        <div style={{ width: '1px', height: '12px', background: '#C0C0C0', marginLeft: 'auto' }} />
       </div>
 
       {/* ID badge — top right resting */}
@@ -348,7 +348,7 @@ export function ProductCard({
             fontFamily: 'var(--font-mono)',
             fontSize: '0.46rem',
             letterSpacing: '0.15em',
-            color: product.stock <= 3 ? '#FF1293' : 'rgba(201,168,76,0.6)',
+            color: product.stock <= 3 ? '#FF1293' : 'rgba(192,192,192,0.6)',
             textTransform: 'uppercase',
             animation: product.stock <= 3 && !reducedMotion ? 'scarcityBlink 1.6s ease-in-out infinite' : undefined,
           }}>

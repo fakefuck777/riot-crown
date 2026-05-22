@@ -54,7 +54,7 @@ export default function SearchRoute() {
         <Link
           to={withLocalePath(locale, '/')}
           className="text-label text-chrome tracking-ultra-wide"
-          style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', textDecoration: 'none', color: 'rgba(201,168,76,0.5)' }}
+          style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', textDecoration: 'none', color: 'rgba(192,192,192,0.5)' }}
         >
           ← RIOT CROWN
         </Link>

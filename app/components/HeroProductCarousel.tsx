@@ -67,12 +67,12 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
     <section
       className="w-full bg-void-pit py-12 md:py-20 lg:py-24 px-8 md:px-16 lg:px-24 cinematic-glow"
       style={{
-        borderTop: '2px solid rgba(201,168,76,0.35)',
-        borderBottom: '2px solid rgba(201,168,76,0.35)',
+        borderTop: '2px solid rgba(192,192,192,0.35)',
+        borderBottom: '2px solid rgba(192,192,192,0.35)',
         position: 'relative',
         overflow: 'hidden',
         background: 'linear-gradient(180deg, rgba(5,5,5,0.95) 0%, rgba(7,7,12,0.8) 50%, rgba(5,5,5,0.95) 100%)',
-        boxShadow: 'inset 0 0 80px rgba(201,168,76,0.08), 0 20px 60px rgba(0,0,0,0.8)',
+        boxShadow: 'inset 0 0 80px rgba(192,192,192,0.08), 0 20px 60px rgba(0,0,0,0.8)',
       }}
     >
       {/* Premium Cinematic background effect */}
@@ -81,7 +81,7 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'radial-gradient(circle at 20% 30%, rgba(255,18,147,0.15) 0%, transparent 40%), radial-gradient(circle at 80% 70%, rgba(110,203,255,0.12) 0%, transparent 40%), radial-gradient(circle at 50% 50%, rgba(201,168,76,0.08) 0%, transparent 50%)',
+          background: 'radial-gradient(circle at 20% 30%, rgba(255,18,147,0.15) 0%, transparent 40%), radial-gradient(circle at 80% 70%, rgba(110,203,255,0.12) 0%, transparent 40%), radial-gradient(circle at 50% 50%, rgba(192,192,192,0.08) 0%, transparent 50%)',
           pointerEvents: 'none',
           animation: 'cinematic-pulse 8s ease-in-out infinite',
         }}
@@ -111,7 +111,7 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
               color: '#F2F2F2',
               textTransform: 'uppercase',
               marginBottom: '1.5rem',
-              background: 'linear-gradient(135deg, #FF1293 0%, #C9A84C 50%, #F2F2F2 100%)',
+              background: 'linear-gradient(135deg, #FF1293 0%, #C0C0C0 50%, #F2F2F2 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
@@ -130,7 +130,7 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
               color: 'rgba(242,242,242,0.88)',
               maxWidth: '42rem',
               lineHeight: 1.75,
-              textShadow: '0 2px 12px rgba(0,0,0,0.55), 0 0 28px rgba(201,168,76,0.12)',
+              textShadow: '0 2px 12px rgba(0,0,0,0.55), 0 0 28px rgba(192,192,192,0.12)',
               fontWeight: 500,
             }}
           >
@@ -172,11 +172,11 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
                   justifyContent: 'space-between',
                   minHeight: '320px',
                   background: idx === currentIndex
-                    ? 'linear-gradient(135deg, rgba(201,168,76,0.12) 0%, rgba(110,203,255,0.06) 100%)'
+                    ? 'linear-gradient(135deg, rgba(192,192,192,0.12) 0%, rgba(110,203,255,0.06) 100%)'
                     : 'transparent',
                   transition: 'background 0.4s ease',
                   borderRadius: '8px',
-                  boxShadow: idx === currentIndex ? '0 0 30px rgba(201,168,76,0.2), inset 0 1px 0 rgba(201,168,76,0.1)' : 'none',
+                  boxShadow: idx === currentIndex ? '0 0 30px rgba(192,192,192,0.2), inset 0 1px 0 rgba(192,192,192,0.1)' : 'none',
                 }}
               >
                 {/* Product Info */}
@@ -239,7 +239,7 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
                         fontFamily: 'var(--font-mono)',
                         fontSize: '1.2rem',
                         fontWeight: 600,
-                        color: '#C9A84C',
+                        color: '#C0C0C0',
                         letterSpacing: '0.05em',
                       }}
                     >
@@ -255,9 +255,9 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
                       textTransform: 'uppercase',
                       fontWeight: 600,
                       padding: '10px 16px',
-                      background: 'rgba(201,168,76,0.15)',
-                      border: '1px solid rgba(201,168,76,0.4)',
-                      color: '#C9A84C',
+                      background: 'rgba(192,192,192,0.15)',
+                      border: '1px solid rgba(192,192,192,0.4)',
+                      color: '#C0C0C0',
                       cursor: 'pointer',
                       borderRadius: '3px',
                       transition: 'all 0.3s ease',
@@ -265,12 +265,12 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
                     }}
                     onMouseEnter={(e) => {
                       const el = e.currentTarget as HTMLElement;
-                      el.style.background = 'rgba(201,168,76,0.25)';
-                      el.style.boxShadow = '0 0 16px rgba(201,168,76,0.3)';
+                      el.style.background = 'rgba(192,192,192,0.25)';
+                      el.style.boxShadow = '0 0 16px rgba(192,192,192,0.3)';
                     }}
                     onMouseLeave={(e) => {
                       const el = e.currentTarget as HTMLElement;
-                      el.style.background = 'rgba(201,168,76,0.15)';
+                      el.style.background = 'rgba(192,192,192,0.15)';
                       el.style.boxShadow = 'none';
                     }}
                   >
@@ -291,9 +291,9 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
               top: '50%',
               transform: 'translateY(-50%)',
               zIndex: 10,
-              background: 'rgba(201,168,76,0.2)',
-              border: '1px solid rgba(201,168,76,0.4)',
-              color: '#C9A84C',
+              background: 'rgba(192,192,192,0.2)',
+              border: '1px solid rgba(192,192,192,0.4)',
+              color: '#C0C0C0',
               width: '40px',
               height: '40px',
               borderRadius: '50%',
@@ -303,17 +303,17 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
               justifyContent: 'center',
               fontSize: '1.2rem',
               transition: 'all 0.3s ease',
-              boxShadow: '0 0 12px rgba(201,168,76,0.15)',
+              boxShadow: '0 0 12px rgba(192,192,192,0.15)',
             }}
             onMouseEnter={(e) => {
               const el = e.currentTarget as HTMLElement;
-              el.style.background = 'rgba(201,168,76,0.35)';
-              el.style.boxShadow = '0 0 24px rgba(201,168,76,0.4), inset 0 1px 0 rgba(255,255,255,0.1)';
+              el.style.background = 'rgba(192,192,192,0.35)';
+              el.style.boxShadow = '0 0 24px rgba(192,192,192,0.4), inset 0 1px 0 rgba(255,255,255,0.1)';
             }}
             onMouseLeave={(e) => {
               const el = e.currentTarget as HTMLElement;
-              el.style.background = 'rgba(201,168,76,0.2)';
-              el.style.boxShadow = '0 0 12px rgba(201,168,76,0.15)';
+              el.style.background = 'rgba(192,192,192,0.2)';
+              el.style.boxShadow = '0 0 12px rgba(192,192,192,0.15)';
             }}
           >
             ←
@@ -328,9 +328,9 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
               top: '50%',
               transform: 'translateY(-50%)',
               zIndex: 10,
-              background: 'rgba(201,168,76,0.2)',
-              border: '1px solid rgba(201,168,76,0.4)',
-              color: '#C9A84C',
+              background: 'rgba(192,192,192,0.2)',
+              border: '1px solid rgba(192,192,192,0.4)',
+              color: '#C0C0C0',
               width: '40px',
               height: '40px',
               borderRadius: '50%',
@@ -340,17 +340,17 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
               justifyContent: 'center',
               fontSize: '1.2rem',
               transition: 'all 0.3s ease',
-              boxShadow: '0 0 12px rgba(201,168,76,0.15)',
+              boxShadow: '0 0 12px rgba(192,192,192,0.15)',
             }}
             onMouseEnter={(e) => {
               const el = e.currentTarget as HTMLElement;
-              el.style.background = 'rgba(201,168,76,0.35)';
-              el.style.boxShadow = '0 0 24px rgba(201,168,76,0.4), inset 0 1px 0 rgba(255,255,255,0.1)';
+              el.style.background = 'rgba(192,192,192,0.35)';
+              el.style.boxShadow = '0 0 24px rgba(192,192,192,0.4), inset 0 1px 0 rgba(255,255,255,0.1)';
             }}
             onMouseLeave={(e) => {
               const el = e.currentTarget as HTMLElement;
-              el.style.background = 'rgba(201,168,76,0.2)';
-              el.style.boxShadow = '0 0 12px rgba(201,168,76,0.15)';
+              el.style.background = 'rgba(192,192,192,0.2)';
+              el.style.boxShadow = '0 0 12px rgba(192,192,192,0.15)';
             }}
           >
             →
@@ -374,24 +374,24 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
               style={{
                 width: idx === currentIndex ? '24px' : '8px',
                 height: '8px',
-                background: idx === currentIndex ? '#C9A84C' : 'rgba(201,168,76,0.3)',
+                background: idx === currentIndex ? '#C0C0C0' : 'rgba(192,192,192,0.3)',
                 border: 'none',
                 borderRadius: '4px',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
-                boxShadow: idx === currentIndex ? '0 0 12px rgba(201,168,76,0.4)' : 'none',
+                boxShadow: idx === currentIndex ? '0 0 12px rgba(192,192,192,0.4)' : 'none',
               }}
               onMouseEnter={(e) => {
                 const el = e.currentTarget as HTMLElement;
                 if (idx !== currentIndex) {
-                  el.style.background = 'rgba(201,168,76,0.5)';
-                  el.style.boxShadow = '0 0 8px rgba(201,168,76,0.3)';
+                  el.style.background = 'rgba(192,192,192,0.5)';
+                  el.style.boxShadow = '0 0 8px rgba(192,192,192,0.3)';
                 }
               }}
               onMouseLeave={(e) => {
                 const el = e.currentTarget as HTMLElement;
                 if (idx !== currentIndex) {
-                  el.style.background = 'rgba(201,168,76,0.3)';
+                  el.style.background = 'rgba(192,192,192,0.3)';
                   el.style.boxShadow = 'none';
                 }
               }}

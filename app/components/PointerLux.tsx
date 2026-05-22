@@ -58,7 +58,7 @@ export function PointerLux() {
         style={{
           background: `
             radial-gradient(circle closest-side,
-              rgba(201,168,76,0.11) 0%,
+              rgba(192,192,192,0.11) 0%,
               rgba(255,18,147,0.045) 42%,
               transparent 78%)
           `,

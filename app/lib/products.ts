@@ -33,9 +33,9 @@ export const PRODUCTS: ProductData[] = [
   {
     id: '01', name: 'Millennium Chain — N°1', price: '¥ 4,200',
     material: '18K RAW GOLD / OXIDIZED SILVER',
-    imageUrl: makeSVG('01', 600, 800, '#C9A84C', 'CHAIN N°1'),
+    imageUrl: makeSVG('01', 600, 800, '#C0C0C0', 'CHAIN N°1'),
     size: 'large', gridArea: '1 / 1 / 3 / 3', stock: 2,
-    accent: '#C9A84C',
+    accent: '#C0C0C0',
     descriptions: {
       ZH: '18K 原色金與氧化銀相扣，每一節手工鍛打；鏈節的細微落差讓鉻金色澤在鎖骨上緩慢移動，像千禧年專輯封面的高光。不對稱垂墜剛好貼合頸線——限量釋出，亮得乾淨、不講玄學只講工藝。',
       EN: '18K raw gold meets oxidized silver in hand-forged links—subtle variance so chrome-toned light travels the collarbone like a CD jewel-case highlight. Asymmetric drape, small-batch release: millennium shine, craft-first.',
@@ -77,9 +77,9 @@ export const PRODUCTS: ProductData[] = [
   {
     id: '03', name: 'Decay Ring', price: '¥ 1,800',
     material: 'OXIDIZED BRASS',
-    imageUrl: makeSVG('03', 300, 800, '#C9A84C', 'DECAY'),
+    imageUrl: makeSVG('03', 300, 800, '#C0C0C0', 'DECAY'),
     size: 'tall', gridArea: '1 / 4 / 3 / 5', stock: 11,
-    accent: '#C9A84C',
+    accent: '#C0C0C0',
     descriptions: {
       ZH: '氧化黃銅保留鑄造肌理，色澤會隨配戴慢慢加深——像千禧年桌面小物被時間刷上一層柔焦。粗獷但不髒，低調仍有 bling 的溫度，適合每天戴著「讓它變成你的版本」。',
       EN: 'Oxidized brass keeps cast grain so the tone deepens with wear—like a Y2K desk talisman softened by time. Raw, never grubby; quiet shine that still reads as bling. Meant to become yours.',
@@ -141,9 +141,9 @@ export const PRODUCTS: ProductData[] = [
   {
     id: '06', name: 'Monolith Collar', price: '¥ 5,900',
     material: '18K GOLD / BLACKENED STEEL',
-    imageUrl: makeSVG('06', 800, 400, '#C9A84C', 'MONOLITH'),
+    imageUrl: makeSVG('06', 800, 400, '#C0C0C0', 'MONOLITH'),
     size: 'wide', gridArea: '3 / 1 / 4 / 4', stock: 1,
-    accent: '#C9A84C',
+    accent: '#C0C0C0',
     descriptions: {
       ZH: '黑化鋼項圈內弧貼頸，18K 金點如星屑排列——份量感強，線條卻收得很乾淨。全球僅三件的工坊線；這一條為本批次最後庫存，錯過即完售，只留下照片裡那道頸光。',
       EN: 'Blackened steel collar, inner curve flush to the throat; 18K gold pins read like stardust in a tight row. Strong presence, clean silhouette. Three pieces worldwide—this listing is the last of the run.',
@@ -183,9 +183,9 @@ export const PRODUCTS: ProductData[] = [
   {
     id: '08', name: 'Arc Torque Bangle', price: '¥ 6,200',
     material: 'TITANIUM / RAW GOLD',
-    imageUrl: makeSVG('08', 300, 800, '#C9A84C', 'TORQUE'),
+    imageUrl: makeSVG('08', 300, 800, '#C0C0C0', 'TORQUE'),
     size: 'tall', gridArea: '3 / 6 / 5 / 7', stock: 4,
-    accent: '#C9A84C',
+    accent: '#C0C0C0',
     descriptions: {
       ZH: '鈦金屬扭矩手環，原色金焊點沿弧線分布——扭角由工坊逐件校對，沒有完全相同的曲率。建築感的 brutalist 線條，邊緣仍保留鉻系冷光，像把一座小橋戴在手腕上。',
       EN: 'Titanium torque bangle with raw gold welds tracing the arc—each twist angle set in the atelier, no two curves identical. Brutalist architecture in profile, edges still carrying a chrome-cool glint.',
@@ -289,9 +289,9 @@ export const PRODUCTS: ProductData[] = [
   {
     id: '13', name: 'Y2K Anklet', price: '¥ 320',
     material: 'CHROME / CRYSTAL',
-    imageUrl: makeSVG('13', 400, 400, '#C9A84C', 'ANKLET'),
+    imageUrl: makeSVG('13', 400, 400, '#C0C0C0', 'ANKLET'),
     size: 'standard', stock: 25,
-    accent: '#C9A84C',
+    accent: '#C0C0C0',
     descriptions: {
       ZH: '鍍鉻腳鏈鑲透明水晶——踝骨一道乾淨高光，走動時碎光跟著節奏跳。千禧代表單品：不敘事、只負責把 early-2000s 的派對燈留在身上。',
       EN: 'Chrome-plated anklet with clear crystal—a clean highlight on the bone; walking sets tiny sparks in rhythm. Signature Y2K piece: less story, more keeping the party lights on your skin.',

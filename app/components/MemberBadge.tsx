@@ -17,7 +17,7 @@ export function MemberBadge() {
     },
     level2: {
       name: 'Riot Level 2',
-      color: '#C9A84C',
+      color: '#C0C0C0',
       next: 'Spend $1500 to unlock 15% discount + VIP support',
     },
     level3: {

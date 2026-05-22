@@ -65,7 +65,7 @@ export function Manifesto() {
       ref={sectionRef}
       className="section-manifesto-aura"
       style={{
-        borderTop: '1px solid rgba(201,168,76,0.18)',
+        borderTop: '1px solid rgba(192,192,192,0.18)',
         borderBottom: '1px solid rgba(182,102,255,0.12)',
         padding: '72px 0 64px',
         overflow: 'hidden',
@@ -86,7 +86,7 @@ export function Manifesto() {
           fontFamily: 'var(--font-mono)',
           fontSize: '0.58rem',
           letterSpacing: '0.35em',
-          color: '#C9A84C',
+          color: '#C0C0C0',
           textTransform: 'uppercase',
           marginBottom: '2rem',
           opacity: 0.85,
@@ -139,7 +139,7 @@ export function Manifesto() {
           <div style={{
             flex: 1,
             height: '1px',
-            background: 'linear-gradient(90deg, #FF1293, #C9A84C, #F2F2F2, #C9A84C, rgba(201,168,76,0.05))',
+            background: 'linear-gradient(90deg, #FF1293, #C0C0C0, #F2F2F2, #C0C0C0, rgba(192,192,192,0.05))',
             backgroundSize: '300% 100%',
             animation: reducedMotion ? 'none' : 'iridescent 4s ease infinite',
           }} />
@@ -153,7 +153,7 @@ export function Manifesto() {
           }}>
             {t.manifesto.season}
           </span>
-          <div style={{ width: '40px', height: '1px', background: 'rgba(201,168,76,0.2)' }} />
+          <div style={{ width: '40px', height: '1px', background: 'rgba(192,192,192,0.2)' }} />
         </div>
 
         <div style={{ marginTop: '1.75rem', maxWidth: 'min(100%, 40rem)' }}>

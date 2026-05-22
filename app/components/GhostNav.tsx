@@ -9,7 +9,7 @@ import { withLocalePath } from '~/lib/localePath';
 
 const HOME_SCROLL_IDS = new Set(['hero', 'manifesto', 'collection', 'scarcity']);
 
-const navGold   = (a: number) => `rgba(201,168,76,${a})`;
+const navGold   = (a: number) => `rgba(192,192,192,${a})`;
 const navChrome = (a: number) => `rgba(242,242,242,${a})`;
 const navVoid   = (a: number) => `rgba(5,5,5,${a})`;
 
@@ -345,7 +345,7 @@ export function GhostNav({ onCartOpen, cartCount = 0 }: { onCartOpen: () => void
                 fontFamily: 'var(--font-mono)',
                 fontSize: '0.72rem',
                 letterSpacing: '0.12em',
-                color: '#C9A84C',
+                color: '#C0C0C0',
               }}
             >
               [{cartCount.toString().padStart(2, '0')}]
@@ -374,9 +374,9 @@ export function GhostNav({ onCartOpen, cartCount = 0 }: { onCartOpen: () => void
             }}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', flexShrink: 0 }}>
-              <div style={{ width: '20px', height: '1px', background: mobileOpen ? '#C9A84C' : '#F2F2F2', transition: 'background 0.22s ease, transform 0.34s cubic-bezier(0.22,1,0.36,1)', transform: mobileOpen ? 'rotate(45deg) translate(4px, 4px)' : 'none' }} />
+              <div style={{ width: '20px', height: '1px', background: mobileOpen ? '#C0C0C0' : '#F2F2F2', transition: 'background 0.22s ease, transform 0.34s cubic-bezier(0.22,1,0.36,1)', transform: mobileOpen ? 'rotate(45deg) translate(4px, 4px)' : 'none' }} />
               <div style={{ width: '20px', height: '1px', background: mobileOpen ? 'transparent' : '#F2F2F2', transition: 'background 0.22s ease, opacity 0.2s ease', opacity: mobileOpen ? 0 : 1 }} />
-              <div style={{ width: '20px', height: '1px', background: mobileOpen ? '#C9A84C' : '#F2F2F2', transition: 'background 0.22s ease, transform 0.34s cubic-bezier(0.22,1,0.36,1)', transform: mobileOpen ? 'rotate(-45deg) translate(4px, -4px)' : 'none' }} />
+              <div style={{ width: '20px', height: '1px', background: mobileOpen ? '#C0C0C0' : '#F2F2F2', transition: 'background 0.22s ease, transform 0.34s cubic-bezier(0.22,1,0.36,1)', transform: mobileOpen ? 'rotate(-45deg) translate(4px, -4px)' : 'none' }} />
             </div>
             <span
               style={{
@@ -441,7 +441,7 @@ export function GhostNav({ onCartOpen, cartCount = 0 }: { onCartOpen: () => void
                 borderBottom: '0.5px solid rgba(242,242,242,0.05)',
                 transition: 'color 0.2s',
               }}
-              onTouchStart={e => { (e.currentTarget as HTMLElement).style.color = '#C9A84C'; }}
+              onTouchStart={e => { (e.currentTarget as HTMLElement).style.color = '#C0C0C0'; }}
               onTouchEnd={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(242,242,242,0.7)'; }}
             >
               {label}
@@ -454,7 +454,7 @@ export function GhostNav({ onCartOpen, cartCount = 0 }: { onCartOpen: () => void
             onClick={() => { onCartOpen(); closeMobileMenu(); }}
             style={{
               fontFamily: 'var(--font-mono)', fontSize: '0.72rem', letterSpacing: '0.2em',
-              color: '#C9A84C', background: 'none', border: 'none', cursor: 'pointer', textTransform: 'uppercase',
+              color: '#C0C0C0', background: 'none', border: 'none', cursor: 'pointer', textTransform: 'uppercase',
               padding: '6px 0',
             }}
           >
@@ -579,7 +579,7 @@ export function GhostNav({ onCartOpen, cartCount = 0 }: { onCartOpen: () => void
               style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px 6px', borderRadius: '2px' }}
             >
               <span>{t.nav.cart}</span>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: '#C9A84C' }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: '#C0C0C0' }}>
                 [{cartCount.toString().padStart(2, '0')}]
               </span>
             </button>

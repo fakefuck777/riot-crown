@@ -96,7 +96,7 @@ export function Testimonials() {
                 fontFamily: '"Monument Extended", "Helvetica Neue", sans-serif',
                 fontSize: '3rem',
                 lineHeight: 0.6,
-                background: 'linear-gradient(135deg, rgba(255,18,147,0.35), rgba(201,168,76,0.25))',
+                background: 'linear-gradient(135deg, rgba(255,18,147,0.35), rgba(192,192,192,0.25))',
                 WebkitBackgroundClip: 'text',
                 backgroundClip: 'text',
                 color: 'transparent',
@@ -154,7 +154,7 @@ export function Testimonials() {
             fontFamily: 'var(--font-mono)',
             fontSize: '0.48rem',
             letterSpacing: '0.25em',
-            color: 'rgba(201,168,76,0.3)',
+            color: 'rgba(192,192,192,0.3)',
             textTransform: 'uppercase',
           }}>
             {t.testimonials.footer1}

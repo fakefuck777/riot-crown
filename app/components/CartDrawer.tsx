@@ -218,7 +218,7 @@ export function CartDrawer({ isOpen, items, onClose, onCheckout }: CartDrawerPro
                 type="button"
                 onClick={onCheckout}
                 style={{ width: '100%', padding: '1rem 0', background: '#F2F2F2', color: '#050505', border: 'none', cursor: 'pointer', fontFamily: '"Monument Extended","Helvetica Neue",sans-serif', fontWeight: 800, fontSize: '0.65rem', letterSpacing: '0.25em', textTransform: 'uppercase', transition: 'background 0.25s' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#C9A84C'; }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#C0C0C0'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#F2F2F2'; }}
               >
                 {t.cart.acquire}
@@ -279,7 +279,7 @@ function CartLineItem({ item, numberLocale }: { item: CartItem; numberLocale: st
           {item.material}
         </p>
         {item.size ? (
-          <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.44rem', letterSpacing: '0.12em', color: 'rgba(201,168,76,0.45)', textTransform: 'uppercase', marginTop: '0.35rem' }}>
+          <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.44rem', letterSpacing: '0.12em', color: 'rgba(192,192,192,0.45)', textTransform: 'uppercase', marginTop: '0.35rem' }}>
             {item.size}
           </p>
         ) : null}
@@ -303,7 +303,7 @@ function CartLineItem({ item, numberLocale }: { item: CartItem; numberLocale: st
           </button>
         </div>
       </div>
-      <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', letterSpacing: '-0.03em', color: '#C9A84C', fontWeight: 300, flexShrink: 0 }}>
+      <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', letterSpacing: '-0.03em', color: '#C0C0C0', fontWeight: 300, flexShrink: 0 }}>
         {lineTotal}
       </p>
     </div>

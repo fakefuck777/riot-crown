@@ -22,7 +22,7 @@ export function ScarcityEngine({ products }: { products?: ProductData[] }) {
     return Math.max(10, Math.min(100, Math.round(share * 100)));
   }, [stats.listedSkuCount, stats.lowSkuCount]);
 
-  const barColor = stats.minStock <= 3 ? '#FF1293' : stats.lowSkuCount >= 5 ? '#C9A84C' : '#A8A8A8';
+  const barColor = stats.minStock <= 3 ? '#FF1293' : stats.lowSkuCount >= 5 ? '#C0C0C0' : '#A8A8A8';
 
   const showLowStockNote = stats.minStock <= 5 && stats.lowSkuCount >= 1;
 
@@ -46,7 +46,7 @@ export function ScarcityEngine({ products }: { products?: ProductData[] }) {
         background: 'linear-gradient(145deg, rgba(8,8,12,0.98) 0%, rgba(14,8,18,0.98) 45%, rgba(8,10,14,0.98) 100%)',
         padding: '48px 0',
         borderTop: '0.5px solid rgba(182,102,255,0.12)',
-        borderBottom: '0.5px solid rgba(201,168,76,0.08)',
+        borderBottom: '0.5px solid rgba(192,192,192,0.08)',
       }}
     >
       <div className="px-8 md:px-16 lg:px-24">
@@ -110,7 +110,7 @@ export function ScarcityEngine({ products }: { products?: ProductData[] }) {
                 fontFamily: 'var(--font-mono)',
                 fontSize: '0.52rem',
                 letterSpacing: '0.18em',
-                color: stats.minStock <= 3 ? '#FF1293' : 'rgba(201,168,76,0.75)',
+                color: stats.minStock <= 3 ? '#FF1293' : 'rgba(192,192,192,0.75)',
                 textTransform: 'uppercase',
                 lineHeight: 1.65,
                 maxWidth: '28rem',
@@ -156,10 +156,10 @@ export function ScarcityEngine({ products }: { products?: ProductData[] }) {
                 ref={heartRef}
                 style={{
                   width: '6px', height: '6px', borderRadius: '50%',
-                  background: stats.minStock <= 3 ? '#FF1293' : '#C9A84C',
+                  background: stats.minStock <= 3 ? '#FF1293' : '#C0C0C0',
                   boxShadow: stats.minStock <= 3
                     ? '0 0 14px rgba(255,18,147,0.9)'
-                    : '0 0 10px rgba(201,168,76,0.7)',
+                    : '0 0 10px rgba(192,192,192,0.7)',
                   animation: reducedMotion ? 'none' : 'goldPulse 2s ease-in-out infinite',
                 }}
               />

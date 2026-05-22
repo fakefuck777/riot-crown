@@ -48,10 +48,10 @@ const MATERIAL_VARIANTS = {
   },
   chrome_gold: {
     nameKey: 'Chrome Gold',
-    color: '#C9A84C',
+    color: '#C0C0C0',
     metalness: 0.95,
     roughness: 0.08,
-    emissive: '#C9A84C',
+    emissive: '#C0C0C0',
     emissiveIntensity: 0.15,
   },
   neon_pink: {

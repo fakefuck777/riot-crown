@@ -278,8 +278,8 @@ export function ScrollNarrative({ onChapterChange }: ScrollNarrativeProps) {
           <h2
             className="text-display-3xl font-black uppercase mb-4 text-transparent bg-clip-text"
             style={{
-              backgroundImage: 'linear-gradient(135deg, #C9A84C 0%, #FF1293 100%)',
-              textShadow: '0 0 40px rgba(201,168,76,0.3)',
+              backgroundImage: 'linear-gradient(135deg, #C0C0C0 0%, #FF1293 100%)',
+              textShadow: '0 0 40px rgba(192,192,192,0.3)',
               letterSpacing: '0.15em',
             }}
           >
@@ -288,8 +288,8 @@ export function ScrollNarrative({ onChapterChange }: ScrollNarrativeProps) {
           <p
             className="text-display-lg font-bold uppercase mb-6"
             style={{
-              color: '#C9A84C',
-              textShadow: '0 0 20px rgba(201,168,76,0.3)',
+              color: '#C0C0C0',
+              textShadow: '0 0 20px rgba(192,192,192,0.3)',
               letterSpacing: '0.08em',
             }}
           >
@@ -308,7 +308,7 @@ export function ScrollNarrative({ onChapterChange }: ScrollNarrativeProps) {
           <div
             className="absolute inset-0 rounded-full blur-3xl opacity-20"
             style={{
-              background: 'radial-gradient(circle, #C9A84C 0%, transparent 70%)',
+              background: 'radial-gradient(circle, #C0C0C0 0%, transparent 70%)',
               animation: 'pulse 4s ease-in-out infinite',
             }}
           />

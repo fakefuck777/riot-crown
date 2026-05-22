@@ -154,9 +154,9 @@ export function CheckoutPortal({ isOpen, onClose, total }: CheckoutPortalProps) 
           <div key={i} style={{
             width: i <= stepIndex ? '24px' : '8px',
             height: '1px',
-            background: i <= stepIndex ? '#C9A84C' : 'rgba(242,242,242,0.15)',
+            background: i <= stepIndex ? '#C0C0C0' : 'rgba(242,242,242,0.15)',
             transition: 'all 0.4s ease',
-            boxShadow: i === stepIndex ? '0 0 6px rgba(201,168,76,0.5)' : 'none',
+            boxShadow: i === stepIndex ? '0 0 6px rgba(192,192,192,0.5)' : 'none',
           }} />
         ))}
       </div>
@@ -204,10 +204,10 @@ function Field({ label, type = 'text', placeholder, autoComplete }: {
           padding: '10px 0',
           borderColor: 'rgba(242,242,242,0.12)',
           borderRadius: 0,
-          caretColor: '#C9A84C',
+          caretColor: '#C0C0C0',
           transition: 'border-color 0.3s ease',
         }}
-        onFocus={e => { e.currentTarget.style.borderColor = 'rgba(201,168,76,0.6)'; }}
+        onFocus={e => { e.currentTarget.style.borderColor = 'rgba(192,192,192,0.6)'; }}
         onBlur={e  => { e.currentTarget.style.borderColor = 'rgba(242,242,242,0.12)'; }}
       />
     </div>
@@ -226,7 +226,7 @@ function SubmitButton({ label, onClick }: { label: string; onClick: () => void }
         fontFamily: '"Monument Extended", "Helvetica Neue", sans-serif',
         fontWeight: 800, fontSize: '0.65rem', letterSpacing: '0.25em',
       }}
-      onMouseEnter={() => gsap.to(ref.current, { background: '#C9A84C', duration: 0.25 })}
+      onMouseEnter={() => gsap.to(ref.current, { background: '#C0C0C0', duration: 0.25 })}
       onMouseLeave={() => gsap.to(ref.current, { background: '#F2F2F2', duration: 0.25 })}
     >
       {label}

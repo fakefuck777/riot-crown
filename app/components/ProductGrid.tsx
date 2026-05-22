@@ -30,7 +30,7 @@ export function ProductGrid({ products = PRODUCTS }: ProductGridProps) {
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'radial-gradient(circle at 18% 12%, rgba(255,18,147,0.08) 0%, transparent 28%), radial-gradient(circle at 82% 18%, rgba(110,203,255,0.08) 0%, transparent 26%), radial-gradient(circle at 50% 100%, rgba(201,168,76,0.08) 0%, transparent 36%)',
+          background: 'radial-gradient(circle at 18% 12%, rgba(255,18,147,0.08) 0%, transparent 28%), radial-gradient(circle at 82% 18%, rgba(110,203,255,0.08) 0%, transparent 26%), radial-gradient(circle at 50% 100%, rgba(192,192,192,0.08) 0%, transparent 36%)',
           pointerEvents: 'none',
         }}
       />
@@ -63,7 +63,7 @@ export function ProductGrid({ products = PRODUCTS }: ProductGridProps) {
           className="glow-gold"
           style={{
             padding: '0.9rem 1rem',
-            border: '1px solid rgba(201,168,76,0.2)',
+            border: '1px solid rgba(192,192,192,0.2)',
             background: 'rgba(5,5,5,0.45)',
             backdropFilter: 'blur(12px)',
             WebkitBackdropFilter: 'blur(12px)',
@@ -77,7 +77,7 @@ export function ProductGrid({ products = PRODUCTS }: ProductGridProps) {
             LIVE EDIT
           </p>
           <p
-            style={{ fontFamily: 'var(--font-mono)', fontSize: '1rem', letterSpacing: '0.02em', color: '#C9A84C' }}
+            style={{ fontFamily: 'var(--font-mono)', fontSize: '1rem', letterSpacing: '0.02em', color: '#C0C0C0' }}
           >
             {products.length.toString().padStart(2, '0')} {t.grid.objects}
           </p>
@@ -93,7 +93,7 @@ export function ProductGrid({ products = PRODUCTS }: ProductGridProps) {
           gridTemplateColumns: 'repeat(6, 1fr)',
           gridAutoRows: 'minmax(460px, auto)',
           gap: '1px',
-          background: 'linear-gradient(135deg, rgba(242,242,242,0.08), rgba(201,168,76,0.08), rgba(255,18,147,0.08))',
+          background: 'linear-gradient(135deg, rgba(242,242,242,0.08), rgba(192,192,192,0.08), rgba(255,18,147,0.08))',
           boxShadow: '0 24px 80px rgba(0,0,0,0.28)',
         }}
       >

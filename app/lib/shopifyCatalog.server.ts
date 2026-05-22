@@ -328,7 +328,7 @@ function mapNode(node: SfProductNode, index: number): ProductData {
   const label = (node.handle || node.title).slice(0, 10).toUpperCase();
   const imageUrl =
     node.featuredImage?.url ??
-    makeSVG(String(index + 1).padStart(2, '0'), 600, 800, '#C9A84C', label);
+    makeSVG(String(index + 1).padStart(2, '0'), 600, 800, '#C0C0C0', label);
 
   const stock: number | undefined = undefined;
 
@@ -354,7 +354,7 @@ function mapNode(node: SfProductNode, index: number): ProductData {
       FR: desc,
     },
     detailsList,
-    accent: '#C9A84C',
+    accent: '#C0C0C0',
     sizes,
     variantIdsBySize,
     merchandiseId,

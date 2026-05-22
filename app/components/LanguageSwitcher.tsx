@@ -111,29 +111,29 @@ export function LanguageSwitcher() {
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
           fontWeight: 500,
-          background: 'rgba(201,168,76,0.08)',
-          border: '1px solid rgba(201,168,76,0.35)',
+          background: 'rgba(192,192,192,0.08)',
+          border: '1px solid rgba(192,192,192,0.35)',
           cursor: 'pointer',
           padding: '8px 12px',
           display: 'flex',
           alignItems: 'center',
           gap: '6px',
           borderRadius: '4px',
-          color: '#C9A84C',
-          boxShadow: '0 0 12px rgba(201,168,76,0.15)',
+          color: '#C0C0C0',
+          boxShadow: '0 0 12px rgba(192,192,192,0.15)',
           transition: 'all 0.3s ease',
         }}
         onMouseEnter={(e) => {
           const el = e.currentTarget as HTMLElement;
-          el.style.background = 'rgba(201,168,76,0.15)';
-          el.style.boxShadow = '0 0 24px rgba(201,168,76,0.35)';
-          el.style.borderColor = 'rgba(201,168,76,0.65)';
+          el.style.background = 'rgba(192,192,192,0.15)';
+          el.style.boxShadow = '0 0 24px rgba(192,192,192,0.35)';
+          el.style.borderColor = 'rgba(192,192,192,0.65)';
         }}
         onMouseLeave={(e) => {
           const el = e.currentTarget as HTMLElement;
-          el.style.background = 'rgba(201,168,76,0.08)';
-          el.style.boxShadow = '0 0 12px rgba(201,168,76,0.15)';
-          el.style.borderColor = 'rgba(201,168,76,0.35)';
+          el.style.background = 'rgba(192,192,192,0.08)';
+          el.style.boxShadow = '0 0 12px rgba(192,192,192,0.15)';
+          el.style.borderColor = 'rgba(192,192,192,0.35)';
         }}
       >
         <span ref={displayRef} style={{ display: 'inline-block' }}>{LANGUAGE_NAMES[locale]}</span>
@@ -152,11 +152,11 @@ export function LanguageSwitcher() {
           background: 'rgba(5,5,5,0.98)',
           backdropFilter: 'blur(24px)',
           WebkitBackdropFilter: 'blur(24px)',
-          border: '1px solid rgba(201,168,76,0.35)',
+          border: '1px solid rgba(192,192,192,0.35)',
           borderRadius: '6px',
           padding: '8px 0',
           minWidth: '140px',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.6), inset 0 1px 0 rgba(201,168,76,0.2)',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.6), inset 0 1px 0 rgba(192,192,192,0.2)',
         }}
       >
         {LOCALES.filter(l => l !== locale).map((l, i) => (
@@ -204,8 +204,8 @@ function DropdownItem({
       }}
       onMouseEnter={(e) => {
         const el = e.currentTarget as HTMLElement;
-        el.style.color = '#C9A84C';
-        el.style.background = 'rgba(201,168,76,0.08)';
+        el.style.color = '#C0C0C0';
+        el.style.background = 'rgba(192,192,192,0.08)';
       }}
       onMouseLeave={(e) => {
         const el = e.currentTarget as HTMLElement;

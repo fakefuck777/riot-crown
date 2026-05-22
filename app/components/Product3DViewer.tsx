@@ -46,10 +46,10 @@ const MATERIAL_VARIANTS = {
   },
   chrome_gold: {
     nameKey: 'Chrome Gold',
-    color: '#C9A84C',
+    color: '#C0C0C0',
     metalness: 0.95,
     roughness: 0.08,
-    emissive: '#C9A84C',
+    emissive: '#C0C0C0',
     emissiveIntensity: 0.15,
   },
   neon_pink: {
@@ -130,7 +130,7 @@ export function Product3DViewer({ modelUrl: _modelUrl, productName: _productName
             <ambientLight intensity={0.5} color="#1a1a2e" />
             <directionalLight position={[5, 5, 5]} intensity={1} color="#FF1293" />
             <directionalLight position={[-5, -5, 5]} intensity={0.7} color="#6ECBFF" />
-            <pointLight position={[0, 0, 3]} intensity={0.8} color="#C9A84C" />
+            <pointLight position={[0, 0, 3]} intensity={0.8} color="#C0C0C0" />
 
             {/* Model */}
             <Model />
