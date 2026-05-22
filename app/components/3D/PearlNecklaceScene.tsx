@@ -20,6 +20,16 @@ import * as THREE from 'three';
 import { useLocale } from '~/lib/LocaleContext';
 import { useDeviceCapabilities, getSceneQualityTier, getParticleCount, getPearlSegments } from '~/hooks/useDeviceCapabilities';
 
+// 预加载 Three.js 和相关库
+if (typeof window !== 'undefined') {
+  // 预加载 WebGL 上下文
+  const canvas = document.createElement('canvas');
+  const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+  if (gl) {
+    gl.getParameter(gl.VERSION);
+  }
+}
+
 declare global {
   interface Window {
     isUserInteracting?: boolean;
@@ -588,6 +598,7 @@ export function PearlNecklaceScene() {
                       depth: true,
                       precision: isMobile ? 'lowp' : 'highp',
                       failIfMajorPerformanceCaveat: false,
+                      preserveDrawingBuffer: true,
                     }}
                     dpr={isMobile ? 1 : [1, 2]}
                     performance={{ min: 0.3, max: isMobile ? 1 : 1 }}
@@ -604,33 +615,47 @@ export function PearlNecklaceScene() {
               </PearlSceneQualityContext.Provider>
             </Suspense>
 
-            {/* Overlay Text */}
+            {/* Overlay Text - 居中高级设计 */}
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              {/* 顶部品牌标语 */}
+              <div className="mb-8 text-center">
+                <p
+                  className="text-xs md:text-sm uppercase tracking-widest text-y2k-pink mb-4"
+                  style={{
+                    textShadow: '0 0 20px rgba(255, 18, 147, 0.5)',
+                    letterSpacing: '0.3em',
+                    fontWeight: 600,
+                  }}
+                >
+                  {t.hero.eyebrow}
+                </p>
+              </div>
+
+              {/* 中心标题 - 优化尺寸和布局 */}
               <h1
-                className="text-brutal-chrome"
+                className="text-4xl md:text-6xl lg:text-7xl font-bold text-center"
                 style={{
                   textShadow:
                     '0 4px 8px rgba(0, 0, 0, 0.9), 0 12px 24px rgba(0, 0, 0, 0.7), inset -2px -2px 4px rgba(0, 0, 0, 0.6), inset 2px 2px 4px rgba(255, 255, 255, 0.4), 0 0 40px rgba(201, 168, 76, 0.25)',
                   letterSpacing: '0.08em',
                   filter: 'brightness(1.2) contrast(1.4) drop-shadow(0 0 30px rgba(201, 168, 76, 0.3))',
                   animation: 'chrome-shine 8s ease-in-out infinite',
+                  background: 'linear-gradient(135deg, #C9A84C 0%, #E8E8E8 50%, #C9A84C 100%)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  color: '#C9A84C',
                 }}
               >
                 RIOT CROWN
               </h1>
-              <p
-                className="text-label uppercase tracking-ultra-wide text-titanium mt-6 px-4"
-                style={{
-                  textShadow: '0 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(201, 168, 76, 0.15)',
-                  opacity: 0.85,
-                  letterSpacing: '0.2em',
-                  fontWeight: 500,
-                  textAlign: 'center',
-                  animation: 'fade-pulse 4s ease-in-out infinite',
-                }}
-              >
-                {t.hero.eyebrow}
-              </p>
+
+              {/* 底部装饰线 */}
+              <div className="mt-8 flex items-center gap-4">
+                <div className="w-12 h-px bg-gradient-to-r from-transparent to-y2k-pink" />
+                <span className="text-xs uppercase tracking-widest text-y2k-pink opacity-70">Premium Collection</span>
+                <div className="w-12 h-px bg-gradient-to-l from-transparent to-y2k-pink" />
+              </div>
             </div>
 
             {/* Scroll Indicator */}
