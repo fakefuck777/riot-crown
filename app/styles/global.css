@@ -731,11 +731,11 @@ a[href],
 
 /* Very narrow phones — shrink display-scale type so nothing clips horizontally */
 html[data-vw="xs"] .text-brutal {
-  font-size: clamp(2.85rem, 15vw, 10rem) !important;
+  font-size: 1rem !important;
 }
 
 html[data-vw="sm"] .text-brutal {
-  font-size: clamp(3.5rem, 13vw, 14rem) !important;
+  font-size: 1.2rem !important;
 }
 
 /* Landscape + touch on phone-width: shorter hero fold */
@@ -746,7 +746,7 @@ html[data-orientation="landscape"][data-pointer="coarse"][data-vw="sm"] #hero {
 }
 
 html[data-orientation="landscape"][data-aspect="ultra-wide"] #hero .text-brutal {
-  font-size: clamp(2.75rem, 11vh, 8rem) !important;
+  font-size: 1rem !important;
 }
 
 /* Ultra-tall portrait (many full-screen phones): slightly compress vertical section padding */
