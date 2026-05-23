@@ -1,10 +1,9 @@
 import type { MetaFunction } from '@shopify/remix-oxygen';
 import { json, type LoaderFunctionArgs } from '@shopify/remix-oxygen';
 import { useLoaderData } from '@remix-run/react';
-import { useEffect } from 'react';
+import { useEffect, Suspense, lazy } from 'react';
 import type { Storefront } from '@shopify/hydrogen';
 import { SITE_DESCRIPTION, SITE_HOME_TITLE, SITE_KEYWORDS } from '~/lib/siteMeta';
-import { PearlNecklaceScene } from '~/components/3D/PearlNecklaceScene';
 import { Manifesto } from '~/components/Manifesto';
 import { ScrollNarrative } from '~/components/ScrollNarrative';
 import { HeroProductCarousel } from '~/components/HeroProductCarousel';
@@ -15,6 +14,44 @@ import { Testimonials } from '~/components/Testimonials';
 import { Footer } from '~/components/Footer';
 import { loadStoreCatalog } from '~/lib/shopifyCatalog.server';
 import { storefrontTokenPrefix4FromEnv, type StorefrontTokenEnv } from '~/lib/storefrontEnvDebug';
+
+// 延迟加载 3D 组件，避免阻塞初始渲染
+const PearlNecklaceScene = lazy(() =>
+  import('~/components/3D/PearlNecklaceScene').then(m => ({ default: m.PearlNecklaceScene }))
+);
+
+// 快速加载的占位符
+function PearlNecklaceSceneFallback() {
+  return (
+    <div
+      style={{
+        width: '100%',
+        height: '100vh',
+        background: 'linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: '#d4af37',
+        fontSize: '14px',
+        fontFamily: 'JetBrains Mono',
+        letterSpacing: '0.1em',
+      }}
+    >
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ marginBottom: '20px' }}>LOADING LUXURY EXPERIENCE</div>
+        <div style={{ fontSize: '12px', opacity: 0.6 }}>
+          <div style={{ animation: 'pulse 1.5s infinite' }}>●</div>
+        </div>
+      </div>
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 0.3; }
+          50% { opacity: 1; }
+        }
+      `}</style>
+    </div>
+  );
+}
 
 type HydrogenRouteContext = {
   storefront?: Storefront;
@@ -61,7 +98,9 @@ export default function Index() {
   return (
     <main>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: catalogJsonLd }} />
-      <PearlNecklaceScene />
+      <Suspense fallback={<PearlNecklaceSceneFallback />}>
+        <PearlNecklaceScene />
+      </Suspense>
       <HeroProductCarousel products={catalogProducts} />
       <ProductGrid products={catalogProducts} />
       <Manifesto />
