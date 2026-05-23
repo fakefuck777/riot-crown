@@ -51,12 +51,12 @@ type PearlSceneQuality = {
 };
 
 const PearlSceneQualityContext = createContext<PearlSceneQuality>({
-  pearlSegments: 48,
-  pearlSegmentsSmall: 32,
+  pearlSegments: 32,
+  pearlSegmentsSmall: 24,
   meshShadows: false,
-  attachedPointLight: 'subtle',
-  envMapIntensity: 1.8,
-  toneExposure: 1.08,
+  attachedPointLight: 'none',
+  envMapIntensity: 1.5,
+  toneExposure: 1.05,
 });
 
 // ─── Pearl Component ───────────────────────────────────────────────────────
