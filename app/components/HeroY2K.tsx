@@ -72,23 +72,23 @@ function NecklaceChain() {
 
   const pearlData: PearlProps[] = useMemo(
     () => [
-      // Center - neon pink
-      { position: [0, 0, 0], scale: 1.2, color: '#FF1293', metallic: 0.8, roughness: 0.2, emissiveIntensity: 0.4 },
-      // Gold accents
-      { position: [-2, 1, 0], scale: 0.8, color: '#C0C0C0', metallic: 0.95, roughness: 0.1, emissiveIntensity: 0.3 },
-      { position: [2, 1, 0], scale: 0.8, color: '#C0C0C0', metallic: 0.95, roughness: 0.1, emissiveIntensity: 0.3 },
-      // Pink sides
-      { position: [-3.5, -0.5, 0], scale: 0.6, color: '#FF1293', metallic: 0.7, roughness: 0.25, emissiveIntensity: 0.35 },
-      { position: [3.5, -0.5, 0], scale: 0.6, color: '#FF1293', metallic: 0.7, roughness: 0.25, emissiveIntensity: 0.35 },
+      // Center - premium gold
+      { position: [0, 0, 0], scale: 1.3, color: '#d4af37', metallic: 0.9, roughness: 0.15, emissiveIntensity: 0.5 },
+      // Platinum accents
+      { position: [-2, 1, 0], scale: 0.9, color: '#e8e8e8', metallic: 0.95, roughness: 0.1, emissiveIntensity: 0.4 },
+      { position: [2, 1, 0], scale: 0.9, color: '#e8e8e8', metallic: 0.95, roughness: 0.1, emissiveIntensity: 0.4 },
+      // Rose accents
+      { position: [-3.5, -0.5, 0], scale: 0.7, color: '#ff1493', metallic: 0.8, roughness: 0.2, emissiveIntensity: 0.4 },
+      { position: [3.5, -0.5, 0], scale: 0.7, color: '#ff1493', metallic: 0.8, roughness: 0.2, emissiveIntensity: 0.4 },
       // Cyan accents
-      { position: [-4.5, -2, 0], scale: 0.5, color: '#6ECBFF', metallic: 0.85, roughness: 0.15, emissiveIntensity: 0.3 },
-      { position: [4.5, -2, 0], scale: 0.5, color: '#6ECBFF', metallic: 0.85, roughness: 0.15, emissiveIntensity: 0.3 },
-      // Gold bottom
-      { position: [-5, -3.5, 0], scale: 0.4, color: '#C0C0C0', metallic: 0.9, roughness: 0.12, emissiveIntensity: 0.25 },
-      { position: [5, -3.5, 0], scale: 0.4, color: '#C0C0C0', metallic: 0.9, roughness: 0.12, emissiveIntensity: 0.25 },
-      // Extra pearls for depth
-      { position: [0, -2, 1], scale: 0.7, color: '#FF1293', metallic: 0.75, roughness: 0.2, emissiveIntensity: 0.3 },
-      { position: [0, -2, -1], scale: 0.7, color: '#6ECBFF', metallic: 0.8, roughness: 0.18, emissiveIntensity: 0.3 },
+      { position: [-4.5, -2, 0], scale: 0.6, color: '#00d9ff', metallic: 0.85, roughness: 0.15, emissiveIntensity: 0.4 },
+      { position: [4.5, -2, 0], scale: 0.6, color: '#00d9ff', metallic: 0.85, roughness: 0.15, emissiveIntensity: 0.4 },
+      // Purple accents
+      { position: [-5, -3.5, 0], scale: 0.5, color: '#8338ec', metallic: 0.85, roughness: 0.12, emissiveIntensity: 0.35 },
+      { position: [5, -3.5, 0], scale: 0.5, color: '#8338ec', metallic: 0.85, roughness: 0.12, emissiveIntensity: 0.35 },
+      // Extra pearls for depth - gold
+      { position: [0, -2, 1], scale: 0.8, color: '#d4af37', metallic: 0.88, roughness: 0.18, emissiveIntensity: 0.35 },
+      { position: [0, -2, -1], scale: 0.8, color: '#00d9ff', metallic: 0.82, roughness: 0.2, emissiveIntensity: 0.35 },
     ],
     []
   );
@@ -188,12 +188,12 @@ function HeroScene() {
       />
 
       {/* Lighting Setup */}
-      <ambientLight intensity={0.5} color="#1a1a2e" />
-      <directionalLight position={[5, 5, 5]} intensity={0.9} color="#FF1293" castShadow={true} />
-      <directionalLight position={[-5, -5, 5]} intensity={0.7} color="#6ECBFF" castShadow={true} />
-      <pointLight position={[0, 0, 5]} intensity={1} color="#C0C0C0" castShadow={true} />
-      <pointLight position={[-8, 0, 0]} intensity={0.6} color="#FF1293" />
-      <pointLight position={[8, 0, 0]} intensity={0.6} color="#6ECBFF" />
+      <ambientLight intensity={0.6} color="#1a1a2e" />
+      <directionalLight position={[5, 5, 5]} intensity={1.1} color="#d4af37" castShadow={true} />
+      <directionalLight position={[-5, -5, 5]} intensity={0.8} color="#00d9ff" castShadow={true} />
+      <pointLight position={[0, 0, 5]} intensity={1.2} color="#e8e8e8" castShadow={true} />
+      <pointLight position={[-8, 0, 0]} intensity={0.7} color="#ff1493" />
+      <pointLight position={[8, 0, 0]} intensity={0.7} color="#8338ec" />
 
       {/* Scene Content */}
       <ParticleSystem />
@@ -290,14 +290,15 @@ export function HeroY2K() {
           </p>
 
           <h1
-            className="text-3xl md:text-5xl font-black uppercase tracking-tighter mb-4 leading-none"
+            className="text-2xl md:text-4xl font-black uppercase tracking-tighter mb-4 leading-none"
             style={{
-              background: 'linear-gradient(135deg, #FF1293 0%, #C0C0C0 50%, #6ECBFF 100%)',
+              background: 'linear-gradient(135deg, #d4af37 0%, #e8e8e8 25%, #FF1293 50%, #00d9ff 75%, #8338ec 100%)',
               WebkitBackgroundClip: 'text',
               backgroundClip: 'text',
               color: 'transparent',
-              textShadow: '0 0 60px rgba(255,18,147,0.3)',
-              filter: 'drop-shadow(0 0 30px rgba(255,18,147,0.2))',
+              textShadow: '0 0 60px rgba(212,175,55,0.4)',
+              filter: 'drop-shadow(0 0 30px rgba(212,175,55,0.3))',
+              letterSpacing: '-0.02em',
             }}
           >
             {t.hero.title1}
