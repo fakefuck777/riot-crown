@@ -3,12 +3,12 @@
 export const SITE_NAME = 'RIOT CROWN';
 
 export const SITE_DESCRIPTION =
-  'RIOT CROWN — fine jewelry with a Y2K millennium soul: crystal light, liquid chrome, and clean millennial lines. Small-batch atelier editions; worldwide shipping; checkout in-app.';
+  'RIOT CROWN — Exclusive luxury jewelry collective. Bespoke Y2K-futurist pieces: hand-forged crystal geometries, liquid chrome finishes, and neo-millennial minimalism. Private atelier editions; curated worldwide delivery; members-only access.';
 
 /** Short line for Organization / manifest `description` caps. */
-export const SITE_TAGLINE = 'Y2K millennium jewelry — crystal, chrome, atelier editions.';
+export const SITE_TAGLINE = 'Luxury atelier. Rare geometries. Curated for the discerning.';
 
-export const SITE_TITLE_SUFFIX = 'Y2K Millennium Jewelry · Riot Atelier';
+export const SITE_TITLE_SUFFIX = 'Exclusive Luxury Jewelry · Private Atelier';
 
 /** Default `<title>` for inner pages that do not override. */
 export const SITE_DEFAULT_TITLE = `${SITE_NAME} | ${SITE_TITLE_SUFFIX}`;
@@ -21,14 +21,15 @@ export const PRODUCT_NOT_FOUND_TITLE = `Piece Not Found | ${SITE_NAME}`;
 /** Comma-separated `keywords` meta (lightweight signal; keep honest, non-spammy). */
 export const SITE_KEYWORDS = [
   'RIOT CROWN',
+  'luxury jewelry',
+  'exclusive jewelry',
+  'bespoke jewelry',
   'Y2K jewelry',
-  'millennium jewelry',
-  'chrome jewelry',
   'crystal jewelry',
-  'sterling silver',
-  'gold jewelry',
-  'atelier',
-  'limited edition jewelry',
+  'chrome jewelry',
+  'atelier jewelry',
+  'limited edition',
+  'private collection',
 ].join(', ');
 
 export const OG_IMAGE_PATH = '/og-brand.svg';
