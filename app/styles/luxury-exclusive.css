@@ -45,7 +45,7 @@
 /* ─── HERO TITLE - ULTRA EXCLUSIVE ─── */
 .hero-title-exclusive {
   font-family: var(--font-luxury-display);
-  font-size: clamp(2rem, 5vw, 4rem);
+  font-size: clamp(0.9rem, 2.5vw, 1.4rem);
   font-weight: 900;
   letter-spacing: -0.02em;
   line-height: 1.1;
@@ -65,8 +65,8 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
 
-  filter: drop-shadow(0 0 30px rgba(212, 175, 55, 0.4));
-  animation: exclusive-glow 5s ease-in-out infinite;
+  filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.2));
+  animation: exclusive-glow 4s ease-in-out infinite;
   position: relative;
   z-index: 10;
 }
