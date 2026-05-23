@@ -89,9 +89,14 @@ export function GrainOverlay() {
       for (let i = 0; i < data.length; i += 4) {
         const rand = ((seed + i) * 1664525 + 1013904223) & 0xffffffff;
         const val  = (rand >>> 0) % 255;
-        data[i]     = val;
-        data[i + 1] = val;
-        data[i + 2] = val;
+        // 高级胶片颗粒 - 添加色彩偏移和动态对比度
+        const colorShift = (frameRef.current * 0.3) % 255;
+        const r = Math.min(255, val + (colorShift * 0.08) % 20);
+        const g = Math.min(255, val + (colorShift * 0.12) % 15);
+        const b = Math.min(255, val + (colorShift * 0.15) % 18);
+        data[i]     = r;
+        data[i + 1] = g;
+        data[i + 2] = b;
         data[i + 3] = 255;
       }
 

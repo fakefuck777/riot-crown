@@ -54,18 +54,21 @@ export function PointerLux() {
     >
       <div
         ref={glowRef}
-        className="absolute left-0 top-0 h-[min(58vw,820px)] w-[min(58vw,820px)] rounded-full"
+        className="absolute left-0 top-0 h-[min(68vw,920px)] w-[min(68vw,920px)] rounded-full"
         style={{
           background: `
             radial-gradient(circle closest-side,
-              rgba(192,192,192,0.11) 0%,
-              rgba(255,18,147,0.045) 42%,
-              transparent 78%)
+              rgba(255,255,255,0.15) 0%,
+              rgba(255,18,147,0.08) 28%,
+              rgba(110,203,255,0.06) 52%,
+              rgba(200,255,0,0.03) 68%,
+              transparent 85%)
           `,
-          filter: 'blur(64px)',
+          filter: 'blur(72px)',
           mixBlendMode: 'screen',
           willChange: 'transform',
-          opacity: 0.82,
+          opacity: 0.92,
+          boxShadow: '0 0 120px rgba(255,18,147,0.15), inset 0 0 80px rgba(110,203,255,0.08)',
         }}
       />
     </div>

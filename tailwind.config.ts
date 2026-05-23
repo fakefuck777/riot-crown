@@ -13,7 +13,7 @@ export default {
         titanium:'#F2F2F2',
         gold:    '#C9A84C',
         liquid:  '#D4D4D4',
-        // Y2K 黑暗工业风格
+        // Y2K 黑暗工业风格 - 升级色彩
         'y2k-pink':     '#ff1293',
         'y2k-pink-dark':'#cc0f75',
         'y2k-purple':   '#b366ff',
@@ -29,6 +29,10 @@ export default {
         // 液态金属渐变
         'liquid-metal': '#d4d4d4',
         'liquid-dark':  '#808080',
+        // 新增高级色彩
+        'neon-cyan':    '#00ffff',
+        'neon-magenta': '#ff00ff',
+        'hologram':     '#a0e7e5',
       },
       fontFamily: {
         display: ['var(--font-display)', 'sans-serif'],
@@ -57,9 +61,9 @@ export default {
         '128': '32rem',
       },
       fontSize: {
-        'display-2xl': ['clamp(5rem, 12vw, 14rem)', { lineHeight: '0.88', letterSpacing: '0.02em' }],
-        'display-xl':  ['clamp(3.5rem, 8vw, 9rem)',  { lineHeight: '0.9',  letterSpacing: '0.03em' }],
-        'display-lg':  ['clamp(2.5rem, 5vw, 6rem)',  { lineHeight: '0.92', letterSpacing: '0.04em' }],
+        'display-2xl': ['clamp(4.5rem, 11vw, 12rem)', { lineHeight: '0.88', letterSpacing: '0.02em' }],
+        'display-xl':  ['clamp(3rem, 7vw, 8rem)',  { lineHeight: '0.9',  letterSpacing: '0.03em' }],
+        'display-lg':  ['clamp(2rem, 4.5vw, 5rem)',  { lineHeight: '0.92', letterSpacing: '0.04em' }],
         'label':       ['0.65rem',                   { lineHeight: '1',    letterSpacing: '0.25em' }],
         'data':        ['0.7rem',                    { lineHeight: '1.2',  letterSpacing: '-0.04em' }],
       },
@@ -70,6 +74,7 @@ export default {
         'liquid-metal-gradient': 'linear-gradient(135deg, #e8e8e8 0%, #808080 50%, #e8e8e8 100%)',
         'acid-glow': 'linear-gradient(135deg, #c8ff00 0%, #99ff00 100%)',
         'dark-waste': 'radial-gradient(ellipse at 50% 50%, rgba(255,18,147,0.1) 0%, transparent 70%)',
+        'hologram-gradient': 'linear-gradient(135deg, #a0e7e5 0%, #00ffff 50%, #6ecbff 100%)',
       },
       boxShadow: {
         'neon-pink': '0 0 20px rgba(255, 18, 147, 0.5), 0 0 40px rgba(255, 18, 147, 0.25)',
@@ -78,6 +83,7 @@ export default {
         'neon-acid': '0 0 20px rgba(200, 255, 0, 0.5), 0 0 40px rgba(200, 255, 0, 0.25)',
         'glitch-pink': '3px 3px 0px rgba(255, 18, 147, 0.8), -3px -3px 0px rgba(110, 203, 255, 0.8)',
         'glitch-purple': '2px 2px 0px rgba(179, 102, 255, 0.8), -2px -2px 0px rgba(200, 255, 0, 0.8)',
+        'hologram': '0 0 30px rgba(160, 231, 229, 0.4), inset 0 0 20px rgba(0, 255, 255, 0.1)',
       },
       transitionTimingFunction: {
         'brutal': 'cubic-bezier(0.16, 1, 0.3, 1)',
@@ -91,6 +97,7 @@ export default {
         'float-slow': 'float 8s ease-in-out infinite',
         'shimmer': 'shimmer 3s infinite',
         'waste-rain': 'waste-rain 4s linear infinite',
+        'hologram-pulse': 'hologram-pulse 3s ease-in-out infinite',
       },
       keyframes: {
         'neon-flicker': {
@@ -122,6 +129,10 @@ export default {
           '10%': { opacity: '1' },
           '90%': { opacity: '1' },
           '100%': { transform: 'translateY(100vh)', opacity: '0' },
+        },
+        'hologram-pulse': {
+          '0%, 100%': { opacity: '0.8', transform: 'scale(1)' },
+          '50%': { opacity: '1', transform: 'scale(1.05)' },
         },
       },
     },
