@@ -38,7 +38,6 @@ function PearlNecklaceSceneFallback() {
       }}
     >
       <div style={{ textAlign: 'center' }}>
-        <div style={{ marginBottom: '20px' }}>LOADING LUXURY EXPERIENCE</div>
         <div style={{ fontSize: '12px', opacity: 0.6 }}>
           <div style={{ animation: 'pulse 1.5s infinite' }}>●</div>
         </div>
