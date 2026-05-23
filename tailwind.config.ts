@@ -61,9 +61,9 @@ export default {
         '128': '32rem',
       },
       fontSize: {
-        'display-2xl': ['clamp(4.5rem, 11vw, 12rem)', { lineHeight: '0.88', letterSpacing: '0.02em' }],
-        'display-xl':  ['clamp(3rem, 7vw, 8rem)',  { lineHeight: '0.9',  letterSpacing: '0.03em' }],
-        'display-lg':  ['clamp(2rem, 4.5vw, 5rem)',  { lineHeight: '0.92', letterSpacing: '0.04em' }],
+        'display-2xl': ['clamp(3.5rem, 9vw, 10rem)', { lineHeight: '0.88', letterSpacing: '0.02em' }],
+        'display-xl':  ['clamp(2.5rem, 6vw, 7rem)',  { lineHeight: '0.9',  letterSpacing: '0.03em' }],
+        'display-lg':  ['clamp(1.8rem, 4vw, 4.5rem)',  { lineHeight: '0.92', letterSpacing: '0.04em' }],
         'label':       ['0.65rem',                   { lineHeight: '1',    letterSpacing: '0.25em' }],
         'data':        ['0.7rem',                    { lineHeight: '1.2',  letterSpacing: '-0.04em' }],
       },

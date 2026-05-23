@@ -206,7 +206,7 @@ body {
 /* ─── TYPOGRAPHY ──────────────────────────────────────────────── */
 @layer utilities {
   .text-brutal {
-    font-size: clamp(4.5rem, 13vw, 15rem);
+    font-size: clamp(3.5rem, 9vw, 10rem);
     line-height: 0.85;
     letter-spacing: -0.02em;
     text-transform: uppercase;
@@ -216,7 +216,7 @@ body {
   /* Metallic Chrome Effect for Hero Title */
   .text-brutal-chrome {
     font-family: var(--font-y2k-display), var(--font-display);
-    font-size: clamp(4.5rem, 13vw, 15rem);
+    font-size: clamp(3.5rem, 9vw, 10rem);
     line-height: 0.85;
     letter-spacing: -0.02em;
     text-transform: uppercase;
@@ -628,7 +628,7 @@ a[href],
 }
   @media (max-width: 768px) {
     .text-brutal-chrome {
-      font-size: clamp(2.2rem, 10vw, 3.5rem) !important;
+      font-size: clamp(2rem, 8vw, 3rem) !important;
     }
 
     .cinematic-glow {

@@ -184,28 +184,35 @@ function NecklaceChain() {
 
   const pearlData: PearlProps[] = useMemo(
     () => [
-      // Center - neon pink (main pearl)
-      { position: [0, 0, 0], scale: 1.5, color: '#FF1293', metallic: 0.85, roughness: 0.15, emissiveIntensity: 0.5, isChrome: true },
-      // Gold accents
-      { position: [-2.5, 1.2, 0], scale: 1, color: '#C0C0C0', metallic: 0.95, roughness: 0.08, emissiveIntensity: 0.35 },
-      { position: [2.5, 1.2, 0], scale: 1, color: '#C0C0C0', metallic: 0.95, roughness: 0.08, emissiveIntensity: 0.35 },
-      // Pink sides
-      { position: [-4, -0.5, 0], scale: 0.8, color: '#FF1293', metallic: 0.8, roughness: 0.2, emissiveIntensity: 0.4 },
-      { position: [4, -0.5, 0], scale: 0.8, color: '#FF1293', metallic: 0.8, roughness: 0.2, emissiveIntensity: 0.4 },
-      // Cyan accents
-      { position: [-5.5, -2, 0], scale: 0.7, color: '#6ECBFF', metallic: 0.9, roughness: 0.12, emissiveIntensity: 0.35 },
-      { position: [5.5, -2, 0], scale: 0.7, color: '#6ECBFF', metallic: 0.9, roughness: 0.12, emissiveIntensity: 0.35 },
-      // Purple accents
-      { position: [-6.5, -3.5, 0], scale: 0.6, color: '#B366FF', metallic: 0.85, roughness: 0.15, emissiveIntensity: 0.3 },
-      { position: [6.5, -3.5, 0], scale: 0.6, color: '#B366FF', metallic: 0.85, roughness: 0.15, emissiveIntensity: 0.3 },
-      // Acid green
-      { position: [0, -4.5, 0], scale: 0.5, color: '#C8FF00', metallic: 0.8, roughness: 0.18, emissiveIntensity: 0.25 },
-      // Extra pearls for depth
-      { position: [0, -2, 1.5], scale: 0.9, color: '#FF1293', metallic: 0.8, roughness: 0.2, emissiveIntensity: 0.35 },
-      { position: [0, -2, -1.5], scale: 0.9, color: '#6ECBFF', metallic: 0.85, roughness: 0.18, emissiveIntensity: 0.35 },
-      // Chrome silver
-      { position: [-3, 3, 0.5], scale: 0.7, color: '#E8E8E8', metallic: 0.98, roughness: 0.05, emissiveIntensity: 0.2 },
-      { position: [3, 3, 0.5], scale: 0.7, color: '#E8E8E8', metallic: 0.98, roughness: 0.05, emissiveIntensity: 0.2 },
+      // Center - Premium holographic pearl (main focal point)
+      { position: [0, 0, 0], scale: 1.6, color: '#00D9FF', metallic: 0.92, roughness: 0.08, emissiveIntensity: 0.6, isChrome: true },
+
+      // Tier 1: Iridescent accents (surrounding center)
+      { position: [-2.8, 1.5, 0], scale: 1.1, color: '#FF006E', metallic: 0.88, roughness: 0.12, emissiveIntensity: 0.5 },
+      { position: [2.8, 1.5, 0], scale: 1.1, color: '#8338EC', metallic: 0.88, roughness: 0.12, emissiveIntensity: 0.5 },
+
+      // Tier 2: Gradient transition (mid-range)
+      { position: [-4.2, -0.8, 0], scale: 0.95, color: '#FB5607', metallic: 0.85, roughness: 0.15, emissiveIntensity: 0.45 },
+      { position: [4.2, -0.8, 0], scale: 0.95, color: '#FFBE0B', metallic: 0.85, roughness: 0.15, emissiveIntensity: 0.45 },
+
+      // Tier 3: Deep jewel tones (outer ring)
+      { position: [-5.8, -2.2, 0], scale: 0.8, color: '#3A86FF', metallic: 0.9, roughness: 0.1, emissiveIntensity: 0.4 },
+      { position: [5.8, -2.2, 0], scale: 0.8, color: '#06FFA5', metallic: 0.9, roughness: 0.1, emissiveIntensity: 0.4 },
+
+      // Tier 4: Accent jewels (far outer)
+      { position: [-6.8, -3.8, 0], scale: 0.7, color: '#FF006E', metallic: 0.87, roughness: 0.13, emissiveIntensity: 0.35 },
+      { position: [6.8, -3.8, 0], scale: 0.7, color: '#00D9FF', metallic: 0.87, roughness: 0.13, emissiveIntensity: 0.35 },
+
+      // Bottom accent - Premium white diamond
+      { position: [0, -4.8, 0], scale: 0.6, color: '#F0F0F0', metallic: 0.95, roughness: 0.05, emissiveIntensity: 0.3 },
+
+      // Depth pearls - 3D positioning
+      { position: [0, -2.2, 1.8], scale: 1.0, color: '#8338EC', metallic: 0.86, roughness: 0.14, emissiveIntensity: 0.4 },
+      { position: [0, -2.2, -1.8], scale: 1.0, color: '#FB5607', metallic: 0.86, roughness: 0.14, emissiveIntensity: 0.4 },
+
+      // Top crown jewels - Premium chrome
+      { position: [-3.2, 3.2, 0.6], scale: 0.75, color: '#FFFFFF', metallic: 0.98, roughness: 0.04, emissiveIntensity: 0.25 },
+      { position: [3.2, 3.2, 0.6], scale: 0.75, color: '#E0E0E0', metallic: 0.97, roughness: 0.06, emissiveIntensity: 0.22 },
     ],
     []
   );
@@ -256,11 +263,14 @@ function ParticleSystem() {
 
     const colors = new Float32Array(count * 3);
     const colorChoices = [
-      [1, 0.07, 0.58], // pink
-      [0.43, 0.4, 1], // purple
-      [0.43, 0.8, 1], // cyan
-      [0.78, 1, 0], // acid
-      [0.93, 0.93, 0.93], // chrome silver
+      [0, 0.85, 1], // cyan - premium
+      [1, 0, 0.43], // magenta - premium
+      [0.52, 0.23, 1], // purple - premium
+      [1, 0.38, 0.03], // orange - premium
+      [1, 0.75, 0.05], // gold - premium
+      [0.23, 0.53, 1], // blue - premium
+      [0.02, 1, 0.65], // mint - premium
+      [1, 1, 1], // white - premium
     ];
 
     for (let i = 0; i < count * 3; i += 3) {
