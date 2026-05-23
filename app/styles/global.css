@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import Luxury Exclusive Theme */
+@import './luxury-exclusive.css';
+
 /* ─── MONUMENT EXTENDED ───────────────────────────────────────── */
 /*
   Drop MonumentExtended-Regular.woff2 + MonumentExtended-Ultrabold.woff2

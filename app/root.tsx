@@ -47,6 +47,9 @@ import {
   withLocalePath,
 } from '~/lib/localePath';
 import { buildRootJsonLd } from '~/lib/schemaOrg';
+import { LuxuryParticleSystem } from '~/components/LuxuryParticleSystem';
+import { LuxuryGlowEffects } from '~/components/LuxuryGlowEffects';
+import { LuxuryLoadingScreen } from '~/components/LuxuryLoadingScreen';
 import globalStyles from '~/styles/global.css?url';
 
 function SyncDocumentLang() {
@@ -156,6 +159,9 @@ function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
+      <LuxuryLoadingScreen />
+      <LuxuryGlowEffects />
+      <LuxuryParticleSystem />
       <GrainOverlay />
       <PointerLux />
       <GhostNav onCartOpen={openCart} cartCount={cartPieceCount} />
