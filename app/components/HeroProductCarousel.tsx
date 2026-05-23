@@ -102,25 +102,6 @@ export function HeroProductCarousel({ products }: HeroProductCarouselProps) {
           >
             ✦ {t.product.featured} ✦
           </p>
-          <h2
-            className="font-y2k"
-            style={{
-              fontWeight: 900,
-              fontSize: 'clamp(2.5rem, 5.5vw, 4rem)',
-              letterSpacing: '0.06em',
-              color: '#F2F2F2',
-              textTransform: 'uppercase',
-              marginBottom: '1.5rem',
-              background: 'linear-gradient(135deg, #FF1293 0%, #C0C0C0 50%, #F2F2F2 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-              textShadow: '0 0 60px rgba(255,18,147,0.2)',
-              filter: 'drop-shadow(0 0 30px rgba(255,18,147,0.25))',
-            }}
-          >
-            {t.product.shopNow}
-          </h2>
           <p
             className="font-editorial"
             style={{
