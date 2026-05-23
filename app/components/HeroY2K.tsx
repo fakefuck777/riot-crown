@@ -35,24 +35,24 @@ function Pearl({ position, scale, color, metallic, roughness, emissiveIntensity 
 
   return (
     <group position={position}>
-      <mesh ref={meshRef} scale={scale} castShadow={true} receiveShadow={true}>
-        <sphereGeometry args={[1, 64, 64]} />
+      <mesh ref={meshRef} scale={scale} castShadow={false} receiveShadow={false}>
+        <sphereGeometry args={[1, 24, 24]} />
         <meshStandardMaterial
           color={color}
           metalness={metallic}
           roughness={roughness}
           emissive={color}
           emissiveIntensity={emissiveIntensity}
-          envMapIntensity={1.2}
+          envMapIntensity={1.0}
         />
       </mesh>
       <pointLight
         ref={lightRef}
-        intensity={1}
-        distance={12}
+        intensity={0.5}
+        distance={10}
         color={color}
         decay={2}
-        castShadow={true}
+        castShadow={false}
       />
     </group>
   );
@@ -235,7 +235,7 @@ export function HeroY2K() {
     return (
       <section className="relative w-full h-screen min-h-dvh bg-void overflow-hidden flex items-center justify-center">
         <div className="text-center px-8">
-          <h1 className="text-6xl md:text-8xl font-black uppercase tracking-tighter mb-4" style={{ color: '#FF1293' }}>
+          <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tighter mb-4" style={{ color: '#FF1293' }}>
             RIOT CROWN
           </h1>
           <p className="text-lg md:text-2xl font-mono tracking-widest uppercase mb-8" style={{ color: '#6ECBFF' }}>
@@ -290,7 +290,7 @@ export function HeroY2K() {
           </p>
 
           <h1
-            className="text-5xl md:text-8xl font-black uppercase tracking-tighter mb-4 leading-none"
+            className="text-3xl md:text-5xl font-black uppercase tracking-tighter mb-4 leading-none"
             style={{
               background: 'linear-gradient(135deg, #FF1293 0%, #C0C0C0 50%, #6ECBFF 100%)',
               WebkitBackgroundClip: 'text',
